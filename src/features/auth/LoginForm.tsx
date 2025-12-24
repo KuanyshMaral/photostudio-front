@@ -1,0 +1,75 @@
+import { useState } from "react";
+import { mockLogin } from "./auth.api";
+import { useAuth } from "../../context/AuthContext";
+
+export default function LoginForm() {
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const res = await mockLogin(email, password);
+      login(res.token);
+    } catch (err) {
+      setError("Login failed. Check credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="auth-container">
+      <div className="auth-card">
+        <header className="auth-header">
+          <div className="auth-logo">MWork PhotoStudio</div>
+          <h2 className="auth-title">Welcome Back</h2>
+          <p className="auth-sub">Sign in to continue to your account</p>
+        </header>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="auth-label">
+            <span className="visually-hidden">Email</span>
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+
+          <label className="auth-label">
+            <span className="visually-hidden">Password</span>
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+
+          <button className="auth-button" type="submit" disabled={loading}>
+            {loading ? "Signing in..." : "Sign in"}
+          </button>
+
+          {error && <p className="auth-error">{error}</p>}
+        </form>
+
+        <footer className="auth-footer">
+          <small>Don’t have an account? Contact admin to create one.</small>
+        </footer>
+      </div>
+    </div>
+  );
+}
