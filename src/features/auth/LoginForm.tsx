@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { mockLogin } from "./auth.api";
+import { Link } from "react-router-dom";
+import { login } from "./auth.api";
+import type { LoginRequest } from "./auth.types";
 import { useAuth } from "../../context/AuthContext";
 
 export default function LoginForm() {
-  const { login } = useAuth();
+  const { login: authLogin } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,10 +18,11 @@ export default function LoginForm() {
     setLoading(true);
 
     try {
-      const res = await mockLogin(email, password);
-      login(res.token);
+      const data: LoginRequest = { email, password };
+      const res = await login(data);
+      authLogin(res.token);
     } catch (err) {
-      setError("Login failed. Check credentials.");
+      setError(err instanceof Error ? err.message : "Login failed. Check credentials.");
     } finally {
       setLoading(false);
     }
@@ -67,7 +70,7 @@ export default function LoginForm() {
         </form>
 
         <footer className="auth-footer">
-          <small>Don’t have an account? Contact admin to create one.</small>
+          <small>Don’t have an account? <Link to="/register">Sign up</Link></small>
         </footer>
       </div>
     </div>
