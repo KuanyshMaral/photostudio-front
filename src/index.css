@@ -140,6 +140,10 @@ button:focus-visible {
   border-color: var(--accent);
 }
 
+.auth-input[type="file"] {
+  padding: 0.5rem;
+}
+
 .auth-button {
   background: var(--accent);
   color: white;
@@ -169,6 +173,97 @@ button:focus-visible {
 .auth-footer {
   text-align: center;
   margin-top: 2rem;
+}
+
+.auth-footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth-footer-links small {
+  display: block;
+}
+
+/* Multi-step form styles */
+.step-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.step-indicator {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ddd;
+  color: #666;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.step-indicator.active {
+  background-color: var(--accent);
+  color: white;
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.step-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.auth-button-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.25s;
+  flex: 1;
+}
+
+.auth-button-secondary:hover {
+  background: #5a6268;
+}
+
+.document-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.document-list h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.document-list ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.document-list li {
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
 .auth-footer a {
