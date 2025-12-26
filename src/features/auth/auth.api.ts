@@ -1,4 +1,4 @@
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, ApiError } from './auth.types';
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StudioRegisterRequest, Profile, ApiError } from './auth.types';
 
 const API_BASE = '/api'; // Adjust if needed
 
@@ -32,6 +32,48 @@ export async function register(data: RegisterRequest): Promise<RegisterResponse>
   if (!response.ok) {
     const error: ApiError = await response.json();
     throw new Error(error.message || 'Registration failed');
+  }
+
+  return response.json();
+}
+
+export async function registerStudio(data: StudioRegisterRequest, token?: string): Promise<RegisterResponse> {
+  const formData = new FormData();
+  formData.append('email', data.email);
+  formData.append('password', data.password);
+  formData.append('companyName', data.companyName);
+  formData.append('bin', data.bin);
+  formData.append('address', data.address);
+  formData.append('contactPerson', data.contactPerson);
+  data.documents.forEach((file, index) => {
+    formData.append(`documents[${index}]`, file);
+  });
+
+  const response = await fetch(`${API_BASE}/auth/register/studio`, {
+    method: 'POST',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Studio registration failed');
+  }
+
+  return response.json();
+}
+
+export async function getProfile(token: string): Promise<Profile> {
+  const response = await fetch(`${API_BASE}/profile`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Failed to fetch profile');
   }
 
   return response.json();
