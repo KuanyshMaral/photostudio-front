@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import BookingForm from "./features/booking/BookingForm";
 import AvailabilityCalendar from "./features/booking/AvailabilityCalendar";
 import MyBookings from "./features/booking/MyBookings..tsx";
+import ReviewForm from "./features/booking/ReviewForm";
+import ReviewList from "./features/booking/ReviewList";
 import "./index.css";
 
 function App() {
-  const [currentView, setCurrentView] = useState<'form' | 'calendar' | 'mybookings'>('form');
+  const [currentView, setCurrentView] = useState<'form' | 'calendar' | 'mybookings' | 'review' | 'reviews'>('form');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -16,7 +18,7 @@ function App() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                Room Booking System
+                PhotoStudio
               </h1>
             </div>
             <div className="flex space-x-4">
@@ -50,6 +52,26 @@ function App() {
               >
                 My Bookings
               </button>
+              <button
+                onClick={() => setCurrentView('review')}
+                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                  currentView === 'review'
+                    ? 'bg-amber-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Write Review
+              </button>
+              <button
+                onClick={() => setCurrentView('reviews')}
+                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                  currentView === 'reviews'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                View Reviews
+              </button>
             </div>
           </div>
         </div>
@@ -63,8 +85,12 @@ function App() {
             roomId={selectedRoom || 'demo-room'} 
             selectedDate={selectedDate} 
           />
-        ) : (
+        ) : currentView === 'mybookings' ? (
           <MyBookings />
+        ) : currentView === 'review' ? (
+          <ReviewForm />
+        ) : (
+          <ReviewList roomId={selectedRoom || 'demo-room'} roomName="Demo Room" />
         )}
       </main>
     </div>
