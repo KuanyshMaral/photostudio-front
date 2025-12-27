@@ -33,6 +33,7 @@ export type StudioRegisterRequest = {
 export type Profile = {
   name: string;
   email: string;
+  phone: string;
   role: string;
   companyName?: string;
   bin?: string;

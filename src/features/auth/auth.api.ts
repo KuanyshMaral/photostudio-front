@@ -78,3 +78,43 @@ export async function getProfile(token: string): Promise<Profile> {
 
   return response.json();
 }
+
+export async function updateProfile(token: string, data: Partial<Pick<Profile, 'name' | 'phone'>>): Promise<Profile> {
+  const response = await fetch(`${API_BASE}/profile`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Failed to update profile');
+  }
+
+  return response.json();
+}
+
+export async function uploadFiles(token: string, files: File[]): Promise<{ message: string }> {
+  const formData = new FormData();
+  files.forEach((file, index) => {
+    formData.append(`files[${index}]`, file);
+  });
+
+  const response = await fetch(`${API_BASE}/upload`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error: ApiError = await response.json();
+    throw new Error(error.message || 'Upload failed');
+  }
+
+  return response.json();
+}
