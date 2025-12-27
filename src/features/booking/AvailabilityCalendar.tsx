@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react";
-
-interface TimeSlot {
-  hour: number;
-  available: boolean;
-  booking?: {
-    id: number;
-    start_time: string;
-    end_time: string;
-  };
-}
+import { getRoomAvailability } from "../../api/availabilityApi";
+import type { TimeSlot } from "../../api/availabilityApi";
 
 interface AvailabilityCalendarProps {
   roomId: string;
@@ -28,23 +20,10 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({ roomId, sel
       setError(null);
       
       try {
-        // Mock API call - replace with actual API when backend is ready
-        // const response = await axios.get(`/rooms/${roomId}/availability?date=${selectedDate.toISOString()}`);
-        
-        // Mock data for demonstration
-        const mockSlots: TimeSlot[] = Array.from({ length: 24 }, (_, hour) => ({
-          hour,
-          available: hour % 3 !== 0, // Every 3rd hour is booked
-          booking: hour % 3 === 0 ? {
-            id: Math.floor(Math.random() * 1000),
-            start_time: `${hour.toString().padStart(2, '0')}:00`,
-            end_time: `${(hour + 1).toString().padStart(2, '0')}:00`
-          } : undefined
-        }));
-        
-        setTimeSlots(mockSlots);
+        const slots = await getRoomAvailability(roomId, selectedDate);
+        setTimeSlots(slots);
       } catch (err) {
-        setError("Failed to fetch availability");
+        setError(err instanceof Error ? err.message : "Failed to fetch availability");
       } finally {
         setLoading(false);
       }
