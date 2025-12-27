@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import BookingForm from "./features/booking/BookingForm";
 import AvailabilityCalendar from "./features/booking/AvailabilityCalendar";
+import MyBookings from "./features/booking/MyBookings..tsx";
 import "./index.css";
 
 function App() {
-  const [currentView, setCurrentView] = useState<'form' | 'calendar'>('form');
+  const [currentView, setCurrentView] = useState<'form' | 'calendar' | 'mybookings'>('form');
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -39,6 +40,16 @@ function App() {
               >
                 View Availability
               </button>
+              <button
+                onClick={() => setCurrentView('mybookings')}
+                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                  currentView === 'mybookings'
+                    ? 'bg-teal-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                My Bookings
+              </button>
             </div>
           </div>
         </div>
@@ -47,11 +58,13 @@ function App() {
       <main className="py-8">
         {currentView === 'form' ? (
           <BookingForm />
-        ) : (
+        ) : currentView === 'calendar' ? (
           <AvailabilityCalendar 
             roomId={selectedRoom || 'demo-room'} 
             selectedDate={selectedDate} 
           />
+        ) : (
+          <MyBookings />
         )}
       </main>
     </div>
