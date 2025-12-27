@@ -21,57 +21,59 @@ function App() {
                 PhotoStudio
               </h1>
             </div>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setCurrentView('form')}
-                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
-                  currentView === 'form'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Book Room
-              </button>
-              <button
-                onClick={() => setCurrentView('calendar')}
-                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
-                  currentView === 'calendar'
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                View Availability
-              </button>
-              <button
-                onClick={() => setCurrentView('mybookings')}
-                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
-                  currentView === 'mybookings'
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                My Bookings
-              </button>
-              <button
-                onClick={() => setCurrentView('review')}
-                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
-                  currentView === 'review'
-                    ? 'bg-amber-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                Write Review
-              </button>
-              <button
-                onClick={() => setCurrentView('reviews')}
-                className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
-                  currentView === 'reviews'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                View Reviews
-              </button>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:space-x-4 space-y-4 sm:space-y-0">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setCurrentView('form')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition duration-200 ${
+                    currentView === 'form'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Book Room
+                </button>
+                <button
+                  onClick={() => setCurrentView('calendar')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition duration-200 ${
+                    currentView === 'calendar'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Availability
+                </button>
+                <button
+                  onClick={() => setCurrentView('mybookings')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition duration-200 ${
+                    currentView === 'mybookings'
+                      ? 'bg-teal-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  My Bookings
+                </button>
+                <button
+                  onClick={() => setCurrentView('review')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition duration-200 ${
+                    currentView === 'review'
+                      ? 'bg-amber-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Write Review
+                </button>
+                <button
+                  onClick={() => setCurrentView('reviews')}
+                  className={`px-3 py-2 rounded-lg font-medium text-sm transition duration-200 ${
+                    currentView === 'reviews'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Reviews
+                </button>
+              </div>
             </div>
           </div>
         </div>

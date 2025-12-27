@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { createBooking } from "../../api/bookingApi";
+import LoadingSpinner from "../../components/LoadingSpinner";
+import ErrorMessage from "../../components/ErrorMessage";
 import type { BookingData } from "../../api/bookingApi"; // только тип
-import { createBooking } from "../../api/bookingApi";    // реальный экспорт функции
 
 const BookingForm: React.FC = () => {
   const [roomId, setRoomId] = useState("");
@@ -10,6 +12,7 @@ const BookingForm: React.FC = () => {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validateForm = (): string[] => {
     const newErrors: string[] = [];
@@ -43,7 +46,9 @@ const BookingForm: React.FC = () => {
       return;
     }
     
-    setMessage("Sending...");
+    setIsSubmitting(true);
+    setMessage("");
+    
     const data: BookingData = { 
       room_id: roomId, 
       start_time: startTime!.toISOString(), 
@@ -53,8 +58,14 @@ const BookingForm: React.FC = () => {
     try {
       const result = await createBooking(data);
       setMessage(`Booking created! ID: ${result.booking.id}, Status: ${result.booking.status}`);
-    } catch {
-      setMessage("Failed to create booking");
+      // Reset form on success
+      setRoomId("");
+      setStartTime(null);
+      setEndTime(null);
+    } catch (error) {
+      setMessage("Failed to create booking. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -78,7 +89,8 @@ const BookingForm: React.FC = () => {
                   placeholder="Enter room identifier"
                   value={roomId}
                   onChange={(e) => setRoomId(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
               
@@ -91,7 +103,8 @@ const BookingForm: React.FC = () => {
                   onChange={setStartTime}
                   showTimeSelect
                   dateFormat="MMMM d, yyyy h:mm aa"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholderText="Select start time"
                 />
               </div>
@@ -105,34 +118,40 @@ const BookingForm: React.FC = () => {
                   onChange={setEndTime}
                   showTimeSelect
                   dateFormat="MMMM d, yyyy h:mm aa"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400"
+                  disabled={isSubmitting}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholderText="Select end time"
                 />
               </div>
               
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] transition duration-200 shadow-lg"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transform hover:scale-[1.02] transition duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Book Room
+                {isSubmitting ? (
+                  <LoadingSpinner size="sm" color="white" text="Booking..." />
+                ) : (
+                  "Book Room"
+                )}
               </button>
             </form>
             
             {errors.length > 0 && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                {errors.map((error, index) => (
-                  <p key={index} className="text-red-700 text-sm">{error}</p>
-                ))}
-              </div>
+              <ErrorMessage 
+                message={errors.join('. ')} 
+                onDismiss={() => setErrors([])}
+                type="error"
+              />
             )}
             
             {message && (
-              <div className={`mt-4 p-3 rounded-lg border ${
+              <div className={`mt-4 p-4 rounded-lg border ${
                 message.includes('created') 
                   ? 'bg-green-50 border-green-200 text-green-700' 
-                  : 'bg-yellow-50 border-yellow-200 text-yellow-700'
+                  : 'bg-red-50 border-red-200 text-red-700'
               }`}>
-                {message}
+                <p className="text-sm font-medium">{message}</p>
               </div>
             )}
           </div>
