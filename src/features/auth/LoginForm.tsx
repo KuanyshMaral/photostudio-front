@@ -1,28 +1,30 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import toast from 'react-hot-toast';
 import { login } from "./auth.api";
 import type { LoginRequest } from "./auth.types";
 import { useAuth } from "../../context/AuthContext";
 
 export default function LoginForm() {
   const { login: authLogin } = useAuth();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
 
     try {
       const data: LoginRequest = { email, password };
       const res = await login(data);
       authLogin(res.token);
+      toast.success('Login successful!');
+      navigate('/profile');
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed. Check credentials.");
+      toast.error(err instanceof Error ? err.message : "Login failed. Check credentials.");
     } finally {
       setLoading(false);
     }
@@ -65,8 +67,6 @@ export default function LoginForm() {
           <button className="auth-button" type="submit" disabled={loading}>
             {loading ? "Signing in..." : "Sign in"}
           </button>
-
-          {error && <p className="auth-error">{error}</p>}
         </form>
 
         <footer className="auth-footer">

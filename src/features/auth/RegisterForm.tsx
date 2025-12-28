@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { register as registerApi } from './auth.api';
 import type { RegisterRequest } from './auth.types';
 
@@ -9,18 +10,16 @@ export default function RegisterForm() {
     defaultValues: { role: 'client' }
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterRequest) => {
-    setError(null);
     setLoading(true);
     try {
       await registerApi(data);
-      // On success, redirect to login
+      toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      toast.error(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -95,8 +94,6 @@ export default function RegisterForm() {
           <button className="auth-button" type="submit" disabled={loading}>
             {loading ? 'Registering...' : 'Register'}
           </button>
-
-          {error && <p className="auth-error">{error}</p>}
         </form>
 
         <footer className="auth-footer">

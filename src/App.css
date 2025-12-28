@@ -84,3 +84,28 @@
 .dashboard-title { margin:0.6rem 0 0; font-size:2rem; }
 .dashboard-sub { margin-top:0.5rem; color:var(--muted); }
 .token { background: rgba(0,0,0,0.05); padding:0.18rem 0.5rem; border-radius:8px; font-family:monospace; color:var(--text); }
+
+/* Loading skeletons */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.1) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-title {
+  height: 2rem;
+  width: 60%;
+  margin: 0 auto 1rem;
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 80%;
+  margin: 0.5rem auto;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

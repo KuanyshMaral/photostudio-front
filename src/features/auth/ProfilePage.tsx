@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { getProfile, uploadFiles } from './auth.api';
 import { useAuth } from '../../context/AuthContext';
 import type { Profile } from './auth.types';
@@ -9,16 +10,16 @@ const ProfilePage: React.FC = () => {
   const { token } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (token) {
       getProfile(token)
         .then(setProfile)
-        .catch((err) => setError(err.message))
+        .catch((err) => {
+          toast.error('Failed to load profile: ' + err.message);
+        })
         .finally(() => setLoading(false));
     }
   }, [token]);
@@ -32,21 +33,37 @@ const ProfilePage: React.FC = () => {
     if (!token || files.length === 0) return;
 
     setUploading(true);
-    setUploadError(null);
 
     try {
       await uploadFiles(token, files);
-      // Optionally refresh profile or show success
+      toast.success('Files uploaded successfully!');
+      // Optionally refresh profile
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+      toast.error(err instanceof Error ? err.message : 'Upload failed');
     } finally {
       setUploading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!profile) return <div>No profile data</div>;
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="profile-loading">
+          <div className="skeleton skeleton-title"></div>
+          <div className="skeleton skeleton-text"></div>
+          <div className="skeleton skeleton-text"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <div className="profile-container">
+        <p>No profile data available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto mt-10">
@@ -110,7 +127,6 @@ const ProfilePage: React.FC = () => {
         <div>
           <h3 className="text-lg font-medium mb-2">Upload Files</h3>
           <FileUpload onFilesSelected={handleFilesSelected} isUploading={uploading} />
-          {uploadError && <p className="mt-2 text-sm text-red-600">{uploadError}</p>}
         </div>
       </div>
     </div>
