@@ -13,6 +13,7 @@ function App() {
       <Toaster position="top-right" />
       <Router>
         <Routes>
+          {/* Auth routes */}
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/studio-register" element={<StudioRegistrationForm />} />
@@ -21,6 +22,8 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           } />
+
+          {/* Dashboard */}
           <Route path="/" element={
             <ProtectedRoute>
               <Dashboard />
