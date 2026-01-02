@@ -1,8 +1,9 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { StudioList } from './features/catalog/pages/StudioList'
-import './index.css'
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./app";
+import { AuthProvider } from "./context/AuthContext";
+import "./index.css"; // твой Tailwind
+ import "./App.css"; // если нужны старые стили друга
 
 const queryClient = new QueryClient()
 

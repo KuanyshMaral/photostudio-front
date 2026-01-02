@@ -1,4 +1,6 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
+
+/* eslint-disable react-refresh/only-export-components */
 
 type AuthContextType = {
   token: string | null;
@@ -9,14 +11,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (savedToken) {
-      setToken(savedToken);
-    }
-  }, []);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
 
   const login = (token: string) => {
     setToken(token);

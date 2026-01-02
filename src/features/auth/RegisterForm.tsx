@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { register as registerApi } from './auth.api';
 import type { RegisterRequest } from './auth.types';
 
 export default function RegisterForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>();
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>({
+    defaultValues: { role: 'client' }
+  });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterRequest) => {
-    setError(null);
     setLoading(true);
     try {
       await registerApi(data);
-      // On success, redirect to login
+      toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed');
+      toast.error(err instanceof Error ? err.message : 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -29,31 +30,11 @@ export default function RegisterForm() {
       <div className="auth-card">
         <header className="auth-header">
           <div className="auth-logo">MWork PhotoStudio</div>
-          <h2 className="auth-title">Create Account</h2>
+          <h2 className="auth-title">Create Client Account</h2>
           <p className="auth-sub">Sign up to get started</p>
         </header>
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
-          <div className="role-selection">
-            <label>
-              <input
-                type="radio"
-                value="client"
-                {...register('role', { required: 'Role is required' })}
-              />
-              Client
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="studio_owner"
-                {...register('role', { required: 'Role is required' })}
-              />
-              Studio Owner
-            </label>
-            {errors.role && <p className="auth-error">{errors.role.message}</p>}
-          </div>
-
           <label className="auth-label">
             <span className="visually-hidden">Name</span>
             <input
@@ -100,7 +81,7 @@ export default function RegisterForm() {
               type="password"
               placeholder="Password"
               {...register('password', {
-                required: 'Password is required',
+                required: 'Password must be at least 6 characters',
                 minLength: {
                   value: 6,
                   message: 'Password must be at least 6 characters'
@@ -113,12 +94,13 @@ export default function RegisterForm() {
           <button className="auth-button" type="submit" disabled={loading}>
             {loading ? 'Registering...' : 'Register'}
           </button>
-
-          {error && <p className="auth-error">{error}</p>}
         </form>
 
         <footer className="auth-footer">
-          <small>Already have an account? <Link to="/login">Sign in</Link></small>
+          <div className="auth-footer-links">
+            <small>Already have an account? <Link to="/login">Sign in</Link></small>
+            <small>Are you a Studio Owner? <Link to="/studio-register">Register as Studio</Link></small>
+          </div>
         </footer>
       </div>
     </div>
