@@ -5,8 +5,11 @@ import { createBooking } from "../../api/bookingApi";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage";
 import type { BookingData } from "../../api/bookingApi"; // только тип
+import { useAuth } from "../../context/AuthContext";
+import toast from 'react-hot-toast';
 
 const BookingForm: React.FC = () => {
+  const { token } = useAuth();
   const [roomId, setRoomId] = useState("");
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
@@ -17,8 +20,8 @@ const BookingForm: React.FC = () => {
   const validateForm = (): string[] => {
     const newErrors: string[] = [];
     
-    if (!roomId.trim()) {
-      newErrors.push("Room ID is required");
+    if (!roomId.trim() || isNaN(Number(roomId))) {
+      newErrors.push("Room ID must be a valid number");
     }
     
     if (!startTime) {
@@ -39,6 +42,11 @@ const BookingForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!token) {
+      toast.error("You must be logged in to create a booking");
+      return;
+    }
+    
     const formErrors = validateForm();
     setErrors(formErrors);
     
@@ -50,20 +58,21 @@ const BookingForm: React.FC = () => {
     setMessage("");
     
     const data: BookingData = { 
-      room_id: roomId, 
+      room_id: Number(roomId), 
       start_time: startTime!.toISOString(), 
       end_time: endTime!.toISOString() 
     };
 
     try {
-      const result = await createBooking(data);
-      setMessage(`Booking created! ID: ${result.booking.id}, Status: ${result.booking.status}`);
+      const result = await createBooking(data, token);
+      toast.success("Booking created successfully!");
       // Reset form on success
       setRoomId("");
       setStartTime(null);
       setEndTime(null);
     } catch (error) {
-      setMessage("Failed to create booking. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to create booking. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -143,16 +152,6 @@ const BookingForm: React.FC = () => {
                 onDismiss={() => setErrors([])}
                 type="error"
               />
-            )}
-            
-            {message && (
-              <div className={`mt-4 p-4 rounded-lg border ${
-                message.includes('created') 
-                  ? 'bg-green-50 border-green-200 text-green-700' 
-                  : 'bg-red-50 border-red-200 text-red-700'
-              }`}>
-                <p className="text-sm font-medium">{message}</p>
-              </div>
             )}
           </div>
         </div>

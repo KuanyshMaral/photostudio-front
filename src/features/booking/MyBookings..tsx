@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { getUserBookings, cancelBooking } from "../../api/myBookingsApi";
+import { getMyBookings, cancelBooking } from "../../api/bookingApi";
 import type { Booking } from "../../api/myBookingsApi";
+import { useAuth } from "../../context/AuthContext";
+import toast from 'react-hot-toast';
 
 const MyBookings: React.FC = () => {
+  const { token } = useAuth();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -10,34 +13,46 @@ const MyBookings: React.FC = () => {
 
   useEffect(() => {
     const fetchBookings = async () => {
+      if (!token) return;
+      
       setLoading(true);
       setError(null);
       
       try {
-        const data = statusFilter === 'all' 
-          ? await getUserBookings()
-          : await getUserBookings(statusFilter);
+        const data = await getMyBookings(token);
         setBookings(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch bookings");
+        const errorMessage = err instanceof Error ? err.message : "Failed to fetch bookings";
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
     };
 
     fetchBookings();
-  }, [statusFilter]);
+  }, [token]);
+
+  const filteredBookings = statusFilter === 'all' 
+    ? bookings 
+    : bookings.filter(booking => booking.status === statusFilter);
 
   const handleCancelBooking = async (bookingId: number) => {
+    if (!token) {
+      toast.error("You must be logged in");
+      return;
+    }
+    
     try {
-      await cancelBooking(bookingId);
+      await cancelBooking(bookingId, token);
+      toast.success("Booking cancelled successfully");
       // Refresh bookings after cancellation
-      const data = statusFilter === 'all' 
-        ? await getUserBookings()
-        : await getUserBookings(statusFilter);
+      const data = await getMyBookings(token);
       setBookings(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to cancel booking");
+      const errorMessage = err instanceof Error ? err.message : "Failed to cancel booking";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -148,13 +163,13 @@ const MyBookings: React.FC = () => {
             )}
 
             {/* Bookings List */}
-            {bookings.length === 0 ? (
+            {filteredBookings.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-lg">No bookings found</div>
               </div>
             ) : (
               <div className="space-y-4">
-                {bookings.map((booking) => (
+                {filteredBookings.map((booking) => (
                   <div
                     key={booking.id}
                     className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
