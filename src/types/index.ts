@@ -82,3 +82,28 @@ export interface StudioDetailResponse {
     rooms: Room[];
   };
 }
+
+// Added types
+export interface Booking {
+    id: number;
+    room_id: number;
+    studio_id: number;
+    start_time: string;
+    end_time: string;
+    total_price: number;
+    status: BookingStatus;
+    payment_status: PaymentStatus;
+}
+
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
+
+export interface Review {
+    id: number;
+    studio_id: number;
+    user_id: number;
+    rating: number;
+    comment?: string;
+    owner_response?: string;
+    created_at: string;
+}

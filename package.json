@@ -16,6 +16,7 @@
     "@tanstack/react-query": "^5.90.16",
     "@types/react-datepicker": "^6.2.0",
     "axios": "^1.13.2",
+    "express": "^5.2.1",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-datepicker": "^9.1.0",
@@ -41,5 +42,21 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4"
-  }
+  },
+  "description": "Фронтенд для платформы бронирования фотостудий.",
+  "main": "eslint.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KuanyshMaral/photostudio-front.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KuanyshMaral/photostudio-front/issues"
+  },
+  "homepage": "https://github.com/KuanyshMaral/photostudio-front#readme"
 }

@@ -6,6 +6,7 @@ import StudioRegistrationForm from "./features/auth/StudioRegistrationForm";
 import ProfilePage from "./features/auth/ProfilePage";
 import Dashboard from "./features/auth/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { StudioDetail } from "./features/catalog/pages/StudioDetail";
 
 function App() {
   return (
@@ -23,6 +24,13 @@ function App() {
             </ProtectedRoute>
           } />
 
+          {/* Catalog routes */}
+          <Route path="/studios/:id" element={
+            <ProtectedRoute>
+               <StudioDetail />
+            </ProtectedRoute>
+          } />
+
           {/* Dashboard */}
           <Route path="/" element={
             <ProtectedRoute>
@@ -35,4 +43,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
