@@ -5,6 +5,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
   token: string;
+  user: Profile;
 };
 
 export type RegisterRequest = {
@@ -17,7 +18,6 @@ export type RegisterRequest = {
 
 export type RegisterResponse = {
   message: string;
-  // Assuming success response has a message
 };
 
 export type StudioRegisterRequest = {
@@ -31,6 +31,7 @@ export type StudioRegisterRequest = {
 };
 
 export type Profile = {
+  id: number;
   name: string;
   email: string;
   phone: string;
@@ -43,4 +44,7 @@ export type Profile = {
 
 export type ApiError = {
   message: string;
+  error?: {
+    message: string;
+  };
 };
