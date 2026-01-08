@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿import React, { useState } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> f83ef12af8aefd8823700639a335fa134678d5bf
 import { useQuery } from '@tanstack/react-query';
 import { getStudios } from '../api/studios';
 import { StudioCard } from '../components/StudioCard';
