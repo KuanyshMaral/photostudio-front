@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getStudioById } from '../api/studios';
 import { RoomCard } from '../components/RoomCard';
+import { ReviewList } from '../../reviews/ReviewList';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 
 export const StudioDetail: React.FC = () => {
@@ -35,7 +36,7 @@ export const StudioDetail: React.FC = () => {
             </div>
 
             <h2 className="text-2xl font-semibold mb-6">Комнаты</h2>
-            <div className="rooms-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="rooms-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
                 {data.rooms?.map(room => (
                     <RoomCard 
                         key={room.id} 
@@ -45,6 +46,8 @@ export const StudioDetail: React.FC = () => {
                     />
                 ))}
             </div>
+
+            <ReviewList studioId={data.studio.id} />
         </div>
     );
 };
