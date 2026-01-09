@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { createReview } from '../../api/reviewApi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 import { StarRating } from './StarRating';
 
 interface ReviewFormProps {

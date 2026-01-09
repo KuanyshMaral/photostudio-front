@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getMyBookings, cancelBooking } from "../../api/bookingApi";
 import type { Booking } from "../../api/myBookingsApi";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.tsx";
 import toast from 'react-hot-toast';
 
 const MyBookings: React.FC = () => {

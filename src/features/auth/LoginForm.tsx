@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import { login } from "./auth.api";
 import type { LoginRequest } from "./auth.types";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.tsx";
 
 export default function LoginForm() {
   const { login: authLogin } = useAuth();

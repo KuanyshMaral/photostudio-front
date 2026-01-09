@@ -5,7 +5,7 @@ import { createBooking } from "../../api/bookingApi";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage";
 import type { BookingData } from "../../api/bookingApi"; // только тип
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext.tsx";
 import toast from 'react-hot-toast';
 
 const BookingForm: React.FC = () => {

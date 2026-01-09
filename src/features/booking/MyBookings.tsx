@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import { toast } from 'react-hot-toast';
 
 import { getMyBookings, cancelBooking as cancelBookingApi } from '../../api/bookingApi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 import type { Booking } from '../../types/booking';
 
 const statusFilters = ['ALL', 'PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'] as const;

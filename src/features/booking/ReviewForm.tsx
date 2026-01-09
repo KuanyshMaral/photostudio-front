@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import StarRating from "../../components/StarRating";
 import { createReview } from "../../api/reviewApi";
 import type { CreateReviewRequest } from "../../api/reviewApi";
-import { useAuth } from "../../context/AuthContext"; 
+import { useAuth } from "../../context/AuthContext.tsx"; 
 
 interface ReviewFormProps {
   bookingId?: number;

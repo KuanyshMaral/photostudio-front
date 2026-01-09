@@ -6,7 +6,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import { createBooking } from '../../api/bookingApi';
 import { getRoomAvailability } from '../../api/availabilityApi';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.tsx';
 import type { TimeSlot } from '../../types/booking';
 import TimeSlotPicker from './TimeSlotPicker';
 
