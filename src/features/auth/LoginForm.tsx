@@ -19,8 +19,11 @@ export default function LoginForm() {
 
     try {
       const data: LoginRequest = { email, password };
+      console.log('Attempting login with:', data);
       const res = await login(data);
-      authLogin(res.token);
+      console.log('Login response:', res);
+      authLogin(res.token, res.user as any);
+      console.log('After authLogin - user should be saved');
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err) {
