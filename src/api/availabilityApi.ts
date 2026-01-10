@@ -1,4 +1,4 @@
-import axios from 'axios';
+const API_BASE = 'http://localhost:3001/api/v1';
 
 export interface TimeSlot {
   hour: number;
@@ -9,8 +9,6 @@ export interface TimeSlot {
     end_time: string;
   };
 }
-
-const API_BASE = '/api/v1';
 
 export const getRoomAvailability = async (roomId: number, date: string): Promise<TimeSlot[]> => {
     const response = await fetch(`${API_BASE}/rooms/${roomId}/availability?date=${date}`);

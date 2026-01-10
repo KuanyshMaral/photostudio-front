@@ -18,11 +18,13 @@ export type RegisterRequest = {
 
 export type RegisterResponse = {
   message: string;
+  // Assuming success response has a message
 };
 
 export type StudioRegisterRequest = {
   email: string;
   password: string;
+  phone: string;
   companyName: string;
   bin: string;
   address: string;
@@ -35,16 +37,14 @@ export type Profile = {
   name: string;
   email: string;
   phone: string;
-  role: string;
+  role: 'client' | 'studio_owner' | 'admin';
   companyName?: string;
   bin?: string;
   address?: string;
   contactPerson?: string;
+  studio_status?: string;
 };
 
 export type ApiError = {
   message: string;
-  error?: {
-    message: string;
-  };
 };

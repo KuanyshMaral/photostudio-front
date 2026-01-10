@@ -3,7 +3,7 @@ import { getRoomAvailability } from "../../api/availabilityApi";
 import type { TimeSlot } from "../../api/availabilityApi";
 
 interface AvailabilityCalendarProps {
-  roomId: string;
+  roomId: string | number;
   selectedDate: Date;
 }
 
@@ -20,7 +20,7 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({ roomId, sel
       setError(null);
       
       try {
-        const slots = await getRoomAvailability(roomId, selectedDate);
+        const slots = await getRoomAvailability(Number(roomId), selectedDate.toISOString().split('T')[0]);
         setTimeSlots(slots);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch availability");

@@ -1,33 +1,175 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import LoginForm from "./features/auth/LoginForm";
-import RegisterForm from "./features/auth/RegisterForm";
-import StudioRegistrationForm from "./features/auth/StudioRegistrationForm";
-import ProfilePage from "./features/auth/ProfilePage";
-import Dashboard from "./features/auth/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
+
+// Auth components (from Amir & Yerkanat projects)
+import LoginForm from "./features/auth/LoginForm.tsx";
+import RegisterForm from "./features/auth/RegisterForm.tsx";
+import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
+import ProfilePage from "./features/auth/ProfilePage.tsx";
+import Dashboard from "./features/auth/Dashboard.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
+import Layout from "./components/Layout.tsx";
+
+// Booking components (from Kiryu project)
+import BookingForm from "./features/booking/BookingForm.tsx";
+import AvailabilityCalendar from "./features/booking/AvailabilityCalendar.tsx";
+import MyBookings from "./features/booking/MyBookings.tsx";
+import ReviewForm from "./features/booking/ReviewForm.tsx";
+import ReviewList from "./features/booking/ReviewList.tsx";
+
+// Reviews components
+import MyReviewsPage from "./features/reviews/MyReviewsPage.tsx";
+import WriteReviewPage from "./features/reviews/WriteReviewPage.tsx";
+
+// Studio catalog components (from Amir project)
+import StudioCatalog from "./features/catalog/StudioCatalog.tsx";
+import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
+
+// Admin components
+import AdminDashboard from "./features/admin/AdminDashboard";
+
+// Owner components
+import OwnerDashboard from "./features/owner/OwnerDashboard";
 
 function App() {
   return (
     <>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" toastOptions={{
+        className: '',
+        style: {
+          background: '#363636',
+          color: '#fff',
+        },
+      }} />
       <Router>
         <Routes>
-          {/* Auth routes */}
+          {/* Public routes */}
+          <Route path="/" element={<AuthLanding />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/studio-register" element={<StudioRegistrationForm />} />
-          <Route path="/profile" element={
+          
+          {/* Studio catalog (protected with layout) */}
+          <Route path="/studios" element={
             <ProtectedRoute>
-              <ProfilePage />
+              <Layout>
+                <StudioCatalog />
+              </Layout>
             </ProtectedRoute>
           } />
-
-          {/* Dashboard */}
-          <Route path="/" element={
+          <Route path="/studios/:id" element={
             <ProtectedRoute>
-              <Dashboard />
+              <StudioDetail />
             </ProtectedRoute>
+          } />
+          
+          {/* Protected routes */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <ProfilePage />
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Booking system (protected) */}
+          <Route path="/booking" element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <BookingForm />
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/availability" element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <AvailabilityCalendar roomId="demo-room" selectedDate={new Date()} />
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/my-bookings" element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <MyBookings />
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reviews" element={
+            <ProtectedRoute>
+              <Layout>
+                <MyReviewsPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/write-review" element={
+            <ProtectedRoute>
+              <Layout>
+                <WriteReviewPage />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reviews" element={
+            <ProtectedRoute>
+              <Layout>
+                <div className="p-8">
+                  <ReviewList />
+                </div>
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRole={'admin'}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          
+          {/* Owner routes */}
+          <Route path="/owner" element={
+            <ProtectedRoute requiredRole={'studio_owner'}>
+              <Layout>
+                <OwnerDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* 404 fallback */}
+          <Route path="*" element={
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
+                <p className="text-gray-600 mb-8">Page not found</p>
+                <Link 
+                  to="/studios" 
+                  className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  Go to Studios
+                </Link>
+              </div>
+            </div>
           } />
         </Routes>
       </Router>
@@ -35,4 +177,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

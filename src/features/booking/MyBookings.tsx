@@ -1,189 +1,311 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
-import { toast } from 'react-hot-toast';
+import React, { useState, useEffect } from "react";
+import { getMyBookings, updateBookingStatus } from "../../api/bookingApi";
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
-import { getMyBookings, cancelBooking as cancelBookingApi } from '../../api/bookingApi';
-import { useAuth } from '../../context/AuthContext';
-import type { Booking } from '../../types/booking';
-
-const statusFilters = ['ALL', 'PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'] as const;
-type StatusFilter = typeof statusFilters[number];
+interface Booking {
+  id: number;
+  room_id: string;
+  room_name?: string;
+  studio_id?: number;
+  studio_name?: string;
+  start_time: string;
+  end_time: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  created_at: string;
+  updated_at?: string;
+  price?: number;
+}
 
 const MyBookings: React.FC = () => {
   const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed'>('all');
+  const [cancelling, setCancelling] = useState<number | null>(null);
 
-  // Fetch user's bookings
-  const {
-    data: bookings = [],
-    isLoading,
-    error,
-  } = useQuery<Booking[]>({
-    queryKey: ['my-bookings', token],
-    queryFn: () => getMyBookings(token || ''),
-    enabled: !!token,
-  });
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!token) {
+        setError("Please login to view bookings");
+        return;
+      }
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await getMyBookings(token);
+        setBookings(data);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить бронирования";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Cancel booking mutation
-  const cancelBookingMutation = useMutation({
-    mutationFn: (bookingId: number) => cancelBookingApi(bookingId, token || ''),
-    onSuccess: (_, bookingId) => {
-      const cancelledBooking = bookings.find(b => b.id === bookingId);
-      const roomName = cancelledBooking?.roomName || 'booking';
-      toast.success(`Successfully cancelled booking for ${roomName}`);
-      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to cancel booking. Please try again.');
-    },
-  });
+    fetchBookings();
+  }, [token]);
 
-  // Filter bookings based on status
-  const filteredBookings = bookings.filter((booking) => {
-    if (statusFilter === 'ALL') return true;
-    return booking.status === statusFilter;
-  });
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'PPp');
-  };
-
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'CONFIRMED':
-        return 'bg-green-100 text-green-800';
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800';
-      case 'COMPLETED':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const handleCancel = async (bookingId: number) => {
+    if (!token) {
+      toast.error('Пожалуйста, войдите в систему для отмены бронирования');
+      return;
+    }
+    
+    setCancelling(bookingId);
+    
+    try {
+      await updateBookingStatus(token, bookingId, 'cancelled');
+      toast.success('Бронирование отменено');
+      // Refetch bookings after cancellation
+      const data = await getMyBookings(token);
+      setBookings(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Не удалось отменить бронирование";
+      toast.error(errorMessage);
+      setError(errorMessage);
+    } finally {
+      setCancelling(null);
     }
   };
 
-  if (!token) {
-    return (
-      <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
-          <p className="text-yellow-700">Please sign in to view your bookings.</p>
-        </div>
-      </div>
-    );
-  }
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      </div>
-    );
-  }
+  const formatTime = (dateString: string): string => {
+    return new Date(dateString).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-  if (error) {
+  // Filter bookings based on status filter
+  const filteredBookings = bookings.filter(booking => {
+    if (statusFilter === 'all') return true;
+    return booking.status === statusFilter;
+  });
+
+  const getStatusColor = (status: string): string => {
+    switch (status) {
+      case 'confirmed':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'cancelled':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'completed':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusText = (status: string): string => {
+    switch (status) {
+      case 'confirmed': return 'Подтверждено';
+      case 'pending': return 'Ожидает';
+      case 'cancelled': return 'Отменено';
+      case 'completed': return 'Завершено';
+      default: return status;
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
-        <div className="bg-red-50 border-l-4 border-red-500 p-4">
-          <p className="text-red-700">Error loading bookings. Please try again later.</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-3 text-gray-600">Загрузка бронирований...</span>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Bookings</h1>
-        <div className="flex space-x-2">
-          <label htmlFor="status-filter" className="sr-only">
-            Filter by status
-          </label>
-          <select
-            id="status-filter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-            className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-          >
-            {statusFilters.map((filter) => (
-              <option key={filter} value={filter}>
-                {filter.charAt(0) + filter.slice(1).toLowerCase()}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {filteredBookings.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-6 text-center">
-          <p className="text-gray-500">No bookings found{statusFilter !== 'ALL' ? ` with status ${statusFilter.toLowerCase()}` : ''}.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredBookings.map((booking) => (
-            <div key={booking.id} className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                  <div className="mb-4 sm:mb-0">
-                    <h3 className="text-lg font-semibold">{booking.roomName}</h3>
-                    <p className="text-gray-600">{booking.studioName}</p>
-                    <div className="mt-2">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(booking.status)}`}>
-                        {booking.status.charAt(0) + booking.status.slice(1).toLowerCase()}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-gray-900 font-medium">${booking.price.toFixed(2)}</p>
-                    <p className="text-sm text-gray-500">
-                      {formatDate(booking.startTime)} - {formatDate(booking.endTime)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                  <div className="text-sm text-gray-500 mb-2 sm:mb-0">
-                    Booked on {formatDate(booking.createdAt)}
-                  </div>
-                  <div className="space-x-2">
-                    {booking.status === 'PENDING' || booking.status === 'CONFIRMED' ? (
-                      <button
-                        onClick={() => {
-                          const confirmed = window.confirm(
-                            `Are you sure you want to cancel your booking for ${booking.roomName} on ${format(new Date(booking.startTime), 'PPp')}?`
-                          );
-                          if (confirmed) {
-                            cancelBookingMutation.mutate(booking.id);
-                          }
-                        }}
-                        disabled={cancelBookingMutation.isPending}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {cancelBookingMutation.isPending && cancelBookingMutation.variables === booking.id ? (
-                          <>
-                            <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-red-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Cancelling...
-                          </>
-                        ) : 'Cancel Booking'}
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-gradient-to-r from-teal-600 to-cyan-600 px-8 py-6">
+            <h2 className="text-2xl font-bold text-white">Мои бронирования</h2>
+            <p className="text-teal-100 mt-1">Управляйте вашими бронированиями студий</p>
+          </div>
+          
+          <div className="p-8">
+            {/* Status Filter */}
+            <div className="mb-6">
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setStatusFilter('all')}
+                  className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                    statusFilter === 'all'
+                      ? 'bg-teal-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Все ({bookings.length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('pending')}
+                  className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                    statusFilter === 'pending'
+                      ? 'bg-yellow-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Ожидает ({bookings.filter(b => b.status === 'pending').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('confirmed')}
+                  className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                    statusFilter === 'confirmed'
+                      ? 'bg-green-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Подтверждено ({bookings.filter(b => b.status === 'confirmed').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('cancelled')}
+                  className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                    statusFilter === 'cancelled'
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Отменено ({bookings.filter(b => b.status === 'cancelled').length})
+                </button>
+                <button
+                  onClick={() => setStatusFilter('completed')}
+                  className={`px-4 py-2 rounded-lg font-medium transition duration-200 ${
+                    statusFilter === 'completed'
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Завершено ({bookings.filter(b => b.status === 'completed').length})
+                </button>
               </div>
             </div>
-          ))}
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-700">{error}</p>
+              </div>
+            )}
+
+            {/* Bookings List */}
+            {filteredBookings.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-400 text-lg">
+                  {statusFilter === 'all' ? 'Нет бронирований' : `Нет бронирований со статусом "${getStatusText(statusFilter)}"`}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredBookings.map((booking) => (
+                  <div
+                    key={booking.id}
+                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+                    data-testid="booking-item"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {booking.room_name || `Комната ${booking.room_id}`}
+                        </h3>
+                        {booking.studio_name && (
+                          <p className="text-sm text-gray-500 mt-1">
+                            {booking.studio_name}
+                            {booking.studio_id && ` #${booking.studio_id}`}
+                          </p>
+                        )}
+                        <p className="text-sm text-gray-600 mt-1">
+                          {formatDate(booking.start_time)}
+                        </p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(booking.status)}`} data-testid="booking-status">
+                        {getStatusText(booking.status)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center text-sm text-gray-600 mb-4">
+                      <div className="flex items-center mr-6">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {formatTime(booking.start_time)} - {formatTime(booking.end_time)}
+                      </div>
+                      <div className="flex items-center mr-6">
+                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        {booking.room_id}
+                      </div>
+                      {booking.price && (
+                        <div className="flex items-center">
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {booking.price} ₸
+                        </div>
+                      )}
+                    </div>
+                    
+                    {booking.status === 'pending' && (
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          disabled={cancelling === booking.id}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {cancelling === booking.id ? 'Отмена...' : 'Отменить бронирование'}
+                        </button>
+                      </div>
+                    )}
+                    
+                    {booking.status === 'confirmed' && (
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          disabled={cancelling === booking.id}
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {cancelling === booking.id ? 'Отмена...' : 'Отменить'}
+                        </button>
+                      </div>
+                    )}
+                    
+                    {booking.status === 'completed' && (
+                      <div className="flex justify-end">
+                        <button
+                          onClick={() => window.location.href = '/write-review'}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+                        >
+                          Оставить отзыв
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
