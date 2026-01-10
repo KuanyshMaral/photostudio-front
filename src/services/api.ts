@@ -1,10 +1,10 @@
 // src/services/api.ts
 
 import axios from 'axios';
-import { Studio, Room, StudiosResponse, StudioDetailResponse, Filters } from '../types';
+import type { Studio, Room, StudiosResponse, StudioDetailResponse, Filters } from '../types';
 
 // Базовый URL API (замените на свой)
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
 
 // Создаем экземпляр axios с базовой конфигурацией
 const api = axios.create({

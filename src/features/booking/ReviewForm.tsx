@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import StarRating from "../../components/StarRating";
 import { createReview } from "../../api/reviewApi";
 import type { CreateReviewRequest } from "../../api/reviewApi";
-import { useAuth } from "../../context/AuthContext"; 
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 interface ReviewFormProps {
   bookingId?: number;
+  studioId?: number;
   roomId?: string;
   roomName?: string;
   onReviewSubmitted?: () => void;
@@ -13,6 +15,7 @@ interface ReviewFormProps {
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ 
   bookingId, 
+  studioId,
   roomId, 
   roomName,
   onReviewSubmitted 
@@ -38,14 +41,6 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     if (comment.trim().length > 500) {
       newErrors.push("Comment must be less than 500 characters");
     }
-
-    if (!token) {
-      newErrors.push("You must be logged in to submit a review");
-    }
-
-    if (!bookingId) {
-       newErrors.push("Booking ID is missing. You can only review after a valid booking.");
-    }
     
     return newErrors;
   };
@@ -53,44 +48,56 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!token) {
+      toast.error('Please login to submit a review');
+      return;
+    }
+    
+    if (!bookingId) {
+      toast.error('Review can only be submitted after a booking');
+      return;
+    }
+    
+    if (!studioId) {
+      toast.error('Studio ID is required');
+      return;
+    }
+    
     const formErrors = validateForm();
     setErrors(formErrors);
     
     if (formErrors.length > 0) {
       return;
     }
-
-    if (!token || !bookingId) return;
     
     setIsSubmitting(true);
     setMessage('');
     
     try {
       const reviewData: CreateReviewRequest = {
+        studio_id: studioId,
         booking_id: bookingId,
         rating,
         comment: comment.trim()
       };
       
       await createReview(token, reviewData);
+      toast.success('Review submitted successfully!');
       setMessage('Review submitted successfully!');
       
       // Reset form
       setRating(0);
       setComment('');
-      setErrors([]);
       
       // Notify parent component
       if (onReviewSubmitted) {
         onReviewSubmitted();
       }
       
-    } catch (error: any) {
-      const errorMessage = error.message || 'Failed to submit review. Please try again.';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit review';
+      toast.error(errorMessage);
       setMessage(errorMessage);
-      if (errorMessage.toLowerCase().includes('booking')) {
-          setErrors([errorMessage]);
-      }
     } finally {
       setIsSubmitting(false);
     }
@@ -98,12 +105,18 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
   const getRatingText = (rating: number): string => {
     switch (rating) {
-      case 1: return 'Poor';
-      case 2: return 'Fair';
-      case 3: return 'Good';
-      case 4: return 'Very Good';
-      case 5: return 'Excellent';
-      default: return 'Select a rating';
+      case 1:
+        return 'Poor';
+      case 2:
+        return 'Fair';
+      case 3:
+        return 'Good';
+      case 4:
+        return 'Very Good';
+      case 5:
+        return 'Excellent';
+      default:
+        return 'Select a rating';
     }
   };
 
@@ -127,9 +140,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                     <span className="font-medium">Room:</span> {roomId}
                     {roomName && ` (${roomName})`}
                   </p>
-                  {bookingId && (
+                  {bookingId && studioId ? (
                     <p className="text-sm text-gray-600 mt-1">
                       <span className="font-medium">Booking ID:</span> #{bookingId}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-amber-600 mt-1">
+                      <span className="font-medium">Note:</span> Review can only be submitted after a booking
                     </p>
                   )}
                 </div>
@@ -179,7 +196,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !token || !bookingId || !studioId}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-amber-600 hover:to-orange-700 transform hover:scale-[1.02] transition duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSubmitting ? (
@@ -205,12 +222,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               </div>
             )}
 
-            {/* Success/Error Message display from state */}
-            {message && !errors.length && (
+            {/* Success Message */}
+            {message && (
               <div className={`mt-6 p-4 rounded-lg border ${
                 message.includes('successfully') 
                   ? 'bg-green-50 border-green-200 text-green-700' 
-                  : 'bg-red-50 border-red-200 text-red-700'
+                  : 'bg-yellow-50 border-yellow-200 text-yellow-700'
               }`}>
                 {message}
               </div>

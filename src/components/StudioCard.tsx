@@ -2,11 +2,11 @@
 
 import React from 'react';
 import { MapPin, Star, Camera } from 'lucide-react';
-import { Studio } from '../types';
+import type { Studio } from '../types';
 
 interface StudioCardProps {
   studio: Studio;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {

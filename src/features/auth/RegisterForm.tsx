@@ -1,25 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { register as registerApi } from './auth.api';
+import { register as registerApi, registerStudio } from './auth.api';
 import type { RegisterRequest } from './auth.types';
 
 export default function RegisterForm() {
+  const [searchParams] = useSearchParams();
+  const registrationType = searchParams.get('type');
+  const navigate = useNavigate();
+
+  // Redirect to studio registration if type=employer
+  useEffect(() => {
+    if (registrationType === 'studio_owner') {
+      navigate('/studio-register', { replace: true });
+    }
+  }, [registrationType, navigate]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>({
     defaultValues: { role: 'client' }
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterRequest) => {
     setLoading(true);
     try {
       await registerApi(data);
-      toast.success('Registration successful! Please log in.');
+      toast.success('Регистрация успешна! Войдите в аккаунт.');
       navigate('/login');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Registration failed');
+      toast.error(err instanceof Error ? err.message : 'Ошибка регистрации');
     } finally {
       setLoading(false);
     }
@@ -29,34 +39,34 @@ export default function RegisterForm() {
     <div className="auth-container">
       <div className="auth-card">
         <header className="auth-header">
-          <div className="auth-logo">MWork PhotoStudio</div>
-          <h2 className="auth-title">Create Client Account</h2>
-          <p className="auth-sub">Sign up to get started</p>
+          <div className="auth-logo">StudioBooking</div>
+          <h2 className="auth-title">Создать аккаунт клиента</h2>
+          <p className="auth-sub">Зарегистрируйтесь для начала работы</p>
         </header>
 
         <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
           <label className="auth-label">
-            <span className="visually-hidden">Name</span>
+            <span className="visually-hidden">Имя</span>
             <input
               className="auth-input"
               type="text"
-              placeholder="Name"
-              {...register('name', { required: 'Name is required' })}
+              placeholder="Имя"
+              {...register('name', { required: 'Имя обязательно' })}
             />
             {errors.name && <p className="auth-error">{errors.name.message}</p>}
           </label>
 
           <label className="auth-label">
-            <span className="visually-hidden">Email</span>
+            <span className="visually-hidden">Электронная почта</span>
             <input
               className="auth-input"
               type="email"
-              placeholder="Email"
+              placeholder="Электронная почта"
               {...register('email', {
-                required: 'Email is required',
+                required: 'Email обязателен',
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: 'Invalid email format'
+                  message: 'Неверный формат email'
                 }
               })}
             />
@@ -64,27 +74,27 @@ export default function RegisterForm() {
           </label>
 
           <label className="auth-label">
-            <span className="visually-hidden">Phone</span>
+            <span className="visually-hidden">Телефон</span>
             <input
               className="auth-input"
               type="tel"
-              placeholder="Phone"
-              {...register('phone', { required: 'Phone is required' })}
+              placeholder="Телефон"
+              {...register('phone', { required: 'Телефон обязателен' })}
             />
             {errors.phone && <p className="auth-error">{errors.phone.message}</p>}
           </label>
 
           <label className="auth-label">
-            <span className="visually-hidden">Password</span>
+            <span className="visually-hidden">Пароль</span>
             <input
               className="auth-input"
               type="password"
-              placeholder="Password"
+              placeholder="Пароль"
               {...register('password', {
-                required: 'Password must be at least 6 characters',
+                required: 'Пароль должен содержать минимум 6 символов',
                 minLength: {
                   value: 6,
-                  message: 'Password must be at least 6 characters'
+                  message: 'Пароль должен содержать минимум 6 символов'
                 }
               })}
             />
@@ -92,14 +102,14 @@ export default function RegisterForm() {
           </label>
 
           <button className="auth-button" type="submit" disabled={loading}>
-            {loading ? 'Registering...' : 'Register'}
+            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
         </form>
 
         <footer className="auth-footer">
           <div className="auth-footer-links">
-            <small>Already have an account? <Link to="/login">Sign in</Link></small>
-            <small>Are you a Studio Owner? <Link to="/studio-register">Register as Studio</Link></small>
+            <small>Уже есть аккаунт? <Link to="/login">Войти</Link></small>
+            <small>Вы владелец студии? <Link to="/studio-register">Зарегистрировать студию</Link></small>
           </div>
         </footer>
       </div>

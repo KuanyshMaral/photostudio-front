@@ -1,75 +1,133 @@
-# React + TypeScript + Vite
+# Unified Studio App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive photo studio booking platform that combines features from 3 separate projects into one unified application.
 
-Currently, two official plugins are available:
+## 🎯 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Authentication System (from Amir & Yerkanat projects)
+- User login and registration
+- Studio owner registration
+- Profile management
+- Protected routes
 
-## React Compiler
+### Studio Catalog (from Amir project)
+- Browse photo studios
+- Advanced filtering (city, price, type)
+- Search functionality
+- Studio details and reviews
+- Pagination
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Booking System (from Kiryu project)
+- Room booking forms
+- Availability calendar
+- My bookings management
+- Review system (write and read reviews)
 
-## Expanding the ESLint configuration
+## 🚀 Quick Start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Install dependencies
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Start development server
+```bash
+npm run dev
 ```
->>>>>>> alisher
->>>>>>> main
+
+### 3. Build for production
+```bash
+npm run build
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # Shared UI components
+├── features/           # Feature modules
+│   ├── auth/          # Authentication features
+│   ├── booking/       # Booking system
+│   └── catalog/       # Studio catalog
+├── api/               # API services
+├── context/           # React contexts
+├── types/             # TypeScript types
+├── services/          # External services
+├── data/              # Mock data
+└── lib/               # Utility libraries
+```
+
+## 🛠 Technologies
+
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **React Router** - Navigation
+- **Tailwind CSS** - Styling
+- **Axios** - HTTP client
+- **React Hook Form** - Form handling
+- **React Hot Toast** - Notifications
+- **Vite** - Build tool
+
+## 🌐 Available Routes
+
+### Public Routes
+- `/login` - User login
+- `/register` - User registration
+- `/studio-register` - Studio owner registration
+- `/studios` - Browse studios
+- `/studios/:id` - Studio details
+
+### Protected Routes (require authentication)
+- `/` - Dashboard
+- `/profile` - User profile
+- `/booking` - Book a studio
+- `/availability` - Check availability
+- `/my-bookings` - View bookings
+- `/write-review` - Write a review
+- `/reviews` - View reviews
+
+## 🔧 Configuration
+
+The project uses mock data by default. To connect to a real API:
+
+1. Update API endpoints in `src/services/api.ts`
+2. Configure environment variables
+3. Replace mock data with real API calls
+
+## 📱 Responsive Design
+
+All components are fully responsive and work on:
+- Desktop (1200px+)
+- Tablet (768px-1199px)
+- Mobile (320px-767px)
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm run test
+
+# Run tests with UI
+npm run test:ui
+```
+
+## 📝 Development Notes
+
+This unified application combines:
+- **Kiryu Project**: Booking and review system
+- **Amir Project**: Authentication and studio catalog
+- **Yerkanat Project**: Enhanced authentication with context
+
+All conflicts have been resolved and features are integrated seamlessly.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+MIT License

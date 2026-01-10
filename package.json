@@ -1,5 +1,5 @@
 {
-  "name": "studio-frontend",
+  "name": "unified-studio-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -16,7 +16,7 @@
     "@tanstack/react-query": "^5.90.16",
     "@types/react-datepicker": "^6.2.0",
     "axios": "^1.13.2",
-    "lucide-react": "^0.562.0",
+    "lucide-react": "^0.453.0",
     "react": "^19.2.0",
     "react-datepicker": "^9.1.0",
     "react-dom": "^19.2.0",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/node": "^24.10.4",
+    "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
