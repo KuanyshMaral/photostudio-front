@@ -44,8 +44,8 @@ const StudioCatalog: React.FC = () => {
       <div className={`min-h-screen bg-gray-50 transition-all duration-300 ${selectedStudio ? 'blur-sm' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Photo Studios</h1>
-            <p className="text-gray-600">Find perfect studio for your photoshoot</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Фотостудии</h1>
+            <p className="text-gray-600">Найдите идеальную студию для вашей фотосессии</p>
           </div>
 
           <div className="flex flex-col lg:flex-row gap-8">

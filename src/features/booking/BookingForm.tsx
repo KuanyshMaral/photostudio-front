@@ -38,7 +38,7 @@ const BookingForm: React.FC = () => {
           login(token, userProfile);
         } catch (error) {
           console.error("Failed to fetch user profile:", error);
-          toast.error("Failed to load user information. Please login again.");
+          toast.error("Не удалось загрузить профиль пользователя. Войдите снова.");
           navigate("/login");
         } finally {
           setIsLoadingUser(false);
@@ -55,7 +55,7 @@ const BookingForm: React.FC = () => {
       setRooms(location.state.rooms);
     } else {
       // If no studio/rooms data, redirect back to studios
-      toast.error("Please select a studio first");
+      toast.error("Сначала выберите студию");
       navigate("/studios");
     }
   }, [location.state, navigate, toast]);
@@ -64,19 +64,19 @@ const BookingForm: React.FC = () => {
     const newErrors: string[] = [];
     
     if (!selectedRoom) {
-      newErrors.push("Room information is missing");
+      newErrors.push("Информация о комнате отсутствует");
     }
     
     if (!startTime) {
-      newErrors.push("Start time is required");
+      newErrors.push("Время начала обязательно");
     }
     
     if (!endTime) {
-      newErrors.push("End time is required");
+      newErrors.push("Время окончания обязательно");
     }
     
     if (startTime && endTime && endTime <= startTime) {
-      newErrors.push("End time must be after start time");
+      newErrors.push("Время окончания должно быть после времени начала");
     }
     
     return newErrors;
@@ -86,12 +86,12 @@ const BookingForm: React.FC = () => {
     e.preventDefault();
     
     if (!token) {
-      toast.error("Please login to book a room");
+      toast.error("Войдите для бронирования комнаты");
       return;
     }
     
     if (!user) {
-      toast.error("User information not available. Please login again.");
+      toast.error("Информация о пользователе недоступна. Войдите снова.");
       return;
     }
     
@@ -115,13 +115,13 @@ const BookingForm: React.FC = () => {
 
     try {
       const result = await createBooking(data, token);
-      toast.success(`Booking created! ID: ${result.id}`);
+      toast.success(`Бронирование создано! ID: ${result.id}`);
       setMessage(`Booking created! ID: ${result.id}`);
       // Reset form on success
       setStartTime(null);
       setEndTime(null);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create booking";
+      const errorMessage = error instanceof Error ? error.message : "Не удалось создать бронирование";
       toast.error(errorMessage);
       setMessage(errorMessage);
     } finally {
@@ -133,7 +133,7 @@ const BookingForm: React.FC = () => {
   if (isLoadingUser) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Loading user information..." />
+        <LoadingSpinner size="lg" text="Загрузка информации о пользователе..." />
       </div>
     );
   }
@@ -143,8 +143,8 @@ const BookingForm: React.FC = () => {
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
-            <h2 className="text-2xl font-bold text-white">Book a Room</h2>
-            <p className="text-blue-100 mt-1">Schedule your photoshoot session</p>
+            <h2 className="text-2xl font-bold text-white">Забронировать комнату</h2>
+            <p className="text-blue-100 mt-1">Запланируйте вашу фотосессию</p>
           </div>
           
           {/* Studio Info */}
@@ -157,7 +157,7 @@ const BookingForm: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <p className="text-lg font-bold text-blue-600">
-                    {rooms.length} {rooms.length === 1 ? 'room' : 'rooms'} available
+                    {rooms.length} {rooms.length === 1 ? 'комната' : 'комнат'} доступна
                   </p>
                 </div>
               </div>
@@ -169,7 +169,7 @@ const BookingForm: React.FC = () => {
               {/* Room Selection */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Select Room
+                  Выберите комнату
                 </label>
                 <select
                   value={selectedRoom?.id || ''}
@@ -180,7 +180,7 @@ const BookingForm: React.FC = () => {
                   disabled={isSubmitting}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
-                  <option value="">Choose a room...</option>
+                  <option value="">Выберите комнату...</option>
                   {rooms.map(room => (
                     <option key={room.id} value={room.id}>
                       {room.name} - {room.price_per_hour_min.toLocaleString()} ₸/час
@@ -212,7 +212,7 @@ const BookingForm: React.FC = () => {
               )}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Start Time
+                  Время начала
                 </label>
                 <DatePicker
                   selected={startTime}
@@ -227,7 +227,7 @@ const BookingForm: React.FC = () => {
               
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  End Time
+                  Время окончания
                 </label>
                 <DatePicker
                   selected={endTime}
@@ -257,7 +257,7 @@ const BookingForm: React.FC = () => {
                 {isSubmitting ? (
                   <LoadingSpinner size="sm" color="white" text="Booking..." />
                 ) : (
-                  "Book Room"
+                  "Забронировать комнату"
                 )}
               </button>
             </form>

@@ -25,15 +25,15 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const sidebarItems = [
-    { id: "dashboard", label: "Dashboard" },
-    { id: "studios", label: "Browse Studios" },
-    { id: "my-bookings", label: "My Bookings" },
-    { id: "profile", label: "Your Profile" },
+    { id: "dashboard", label: "Панель управления" },
+    { id: "studios", label: "Просмотр студий" },
+    { id: "my-bookings", label: "Мои бронирования" },
+    { id: "profile", label: "Мой профиль" },
   ];
 
   // Add owner dashboard for studio owners
   if (user?.role === 'studio_owner') {
-    sidebarItems.splice(1, 0, { id: "owner", label: "Manage Studio" });
+    sidebarItems.splice(1, 0, { id: "owner", label: "Управление студией" });
   }
 
   return (
@@ -73,7 +73,7 @@ export default function Layout({ children }: LayoutProps) {
               onClick={handleLogout}
               className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
             >
-              Sign out
+              Выйти
             </button>
           </div>
         </div>

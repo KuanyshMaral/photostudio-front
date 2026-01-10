@@ -38,61 +38,61 @@ const ProfilePage: React.FC = () => {
       await uploadFiles(token, files);
       // Optionally refresh profile or show success
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+      setUploadError(err instanceof Error ? err.message : 'Ошибка загрузки');
     } finally {
       setUploading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!profile) return <div>No profile data</div>;
+  if (loading) return <div>Загрузка...</div>;
+  if (error) return <div>Ошибка: {error}</div>;
+  if (!profile) return <div>Нет данных профиля</div>;
 
   return (
     <div className="max-w-md mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-6">Profile</h2>
+      <h2 className="text-2xl font-bold mb-6">Профиль</h2>
 
       {isEditing ? (
         <EditProfileForm profile={profile} onUpdate={handleProfileUpdate} />
       ) : (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium">Name</label>
+            <label className="block text-sm font-medium">Имя</label>
             <p className="p-2 border rounded">{profile.name}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium">Email</label>
+            <label className="block text-sm font-medium">Электронная почта</label>
             <p className="p-2 border rounded">{profile.email}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium">Phone</label>
+            <label className="block text-sm font-medium">Телефон</label>
             <p className="p-2 border rounded">{profile.phone}</p>
           </div>
           <div>
-            <label className="block text-sm font-medium">Role</label>
+            <label className="block text-sm font-medium">Роль</label>
             <p className="p-2 border rounded">{profile.role}</p>
           </div>
           {profile.companyName && (
             <div>
-              <label className="block text-sm font-medium">Company Name</label>
+              <label className="block text-sm font-medium">Название компании</label>
               <p className="p-2 border rounded">{profile.companyName}</p>
             </div>
           )}
           {profile.bin && (
             <div>
-              <label className="block text-sm font-medium">BIN</label>
+              <label className="block text-sm font-medium">БИН</label>
               <p className="p-2 border rounded">{profile.bin}</p>
             </div>
           )}
           {profile.address && (
             <div>
-              <label className="block text-sm font-medium">Address</label>
+              <label className="block text-sm font-medium">Адрес</label>
               <p className="p-2 border rounded">{profile.address}</p>
             </div>
           )}
           {profile.contactPerson && (
             <div>
-              <label className="block text-sm font-medium">Contact Person</label>
+              <label className="block text-sm font-medium">Контактное лицо</label>
               <p className="p-2 border rounded">{profile.contactPerson}</p>
             </div>
           )}
@@ -104,11 +104,11 @@ const ProfilePage: React.FC = () => {
           onClick={() => setIsEditing(!isEditing)}
           className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
         >
-          {isEditing ? 'Cancel' : 'Edit Profile'}
+          {isEditing ? 'Отмена' : 'Редактировать профиль'}
         </button>
 
         <div>
-          <h3 className="text-lg font-medium mb-2">Upload Files</h3>
+          <h3 className="text-lg font-medium mb-2">Загрузить файлы</h3>
           <FileUpload onFilesSelected={handleFilesSelected} isUploading={uploading} />
           {uploadError && <p className="mt-2 text-sm text-red-600">{uploadError}</p>}
         </div>

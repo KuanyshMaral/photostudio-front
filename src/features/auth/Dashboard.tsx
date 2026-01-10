@@ -44,14 +44,14 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
-              Welcome back, {profile?.name || 'User'}!
+              С возвращением, {profile?.name || 'Пользователь'}!
             </h2>
             <p className="text-gray-600 mt-1">
               {isStudioOwner 
-                ? 'Manage your photo studio and bookings' 
+                ? 'Управляйте вашей фотостудией и бронированиями' 
                 : isAdmin 
-                ? 'Admin dashboard - Manage all users and studios'
-                : 'Manage your photo studio booking experience'
+                ? 'Панель администратора - Управление всеми пользователями и студиями'
+                : 'Управляйте вашим опытом бронирования фотостудий'
               }
             </p>
             <div className="mt-2 flex items-center gap-2">
@@ -66,7 +66,7 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Logged in as:</p>
+            <p className="text-sm text-gray-500">Вошли как:</p>
             <p className="text-sm font-medium text-gray-900">{profile?.email}</p>
           </div>
         </div>
@@ -82,8 +82,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-blue-600 mb-3">🏢</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Browse Studios</h3>
-              <p className="text-gray-600 text-sm">Explore and discover photo studios in your area</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Просмотр студий</h3>
+              <p className="text-gray-600 text-sm">Исследуйте и открывайте фотостудии в вашем районе</p>
             </Link>
 
             <Link
@@ -91,8 +91,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-green-600 mb-3">📅</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Book Studio</h3>
-              <p className="text-gray-600 text-sm">Reserve a photo studio for your next shoot</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Забронировать студию</h3>
+              <p className="text-gray-600 text-sm">Забронируйте фотостудию для вашей следующей фотосессии</p>
             </Link>
 
             <Link
@@ -100,8 +100,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-purple-600 mb-3">📋</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">My Bookings</h3>
-              <p className="text-gray-600 text-sm">View and manage your studio reservations</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Мои бронирования</h3>
+              <p className="text-gray-600 text-sm">Просматривайте и управляйте вашими бронированиями студий</p>
             </Link>
           </>
         )}
@@ -114,8 +114,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-orange-600 mb-3">🏢</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Studio Management</h3>
-              <p className="text-gray-600 text-sm">Manage your studio details and settings</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Управление студией</h3>
+              <p className="text-gray-600 text-sm">Управляйте деталями вашей студии и настройками</p>
             </Link>
 
             <Link
@@ -123,8 +123,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-blue-600 mb-3">📅</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Studio Bookings</h3>
-              <p className="text-gray-600 text-sm">View and manage incoming booking requests</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Бронирования студии</h3>
+              <p className="text-gray-600 text-sm">Просматривайте и управляйте запросами на бронирование</p>
             </Link>
 
             <Link
@@ -132,8 +132,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-green-600 mb-3">⏰</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Availability</h3>
-              <p className="text-gray-600 text-sm">Set your studio availability calendar</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Доступность</h3>
+              <p className="text-gray-600 text-sm">Установите календарь доступности вашей студии</p>
             </Link>
           </>
         )}
@@ -146,8 +146,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-red-600 mb-3">👥</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">User Management</h3>
-              <p className="text-gray-600 text-sm">Manage all users and permissions</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Управление пользователями</h3>
+              <p className="text-gray-600 text-sm">Управляйте всеми пользователями и правами доступа</p>
             </Link>
 
             <Link
@@ -155,8 +155,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-purple-600 mb-3">🏢</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Studio Management</h3>
-              <p className="text-gray-600 text-sm">Approve and manage all studios</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Управление студиями</h3>
+              <p className="text-gray-600 text-sm">Одобряйте и управляйте всеми студиями</p>
             </Link>
 
             <Link
@@ -164,8 +164,8 @@ export default function Dashboard() {
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
               <div className="text-indigo-600 mb-3">📊</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics</h3>
-              <p className="text-gray-600 text-sm">View platform analytics and reports</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Аналитика</h3>
+              <p className="text-gray-600 text-sm">Просматривайте аналитику платформы и отчеты</p>
             </Link>
           </>
         )}
@@ -176,8 +176,8 @@ export default function Dashboard() {
           className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
         >
           <div className="text-teal-600 mb-3">📆</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Availability</h3>
-          <p className="text-gray-600 text-sm">Check studio availability calendar</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Доступность</h3>
+          <p className="text-gray-600 text-sm">Проверяйте доступность студии в календаре</p>
         </Link>
 
         <Link
@@ -185,8 +185,8 @@ export default function Dashboard() {
           className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
         >
           <div className="text-yellow-600 mb-3">⭐</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Write Review</h3>
-          <p className="text-gray-600 text-sm">Share your experience with studios</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Написать отзыв</h3>
+          <p className="text-gray-600 text-sm">Поделитесь своим опытом со студиями</p>
         </Link>
 
         <Link
@@ -194,8 +194,8 @@ export default function Dashboard() {
           className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
         >
           <div className="text-pink-600 mb-3">💬</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Reviews</h3>
-          <p className="text-gray-600 text-sm">Read reviews from other users</p>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Отзывы</h3>
+          <p className="text-gray-600 text-sm">Читайте отзывы от других пользователей</p>
         </Link>
       </div>
 
@@ -207,8 +207,8 @@ export default function Dashboard() {
               {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Your Profile</h3>
-              <p className="text-gray-600 text-sm mt-1">Manage your account settings and preferences</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Ваш профиль</h3>
+              <p className="text-gray-600 text-sm mt-1">Управляйте настройками вашего аккаунта и предпочтениями</p>
               {profile?.phone && (
                 <p className="text-gray-500 text-xs mt-1">📞 {profile.phone}</p>
               )}
@@ -218,7 +218,7 @@ export default function Dashboard() {
             to="/profile"
             className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
           >
-            Edit Profile →
+            Редактировать профиль →
           </Link>
         </div>
       </div>

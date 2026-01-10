@@ -39,7 +39,7 @@ const MyBookings: React.FC = () => {
         const data = await getMyBookings(token);
         setBookings(data);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to fetch bookings";
+        const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить бронирования";
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
@@ -65,7 +65,7 @@ const MyBookings: React.FC = () => {
       const data = await getMyBookings(token);
       setBookings(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to cancel booking";
+      const errorMessage = err instanceof Error ? err.message : "Не удалось отменить бронирование";
       toast.error(errorMessage);
       setError(errorMessage);
     } finally {
@@ -74,7 +74,7 @@ const MyBookings: React.FC = () => {
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -83,7 +83,7 @@ const MyBookings: React.FC = () => {
   };
 
   const formatTime = (dateString: string): string => {
-    return new Date(dateString).toLocaleTimeString('en-US', {
+    return new Date(dateString).toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -127,7 +127,7 @@ const MyBookings: React.FC = () => {
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-600">Loading bookings...</span>
+              <span className="ml-3 text-gray-600">Загрузка бронирований...</span>
             </div>
           </div>
         </div>
@@ -140,8 +140,8 @@ const MyBookings: React.FC = () => {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-teal-600 to-cyan-600 px-8 py-6">
-            <h2 className="text-2xl font-bold text-white">My Bookings</h2>
-            <p className="text-teal-100 mt-1">Manage your room reservations</p>
+            <h2 className="text-2xl font-bold text-white">Мои бронирования</h2>
+            <p className="text-teal-100 mt-1">Управляйте вашими бронированиями студий</p>
           </div>
           
           <div className="p-8">
