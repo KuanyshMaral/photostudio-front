@@ -1,10 +1,47 @@
 // src/components/StudioDetailModal.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Star, MapPin, Users, DollarSign, Phone, Mail, Camera } from 'lucide-react';
-import ReviewsModal from './ReviewsModal';
-import type { Studio, Room } from '../types/index';
+import { X, Star, MapPin, Users, DollarSign, Phone, Mail, Camera, Plus } from 'lucide-react';
+// import ReviewsModal from './ReviewsModal';
+import { getStudioReviews } from '../api/reviewApi';
+import type { Review } from '../api/reviewApi';
+
+// Define types locally since they're not imported
+interface Studio {
+  id: number;
+  name: string;
+  description: string;
+  address: string;
+  phone?: string;
+  email?: string;
+  price_per_hour: number;
+  rating: number;
+  amenities: string[];
+  photos: string[];
+  working_hours?: string;
+  total_reviews?: number;
+  district?: string;
+}
+
+interface Room {
+  id: number;
+  name: string;
+  description?: string;
+  price_per_hour_min?: number;
+  area_sqm?: number;
+  capacity?: number;
+  room_type?: string;
+  amenities?: string[];
+  equipment?: Array<{
+    id: number;
+    name: string;
+    brand?: string;
+    model?: string;
+    category?: string;
+    quantity: number;
+  }>;
+}
 
 interface StudioDetailModalProps {
   studio: Studio;
@@ -19,9 +56,47 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   rooms = [], 
   onClose 
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>('overview');
-  const [showReviewsModal, setShowReviewsModal] = useState(false);
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<TabType>('overview');
+  // const [showReviewsModal, setShowReviewsModal] = useState(false);
+  const [reviews, setReviews] = useState<(Review & { ownerResponse?: any })[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+
+  // Fetch reviews when reviews tab is active
+  useEffect(() => {
+    if (activeTab === 'reviews' && studio.id) {
+      const fetchReviews = async () => {
+        setLoading(true);
+        setError(null);
+        
+        try {
+          const data = await getStudioReviews(studio.id);
+          
+          // Mock owner responses for demonstration (remove this when owner responses are implemented in backend)
+          const reviewsWithResponses = data.map((review: Review) => ({
+            ...review,
+            ownerResponse: Math.random() > 0.5 ? {
+              id: Math.floor(Math.random() * 10000),
+              review_id: review.id,
+              response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
+              created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
+              responder_name: "Studio Manager"
+            } : undefined
+          }));
+          
+          setReviews(reviewsWithResponses);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to fetch reviews");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchReviews();
+    }
+  }, [activeTab, studio.id]);
 
   const tabs = [
     { id: 'overview', label: 'Обзор' },
@@ -29,6 +104,45 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     { id: 'equipment', label: 'Оборудование' },
     { id: 'reviews', label: 'Отзывы' }
   ] as const;
+
+  // Utility functions
+  const token = localStorage.getItem('token');
+  
+  const StarRating = ({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg' }) => {
+    const sizeClass = size === 'lg' ? 'w-6 h-6' : 'w-4 h-4';
+    return (
+      <div className="flex space-x-1">
+        {[1, 2, 3, 4, 5].map((star: number) => (
+          <Star
+            key={star}
+            className={`${sizeClass} ${
+              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString).toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getRatingText = (rating: number): string => {
+    if (rating >= 4.5) return 'Отлично';
+    if (rating >= 3.5) return 'Хорошо';
+    if (rating >= 2.5) return 'Нормально';
+    if (rating >= 1.5) return 'Плохо';
+    return 'Ужасно';
+  };
+
+  const averageRating = reviews.length > 0 
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
+    : '0.0';
 
   const handleBooking = () => {
     // Navigate to booking page with studio data (user will choose room there)
@@ -42,10 +156,10 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
 
   // Форматирование рабочих часов
   const formatWorkingHours = (day: string) => {
-    if (!studio.working_hours || !studio.working_hours[day]) {
+    if (!studio.working_hours || !(studio.working_hours as any)[day]) {
       return 'Закрыто';
     }
-    const hours = studio.working_hours[day];
+    const hours = (studio.working_hours as any)[day];
     return `${hours.open} - ${hours.close}`;
   };
 
@@ -181,7 +295,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-semibold text-lg">{room.name}</h4>
                           <p className="text-blue-600 font-bold">
-                            {room.price_per_hour_min.toLocaleString()} ₸/час
+                            {room.price_per_hour_min?.toLocaleString() || 0} ₸/час
                           </p>
                         </div>
                         
@@ -299,26 +413,120 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
           {/* Reviews Tab */}
           {activeTab === 'reviews' && (
             <div className="text-center py-16">
-              <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 mb-4">Отзывы скоро появятся</p>
-              <button
-                onClick={() => setShowReviewsModal(true)}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Посмотреть отзывы
-              </button>
+              {loading && (
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              )}
+              {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700">{error}</p>
+                </div>
+              )}
+              
+              {!loading && !error && reviews.length === 0 && (
+                <div className="text-gray-400 text-lg mb-4">Отзывов пока нет</div>
+              )}
+              
+              {!loading && !error && reviews.length > 0 && (
+                <>
+                  <div className="space-y-6">
+                    {/* Summary Stats */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-4">
+                        <div className="text-3xl font-bold text-gray-900">{averageRating}</div>
+                        <div>
+                          <StarRating rating={parseFloat(averageRating)} size="lg" />
+                          <p className="text-sm text-gray-600 mt-1">
+                            {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Sort Options */}
+                    <div className="flex items-center space-x-4">
+                      <label className="text-sm font-medium text-gray-700">Сортировать по:</label>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+                      >
+                        <option value="newest">Сначала новые</option>
+                        <option value="oldest">Сначала старые</option>
+                        <option value="highest">Высший рейтинг</option>
+                        <option value="lowest">Низший рейтинг</option>
+                      </select>
+                    </div>
+                    
+                    {/* Write Review Button */}
+                    {token && (
+                      <button
+                        onClick={() => {
+                          onClose();
+                          navigate('/write-review');
+                        }}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Оставить отзыв
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Reviews List */}
+                  <div className="space-y-6">
+                    {reviews.map((review) => (
+                      <div key={review.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+                        {/* Review Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-indigo-600 text-sm font-semibold">
+                                {review.user_name?.charAt(0) || 'U'}
+                              </span>
+                            </div>
+                            <div>
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900">{review.user_name || 'Guest User'}</p>
+                                <p className="text-sm text-gray-500">{formatDate(review.created_at)}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <StarRating rating={review.rating} />
+                            <p className="text-sm font-medium text-gray-700 mt-1">{getRatingText(review.rating)}</p>
+                          </div>
+                        </div>
+                    
+                    {/* Review Content */}
+                    <div className="mb-4">
+                      <p className="text-gray-700 leading-relaxed">{review.comment}</p>
+                    </div>
+                    
+                    {/* Owner Response */}
+                    {review.ownerResponse && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <div className="flex items-start space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-blue-600 text-sm font-semibold">M</span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <p className="font-medium text-blue-900 text-sm">{review.ownerResponse.responder_name}</p>
+                              <span className="text-xs text-blue-600">• {formatDate(review.ownerResponse.created_at)}</span>
+                            </div>
+                            <p className="text-blue-800 text-sm leading-relaxed">{review.ownerResponse.response}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+                </>
+              )}
             </div>
           )}
         </div>
-
-        {/* Reviews Modal */}
-        {showReviewsModal && (
-          <ReviewsModal
-            studioId={studio.id}
-            studioName={studio.name}
-            onClose={() => setShowReviewsModal(false)}
-          />
-        )}
       </div>
     </div>
   );

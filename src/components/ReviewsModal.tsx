@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { X, Star, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -17,12 +17,14 @@ interface ReviewsModalProps {
   studioId: number;
   studioName: string;
   onClose: () => void;
+  isOpen?: boolean; // Add isOpen prop for external control
 }
 
 const ReviewsModal: React.FC<ReviewsModalProps> = ({ 
   studioId, 
   studioName,
-  onClose 
+  onClose,
+  isOpen = true // Default to true for backward compatibility
 }) => {
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -30,37 +32,41 @@ const ReviewsModal: React.FC<ReviewsModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  const modalRef = useRef<HTMLDivElement>(null);
 
+  // Only fetch reviews when modal is open
   useEffect(() => {
-    const fetchReviews = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const data = await getStudioReviews(studioId);
+    if (isOpen && studioId) {
+      const fetchReviews = async () => {
+        setLoading(true);
+        setError(null);
         
-        // Mock owner responses for demonstration
-        const reviewsWithResponses = data.map((review: Review) => ({
-          ...review,
-          ownerResponse: Math.random() > 0.5 ? {
-            id: Math.floor(Math.random() * 10000),
-            review_id: review.id,
-            response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
-            created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
-            responder_name: "Studio Manager"
-          } : undefined
-        }));
-        
-        setReviews(reviewsWithResponses);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch reviews");
-      } finally {
-        setLoading(false);
-      }
-    };
+        try {
+          const data = await getStudioReviews(studioId);
+          
+          // Mock owner responses for demonstration
+          const reviewsWithResponses = data.map((review: Review) => ({
+            ...review,
+            ownerResponse: Math.random() > 0.5 ? {
+              id: Math.floor(Math.random() * 10000),
+              review_id: review.id,
+              response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
+              created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
+              responder_name: "Studio Manager"
+            } : undefined
+          }));
+          
+          setReviews(reviewsWithResponses);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Failed to fetch reviews");
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchReviews();
-  }, [studioId]);
+      fetchReviews();
+    }
+  }, [isOpen, studioId]);
 
   const sortReviews = (reviewsToSort: (Review & { ownerResponse?: OwnerResponse })[]) => {
     const sorted = [...reviewsToSort];
@@ -125,9 +131,40 @@ const ReviewsModal: React.FC<ReviewsModalProps> = ({
     ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length).toFixed(1)
     : '0.0';
 
+  useEffect(() => {
+    const handleEscapeKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [onClose]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
+
+  // Only render modal when isOpen is true
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto my-4">
+      <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto my-4" ref={modalRef} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="sticky top-0 bg-white border-b z-10 p-6">
           <div className="flex items-center justify-between mb-4">
