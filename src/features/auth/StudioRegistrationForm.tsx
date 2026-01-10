@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerStudio } from './auth.api';
-import type { StudioRegisterRequest } from './auth.types';
+import toast from 'react-hot-toast';
 
 const StudioRegistrationForm: React.FC = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<StudioRegisterRequest>({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
+    phone: '', // Added phone field
     companyName: '',
     bin: '',
     address: '',
     contactPerson: '',
-    documents: [],
+    documents: [] as File[],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,7 @@ const StudioRegistrationForm: React.FC = () => {
     if (currentStep === 1) {
       if (!formData.email) newErrors.email = 'Email is required';
       if (!formData.password) newErrors.password = 'Password is required';
+      if (!formData.phone) newErrors.phone = 'Phone is required';
       if (!formData.companyName) newErrors.companyName = 'Company Name is required';
     } else if (currentStep === 2) {
       if (!formData.bin) newErrors.bin = 'BIN is required';
@@ -51,10 +54,12 @@ const StudioRegistrationForm: React.FC = () => {
       setLoading(true);
       try {
         await registerStudio(formData);
-        alert('Registration successful!');
-        // Redirect to login or dashboard
+        toast.success('Studio registration submitted! We will review your documents.');
+        navigate('/login');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Registration failed');
+        const errorMessage = err instanceof Error ? err.message : 'Studio registration failed';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -116,6 +121,18 @@ const StudioRegistrationForm: React.FC = () => {
                   onChange={handleChange}
                 />
                 {errors.password && <p className="auth-error">{errors.password}</p>}
+              </label>
+              <label className="auth-label">
+                <span className="visually-hidden">Phone</span>
+                <input
+                  className="auth-input"
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                {errors.phone && <p className="auth-error">{errors.phone}</p>}
               </label>
               <label className="auth-label">
                 <span className="visually-hidden">Company Name</span>

@@ -20,9 +20,17 @@ export default function LoginForm() {
     try {
       const data: LoginRequest = { email, password };
       const res = await login(data);
-      authLogin(res.token);
+      authLogin(res.token, res.user);
       toast.success('Login successful!');
-      navigate('/profile');
+      
+      // Redirect based on user role
+      if (res.user?.role === 'admin') {
+        navigate('/admin');
+      } else if (res.user?.role === 'studio_owner') {
+        navigate('/owner');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed. Check credentials.");
     } finally {
@@ -70,7 +78,7 @@ export default function LoginForm() {
         </form>
 
         <footer className="auth-footer">
-          <small>Don’t have an account? <Link to="/register">Sign up</Link></small>
+          <small>Don't have an account? <Link to="/register">Sign up</Link></small>
         </footer>
       </div>
     </div>

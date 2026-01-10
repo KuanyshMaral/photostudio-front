@@ -1,4 +1,5 @@
-export interface ReviewData {
+export interface CreateReviewRequest {
+  studio_id: number;
   booking_id: number;
   rating: number;
   comment: string;
@@ -6,83 +7,90 @@ export interface ReviewData {
 
 export interface Review {
   id: number;
-  booking_id: number;
-  room_id: string;
+  studio_id: number;
+  room_id?: number;
+  booking_id?: number;
+  user_id: number;
+  user_name: string;
+  studio_name?: string;
   room_name?: string;
   rating: number;
   comment: string;
   created_at: string;
 }
 
-export const createReview = async (data: ReviewData): Promise<{ review: Review }> => {
-  try {
-    // Real API call - uncomment when backend is ready
-    // const response = await axios.post('/reviews', data);
-    // return response.data;
+export interface OwnerResponse {
+  id: number;
+  review_id: number;
+  response: string;
+  created_at: string;
+  responder_name: string;
+}
 
-    // Mock API for development
-    await new Promise(resolve => setTimeout(resolve, 800));
+const API_BASE = 'http://localhost:3001/api/v1';
+
+export const getStudioReviews = async (studioId: number): Promise<Review[]> => {
+    const response = await fetch(`${API_BASE}/studios/${studioId}/reviews`);
+    if (!response.ok) throw new Error('Failed to fetch reviews');
     
-    const mockReview: Review = {
-      id: Math.floor(Math.random() * 10000),
-      booking_id: data.booking_id,
-      room_id: 'ROOM-' + Math.floor(Math.random() * 100),
-      room_name: 'Conference Room ' + String.fromCharCode(65 + Math.floor(Math.random() * 3)),
-      rating: data.rating,
-      comment: data.comment,
-      created_at: new Date().toISOString()
-    };
-
-    return { review: mockReview };
-  } catch (error) {
-    console.error('Failed to create review:', error);
-    throw new Error('Failed to submit review');
-  }
+    const json = await response.json();
+    return json.data || [];
 };
 
-export const getRoomReviews = async (roomId: string): Promise<Review[]> => {
-  try {
-    // Real API call - uncomment when backend is ready
-    // const response = await axios.get(`/rooms/${roomId}/reviews`);
-    // return response.data;
-
-    // Mock API for development
-    await new Promise(resolve => setTimeout(resolve, 600));
+export const getUserReviews = async (token: string): Promise<Review[]> => {
+    const response = await fetch(`${API_BASE}/users/reviews`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     
-    // Generate mock reviews for the room
-    const mockReviews: Review[] = [
-      {
-        id: 2001,
-        booking_id: 1001,
-        room_id: roomId,
-        room_name: 'Conference Room A',
-        rating: 5,
-        comment: 'Excellent room! Clean, well-equipped, and great for presentations.',
-        created_at: '2024-01-10T15:30:00Z'
-      },
-      {
-        id: 2002,
-        booking_id: 1002,
-        room_id: roomId,
-        room_name: 'Conference Room A',
-        rating: 4,
-        comment: 'Good space, but could use better lighting for video calls.',
-        created_at: '2024-01-08T11:20:00Z'
-      },
-      {
-        id: 2003,
-        booking_id: 1003,
-        room_id: roomId,
-        room_name: 'Conference Room A',
-        rating: 3,
-        comment: 'Decent room, but the AC was a bit noisy during our meeting.',
-        created_at: '2024-01-05T14:15:00Z'
-      }
-    ];
+    if (!response.ok) throw new Error('Failed to fetch user reviews');
+    
+    const json = await response.json();
+    return json.data || [];
+};
 
-    return mockReviews;
-  } catch (error) {
-    console.error('Failed to fetch room reviews:', error);
-    throw new Error('Failed to fetch reviews');
-  }
+export const getOwnerStudioReviewsDetail = async (token: string, studioId: number): Promise<Review[]> => {
+    const response = await fetch(`${API_BASE}/owners/studios/${studioId}/reviews`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch studio reviews');
+    
+    const json = await response.json();
+    return json.data || [];
+};
+
+export const getOwnerStudioReviews = async (token: string): Promise<Review[]> => {
+    // Get all reviews for studios owned by the current user
+    const response = await fetch(`${API_BASE}/owners/studios/reviews`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    if (!response.ok) throw new Error('Failed to fetch owner studio reviews');
+    
+    const json = await response.json();
+    return json.data || [];
+};
+
+export const createReview = async (token: string, data: CreateReviewRequest) => {
+    const response = await fetch(`${API_BASE}/reviews`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error?.message || 'Failed to create review');
+    }
+    
+    return (await response.json()).data;
 };

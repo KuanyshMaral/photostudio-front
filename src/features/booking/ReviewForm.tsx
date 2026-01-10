@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import StarRating from "../../components/StarRating";
 import { createReview } from "../../api/reviewApi";
-import type { ReviewData } from "../../api/reviewApi";
+import type { CreateReviewRequest } from "../../api/reviewApi";
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
 
 interface ReviewFormProps {
   bookingId?: number;
+  studioId?: number;
   roomId?: string;
   roomName?: string;
   onReviewSubmitted?: () => void;
@@ -12,10 +15,12 @@ interface ReviewFormProps {
 
 const ReviewForm: React.FC<ReviewFormProps> = ({ 
   bookingId, 
+  studioId,
   roomId, 
   roomName,
   onReviewSubmitted 
 }) => {
+  const { token } = useAuth();
   const [rating, setRating] = useState<number>(0);
   const [comment, setComment] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -43,6 +48,21 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!token) {
+      toast.error('Please login to submit a review');
+      return;
+    }
+    
+    if (!bookingId) {
+      toast.error('Review can only be submitted after a booking');
+      return;
+    }
+    
+    if (!studioId) {
+      toast.error('Studio ID is required');
+      return;
+    }
+    
     const formErrors = validateForm();
     setErrors(formErrors);
     
@@ -54,16 +74,15 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     setMessage('');
     
     try {
-      // Generate a mock booking ID if not provided
-      const mockBookingId = bookingId || Math.floor(Math.random() * 10000);
-      
-      const reviewData: ReviewData = {
-        booking_id: mockBookingId,
+      const reviewData: CreateReviewRequest = {
+        studio_id: studioId,
+        booking_id: bookingId,
         rating,
         comment: comment.trim()
       };
       
-      const result = await createReview(reviewData);
+      await createReview(token, reviewData);
+      toast.success('Review submitted successfully!');
       setMessage('Review submitted successfully!');
       
       // Reset form
@@ -76,7 +95,9 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
       }
       
     } catch (error) {
-      setMessage('Failed to submit review. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit review';
+      toast.error(errorMessage);
+      setMessage(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -119,14 +140,13 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                     <span className="font-medium">Room:</span> {roomId}
                     {roomName && ` (${roomName})`}
                   </p>
-                  {bookingId && (
+                  {bookingId && studioId ? (
                     <p className="text-sm text-gray-600 mt-1">
                       <span className="font-medium">Booking ID:</span> #{bookingId}
                     </p>
-                  )}
-                  {!bookingId && (
+                  ) : (
                     <p className="text-sm text-amber-600 mt-1">
-                      <span className="font-medium">Note:</span> Demo mode - booking ID will be generated automatically
+                      <span className="font-medium">Note:</span> Review can only be submitted after a booking
                     </p>
                   )}
                 </div>
@@ -176,7 +196,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !token || !bookingId || !studioId}
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-amber-600 hover:to-orange-700 transform hover:scale-[1.02] transition duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSubmitting ? (

@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { register as registerApi } from './auth.api';
+import { register as registerApi, registerStudio } from './auth.api';
 import type { RegisterRequest } from './auth.types';
 
 export default function RegisterForm() {
+  const [searchParams] = useSearchParams();
+  const registrationType = searchParams.get('type');
+  const navigate = useNavigate();
+
+  // Redirect to studio registration if type=employer
+  useEffect(() => {
+    if (registrationType === 'employer') {
+      navigate('/studio-register', { replace: true });
+    }
+  }, [registrationType, navigate]);
+
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterRequest>({
     defaultValues: { role: 'client' }
   });
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterRequest) => {
     setLoading(true);

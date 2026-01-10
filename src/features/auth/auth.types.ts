@@ -5,6 +5,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
   token: string;
+  user: Profile;
 };
 
 export type RegisterRequest = {
@@ -23,6 +24,7 @@ export type RegisterResponse = {
 export type StudioRegisterRequest = {
   email: string;
   password: string;
+  phone: string;
   companyName: string;
   bin: string;
   address: string;
@@ -31,14 +33,16 @@ export type StudioRegisterRequest = {
 };
 
 export type Profile = {
+  id: number;
   name: string;
   email: string;
   phone: string;
-  role: string;
+  role: 'client' | 'studio_owner' | 'admin';
   companyName?: string;
   bin?: string;
   address?: string;
   contactPerson?: string;
+  studio_status?: string;
 };
 
 export type ApiError = {
