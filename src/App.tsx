@@ -13,10 +13,8 @@ import Layout from "./components/Layout.tsx";
 
 // Booking components (from Kiryu project)
 import BookingForm from "./features/booking/BookingForm.tsx";
-import AvailabilityCalendar from "./features/booking/AvailabilityCalendar.tsx";
+import AvailabilityCalendarPage from "./features/booking/AvailabilityCalendarPage.tsx";
 import MyBookings from "./features/booking/MyBookings.tsx";
-import ReviewForm from "./features/booking/ReviewForm.tsx";
-import ReviewList from "./features/booking/ReviewList.tsx";
 
 // Reviews components
 import MyReviewsPage from "./features/reviews/MyReviewsPage.tsx";
@@ -60,7 +58,9 @@ function App() {
           } />
           <Route path="/studios/:id" element={
             <ProtectedRoute>
-              <StudioDetail />
+              <Layout>
+                <StudioDetail />
+              </Layout>
             </ProtectedRoute>
           } />
           
@@ -94,12 +94,10 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/availability" element={
+          <Route path="/availability/:roomId" element={
             <ProtectedRoute>
               <Layout>
-                <div className="p-8">
-                  <AvailabilityCalendar roomId="demo-room" selectedDate={new Date()} />
-                </div>
+                <AvailabilityCalendarPage />
               </Layout>
             </ProtectedRoute>
           } />
@@ -130,15 +128,6 @@ function App() {
             </ProtectedRoute>
           } />
           
-          <Route path="/reviews" element={
-            <ProtectedRoute>
-              <Layout>
-                <div className="p-8">
-                  <ReviewList />
-                </div>
-              </Layout>
-            </ProtectedRoute>
-          } />
           
           {/* Admin routes */}
           <Route path="/admin" element={
