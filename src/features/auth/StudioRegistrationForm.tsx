@@ -1,18 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerStudio } from './auth.api';
-import type { StudioRegisterRequest } from './auth.types';
+import toast from 'react-hot-toast';
 
 const StudioRegistrationForm: React.FC = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<StudioRegisterRequest>({
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
+    phone: '', // Added phone field
     companyName: '',
     bin: '',
     address: '',
     contactPerson: '',
-    documents: [],
+    documents: [] as File[],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -21,15 +23,16 @@ const StudioRegistrationForm: React.FC = () => {
   const validateStep = (currentStep: number): boolean => {
     const newErrors: Record<string, string> = {};
     if (currentStep === 1) {
-      if (!formData.email) newErrors.email = 'Email is required';
-      if (!formData.password) newErrors.password = 'Password is required';
-      if (!formData.companyName) newErrors.companyName = 'Company Name is required';
+      if (!formData.email) newErrors.email = 'Email обязателен';
+      if (!formData.password) newErrors.password = 'Пароль обязателен';
+      if (!formData.phone) newErrors.phone = 'Телефон обязателен';
+      if (!formData.companyName) newErrors.companyName = 'Название компании обязательно';
     } else if (currentStep === 2) {
-      if (!formData.bin) newErrors.bin = 'BIN is required';
-      if (!formData.address) newErrors.address = 'Address is required';
-      if (!formData.contactPerson) newErrors.contactPerson = 'Contact Person is required';
+      if (!formData.bin) newErrors.bin = 'БИН обязателен';
+      if (!formData.address) newErrors.address = 'Адрес обязателен';
+      if (!formData.contactPerson) newErrors.contactPerson = 'Контактное лицо обязательно';
     } else if (currentStep === 3) {
-      if (formData.documents.length === 0) newErrors.documents = 'At least one document is required';
+      if (formData.documents.length === 0) newErrors.documents = 'Требуется хотя бы один документ';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -51,10 +54,12 @@ const StudioRegistrationForm: React.FC = () => {
       setLoading(true);
       try {
         await registerStudio(formData);
-        alert('Registration successful!');
-        // Redirect to login or dashboard
+        toast.success('Регистрация студии отправлена! Мы проверим ваши документы.');
+        navigate('/login');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Registration failed');
+        const errorMessage = err instanceof Error ? err.message : 'Ошибка регистрации студии';
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -75,9 +80,9 @@ const StudioRegistrationForm: React.FC = () => {
     <div className="auth-container">
       <div className="auth-card">
         <header className="auth-header">
-          <div className="auth-logo">MWork PhotoStudio</div>
-          <h2 className="auth-title">Studio Registration</h2>
-          <p className="auth-sub">Create your studio account</p>
+          <div className="auth-logo">StudioBooking</div>
+          <h2 className="auth-title">Регистрация студии</h2>
+          <p className="auth-sub">Создайте аккаунт студии</p>
         </header>
 
         {/* Step Indicators */}
@@ -92,38 +97,50 @@ const StudioRegistrationForm: React.FC = () => {
         <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
           {step === 1 && (
             <>
-              <h3 className="step-title">Account Details</h3>
+              <h3 className="step-title">Детали аккаунта</h3>
               <label className="auth-label">
-                <span className="visually-hidden">Email</span>
+                <span className="visually-hidden">Электронная почта</span>
                 <input
                   className="auth-input"
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="Электронная почта"
                   value={formData.email}
                   onChange={handleChange}
                 />
                 {errors.email && <p className="auth-error">{errors.email}</p>}
               </label>
               <label className="auth-label">
-                <span className="visually-hidden">Password</span>
+                <span className="visually-hidden">Пароль</span>
                 <input
                   className="auth-input"
                   type="password"
                   name="password"
-                  placeholder="Password"
+                  placeholder="Пароль"
                   value={formData.password}
                   onChange={handleChange}
                 />
                 {errors.password && <p className="auth-error">{errors.password}</p>}
               </label>
               <label className="auth-label">
-                <span className="visually-hidden">Company Name</span>
+                <span className="visually-hidden">Телефон</span>
+                <input
+                  className="auth-input"
+                  type="tel"
+                  name="phone"
+                  placeholder="Телефон"
+                  value={formData.phone}
+                  onChange={handleChange}
+                />
+                {errors.phone && <p className="auth-error">{errors.phone}</p>}
+              </label>
+              <label className="auth-label">
+                <span className="visually-hidden">Название компании</span>
                 <input
                   className="auth-input"
                   type="text"
                   name="companyName"
-                  placeholder="Company Name"
+                  placeholder="Название компании"
                   value={formData.companyName}
                   onChange={handleChange}
                 />
@@ -134,25 +151,25 @@ const StudioRegistrationForm: React.FC = () => {
 
           {step === 2 && (
             <>
-              <h3 className="step-title">Business Details</h3>
+              <h3 className="step-title">Детали бизнеса</h3>
               <label className="auth-label">
-                <span className="visually-hidden">BIN</span>
+                <span className="visually-hidden">БИН</span>
                 <input
                   className="auth-input"
                   type="text"
                   name="bin"
-                  placeholder="Business Identification Number"
+                  placeholder="Бизнес идентификационный номер"
                   value={formData.bin}
                   onChange={handleChange}
                 />
                 {errors.bin && <p className="auth-error">{errors.bin}</p>}
               </label>
               <label className="auth-label">
-                <span className="visually-hidden">Address</span>
+                <span className="visually-hidden">Адрес</span>
                 <textarea
                   className="auth-input"
                   name="address"
-                  placeholder="Address"
+                  placeholder="Адрес"
                   value={formData.address}
                   onChange={handleChange}
                   rows={3}
@@ -160,12 +177,12 @@ const StudioRegistrationForm: React.FC = () => {
                 {errors.address && <p className="auth-error">{errors.address}</p>}
               </label>
               <label className="auth-label">
-                <span className="visually-hidden">Contact Person</span>
+                <span className="visually-hidden">Контактное лицо</span>
                 <input
                   className="auth-input"
                   type="text"
                   name="contactPerson"
-                  placeholder="Contact Person"
+                  placeholder="Контактное лицо"
                   value={formData.contactPerson}
                   onChange={handleChange}
                 />
@@ -176,9 +193,9 @@ const StudioRegistrationForm: React.FC = () => {
 
           {step === 3 && (
             <>
-              <h3 className="step-title">Document Upload</h3>
+              <h3 className="step-title">Загрузка документов</h3>
               <label className="auth-label">
-                <span className="visually-hidden">Documents</span>
+                <span className="visually-hidden">Документы</span>
                 <input
                   className="auth-input"
                   type="file"
@@ -189,7 +206,7 @@ const StudioRegistrationForm: React.FC = () => {
               </label>
               {formData.documents.length > 0 && (
                 <div className="document-list">
-                  <h4>Selected Documents:</h4>
+                  <h4>Выбранные документы:</h4>
                   <ul>
                     {formData.documents.map((file, index) => (
                       <li key={index}>{file.name}</li>
@@ -205,16 +222,16 @@ const StudioRegistrationForm: React.FC = () => {
           <div className="step-buttons">
             {step > 1 && (
               <button type="button" onClick={handleBack} className="auth-button-secondary">
-                Back
+                Назад
               </button>
             )}
             {step < 3 ? (
               <button type="button" onClick={handleNext} className="auth-button">
-                Next
+                Далее
               </button>
             ) : (
               <button type="button" onClick={handleSubmit} className="auth-button" disabled={loading}>
-                {loading ? 'Registering...' : 'Register'}
+                {loading ? 'Регистрация...' : 'Зарегистрировать'}
               </button>
             )}
           </div>
@@ -222,8 +239,8 @@ const StudioRegistrationForm: React.FC = () => {
 
         <footer className="auth-footer">
           <div className="auth-footer-links">
-            <small>Already have an account? <Link to="/login">Sign in</Link></small>
-            <small>Register as Client? <Link to="/register">Client Registration</Link></small>
+            <small>Уже есть аккаунт? <Link to="/login">Войти</Link></small>
+            <small>Регистрация как клиент? <Link to="/register">Регистрация клиента</Link></small>
           </div>
         </footer>
       </div>

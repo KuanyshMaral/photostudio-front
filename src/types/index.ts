@@ -16,6 +16,7 @@ export interface Studio {
   phone?: string;
   email?: string;
   website?: string;
+  rooms?: Room[];
 }
 
 export interface DaySchedule {
@@ -50,6 +51,39 @@ export interface Equipment {
   model?: string;
   quantity: number;
   rental_price?: number;
+}
+
+export interface Booking {
+  id: number;
+  room_id: number;
+  studio_id: number;
+  start_time: string;
+  end_time: string;
+  total_price: number;
+  status: BookingStatus;
+  payment_status: PaymentStatus;
+}
+
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
+
+export interface Review {
+  id: number;
+  studio_id: number;
+  user_id: number;
+  rating: number;
+  comment?: string;
+  owner_response?: string;
+  created_at: string;
+}
+
+export interface StudioFilterParams {
+  city?: string;
+  room_type?: string;
+  min_price?: number;
+  max_price?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface Filters {
