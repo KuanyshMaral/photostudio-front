@@ -12,7 +12,11 @@ export const getStudios = async (params: StudioFilterParams) => {
     if (params.limit) searchParams.append('limit', String(params.limit));
     
     const response = await fetch(`${API_BASE}/studios?${searchParams.toString()}`);
-    if (!response.ok) throw new Error('Failed to fetch studios');
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `HTTP error ${response.status}`);
+    }
     
     const json = await response.json();
     return { 
@@ -24,7 +28,14 @@ export const getStudios = async (params: StudioFilterParams) => {
 
 export const getStudioById = async (id: number) => {
     const response = await fetch(`${API_BASE}/studios/${id}`);
-    if (!response.ok) throw new Error('Studio not found');
+    
+    if (!response.ok) {
+        if (response.status === 404) {
+            throw new Error('Studio not found');
+        }
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to load studio');
+    }
     
     const json = await response.json();
     return json.data;
@@ -40,7 +51,11 @@ export const getStudiosWithRooms = async (params: StudioFilterParams) => {
     if (params.limit) searchParams.append('limit', String(params.limit));
     
     const response = await fetch(`${API_BASE}/studios?include_rooms=true&${searchParams.toString()}`);
-    if (!response.ok) throw new Error('Failed to fetch studios with rooms');
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to fetch studios with rooms');
+    }
     
     const json = await response.json();
     return { 
