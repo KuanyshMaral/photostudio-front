@@ -1,13 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-
-interface User {
-  id: number;
-  email: string;
-  name: string;
-  role: 'client' | 'studio_owner' | 'admin';
-  created_at: string;
-}
+import { getAllUsers, updateUser, deleteUser, type User } from './users.api';
 
 export default function UserManagement() {
   const { token } = useAuth();
@@ -15,28 +8,21 @@ export default function UserManagement() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data for now - replace with actual API call
-    const mockUsers: User[] = [
-      {
-        id: 1,
-        email: 'admin@studiobooking.kz',
-        name: 'Admin',
-        role: 'admin',
-        created_at: '2024-01-01'
-      },
-      {
-        id: 2,
-        email: 'client@test.com',
-        name: 'Test Client',
-        role: 'client',
-        created_at: '2024-01-02'
+    const fetchUsers = async () => {
+      if (!token) return;
+      console.log('UserManagement: Fetching users...');
+      try {
+        const data = await getAllUsers(token);
+        console.log('UserManagement: Received data:', data);
+        setUsers(data);
+      } catch (error) {
+        console.error('Failed to fetch users:', error);
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
     
-    setTimeout(() => {
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 1000);
+    fetchUsers();
   }, [token]);
 
   if (loading) {
