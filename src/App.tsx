@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { StudioDetail } from "./features/catalog/pages/StudioDetail";
 import { AdminDashboard } from "./features/admin/AdminDashboard";
 import { AuthProvider } from './context/AuthContext';
+import MyStudios from './features/owner/MyStudios';
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,8 @@ function App() {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/studio-register" element={<StudioRegistrationForm />} />
 
+            
+
             {/* Protected routes */}
             <Route path="/profile" element={
               <ProtectedRoute>
@@ -32,6 +35,14 @@ function App() {
               </ProtectedRoute>
             } />
 
+<Route
+  path="/owner/studios"
+  element={
+    <ProtectedRoute>
+      <MyStudios />
+    </ProtectedRoute>
+  }
+/>
             <Route path="/studios/:id" element={
               <ProtectedRoute>
                  <StudioDetail />
