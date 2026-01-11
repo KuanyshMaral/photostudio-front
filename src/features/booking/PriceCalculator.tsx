@@ -17,9 +17,9 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     if (!startTime || !endTime) return 0;
     
     const diffMs = endTime.getTime() - startTime.getTime();
-    const diffHours = diffMs / (1000 * 60 * 60);
+    // Calculate duration more precisely to avoid floating-point errors
+    const diffHours = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100;
     
-    // Round up to the nearest hour (or partial hour)
     return Math.max(0, diffHours);
   };
 
@@ -27,9 +27,10 @@ const PriceCalculator: React.FC<PriceCalculatorProps> = ({
     const duration = calculateDuration();
     if (duration === 0) return 0;
     
-    // Use minimum price per hour, could be enhanced to use max price for longer bookings
+    // Use minimum price per hour with precise calculation
     const hourlyRate = room.price_per_hour_min;
-    return Math.ceil(duration * hourlyRate);
+    // Calculate price and round to nearest integer to avoid floating-point issues
+    return Math.round(duration * hourlyRate);
   };
 
   const duration = calculateDuration();
