@@ -1,13 +1,13 @@
-<<<<<<< HEAD
-﻿import React, { useState } from 'react';
-=======
 import React, { useState } from 'react';
->>>>>>> f83ef12af8aefd8823700639a335fa134678d5bf
 import { useQuery } from '@tanstack/react-query';
 import { getStudios } from '../api/studios';
-import { StudioCard } from '../components/StudioCard';
+// Убедись, что путь к StudioCard правильный. 
+// Если ты сохранил код выше в src/components/StudioCard.tsx, то путь такой:
+import { StudioCard } from '../../../components/StudioCard'; 
 import { StudioFilters } from '../components/StudioFilters';
-import { StudioFilterParams } from '../../../types';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+// StudioFilterParams берем из types.ts, так как в index.ts его нет
+import { StudioFilterParams } from '../../../types/types'; 
 
 export const StudioList: React.FC = () => {
     const [filters, setFilters] = useState<StudioFilterParams>({
@@ -16,12 +16,29 @@ export const StudioList: React.FC = () => {
         city: 'Алматы'
     });
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ['studios', filters],
         queryFn: () => getStudios(filters),
     });
 
-    if (isLoading) return <div className="p-10 text-center">Загрузка каталога...</div>;
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-screen bg-gray-50">
+                <LoadingSpinner size="lg" text="Загрузка каталога..." />
+            </div>
+        );
+    }
+
+    if (isError) {
+         return (
+            <div className="flex justify-center items-center h-screen bg-gray-50">
+                <p className="text-red-500">Ошибка загрузки данных</p>
+            </div>
+        );
+    }
+
+    // data прилетает как StudiosResponse, внутри есть data.studios
+    const studiosList = data?.data?.studios || [];
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -33,11 +50,11 @@ export const StudioList: React.FC = () => {
                     </aside>
                     <main className="md:col-span-3">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {data?.data.map(studio => (
+                            {studiosList.map((studio) => (
                                 <StudioCard key={studio.id} studio={studio} />
                             ))}
                         </div>
-                        {data?.data.length === 0 && (
+                        {studiosList.length === 0 && (
                             <p className="text-center text-gray-500 mt-10">Студии не найдены</p>
                         )}
                     </main>
