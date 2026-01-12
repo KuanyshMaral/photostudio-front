@@ -142,6 +142,15 @@ export default function Dashboard() {
         {isAdmin && (
           <>
             <Link
+              to="/admin/dashboard"
+              className="bg-blue-100 p-6 rounded-lg border border-blue-300 hover:border-blue-400 transition-colors shadow-sm hover:shadow-md"
+            >
+              <div className="text-blue-600 mb-3">🏠</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Admin Dashboard</h3>
+              <p className="text-gray-600 text-sm">View statistics and pending requests</p>
+            </Link>
+
+            <Link
               to="/admin/users"
               className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
             >
