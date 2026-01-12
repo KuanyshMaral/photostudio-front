@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getPendingStudios, verifyStudio, rejectStudio, type PendingStudio } from './admin.api';
-import StudioCard from './StudioCard';
 import toast from 'react-hot-toast';
 
 interface Props {
@@ -22,7 +21,7 @@ export default function PendingStudios({ onUpdate }: Props) {
             const data = await getPendingStudios(token);
             setStudios(data);
         } catch (error) {
-            toast.error('Не удалось загрузить заявки');
+            toast.error('Failed to load verification requests');
         } finally {
             setLoading(false);
         }
@@ -38,55 +37,69 @@ export default function PendingStudios({ onUpdate }: Props) {
         
         try {
             await verifyStudio(token, studioId);
-            toast.success('Студия верифицирована');
+            toast.success('Studio verified successfully');
             setStudios(prev => prev.filter(s => s.id !== studioId));
             onUpdate();
         } catch (error) {
-            toast.error('Ошибка при верификации');
+            toast.error('Error during verification');
         } finally {
             setActionLoading(null);
         }
     };
     
-    const handleReject = async (studioId: number) => {
-        const studio = studios.find(s => s.id === studioId);
-        if (studio) {
-            setRejectModal({ studioId: studio.id, name: studio.name });
-        }
-    };
-    
-    const handleRejectSubmit = async () => {
+    const handleReject = async () => {
         if (!token || !rejectModal || !rejectReason.trim()) return;
         setActionLoading(rejectModal.studioId);
         
         try {
             await rejectStudio(token, rejectModal.studioId, rejectReason);
-            toast.success('Заявка отклонена');
+            toast.success('Request rejected');
             setStudios(prev => prev.filter(s => s.id !== rejectModal.studioId));
             setRejectModal(null);
             setRejectReason('');
             onUpdate();
         } catch (error) {
-            toast.error('Ошибка при отклонении');
+            toast.error('Error rejecting request');
         } finally {
             setActionLoading(null);
         }
     };
     
-    if (loading) return <p>Загрузка...</p>;
-    if (studios.length === 0) return <p>Нет заявок на верификацию</p>;
+    if (loading) return <p>Loading...</p>;
+    if (studios.length === 0) return <p>No pending verification requests</p>;
     
     return (
         <>
             <div className="pending-list">
                 {studios.map(studio => (
-                    <StudioCard
-                        key={studio.id}
-                        studio={studio}
-                        onVerify={handleVerify}
-                        onReject={handleReject}
-                        actionLoading={actionLoading}
-                    />
+                    <div key={studio.id} className="pending-card">
+                        <div className="pending-info">
+                            <h3>{studio.name}</h3>
+                            <p>{studio.address}, {studio.city}</p>
+                            <p className="owner-info">
+                                Owner: {studio.owner_name} ({studio.owner_email})
+                            </p>
+                            <p className="date">
+                                Requested on: {new Date(studio.created_at).toLocaleDateString()}
+                            </p>
+                        </div>
+                        <div className="pending-actions">
+                            <button
+                                onClick={() => handleVerify(studio.id)}
+                                disabled={actionLoading === studio.id}
+                                className="btn-verify"
+                            >
+                                {actionLoading === studio.id ? '...' : 'Approve'}
+                            </button>
+                            <button
+                                onClick={() => setRejectModal({ studioId: studio.id, name: studio.name })}
+                                disabled={actionLoading === studio.id}
+                                className="btn-reject"
+                            >
+                                Reject
+                            </button>
+                        </div>
+                    </div>
                 ))}
             </div>
             
@@ -94,24 +107,24 @@ export default function PendingStudios({ onUpdate }: Props) {
             {rejectModal && (
                 <div className="modal-overlay" onClick={() => setRejectModal(null)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3>Отклонить заявку</h3>
-                        <p>Студия: {rejectModal.name}</p>
+                        <h3>Reject Request</h3>
+                        <p>Studio: {rejectModal.name}</p>
                         <textarea
                             value={rejectReason}
                             onChange={e => setRejectReason(e.target.value)}
-                            placeholder="Укажите причину отклонения..."
+                            placeholder="Please provide a reason for rejection..."
                             rows={4}
                         />
                         <div className="modal-actions">
                             <button onClick={() => setRejectModal(null)} className="btn-cancel">
-                                Отмена
+                                Cancel
                             </button>
                             <button 
-                                onClick={handleRejectSubmit} 
-                                disabled={!rejectReason.trim() || actionLoading === rejectModal.studioId}
+                                onClick={handleReject} 
+                                disabled={!rejectReason.trim()}
                                 className="btn-reject"
                             >
-                                {actionLoading === rejectModal.studioId ? '...' : 'Отклонить'}
+                                Reject
                             </button>
                         </div>
                     </div>

@@ -1,11 +1,10 @@
-const API_BASE = '/api/v1';
+const API_BASE = 'http://localhost:3001/api/v1';
 
 export interface Statistics {
     total_users: number;
     total_studios: number;
     total_bookings: number;
     pending_studios: number;
-    pending_bookings: number;
     today_bookings: number;
 }
 
@@ -16,20 +15,6 @@ export interface PendingStudio {
     city: string;
     owner_name: string;
     owner_email: string;
-    created_at: string;
-}
-
-export interface PendingBooking {
-    id: number;
-    studio_name: string;
-    client_name: string;
-    client_email: string;
-    room_name: string;
-    date: string;
-    start_time: string;
-    end_time: string;
-    total_price: number;
-    status: 'pending' | 'approved' | 'rejected';
     created_at: string;
 }
 
@@ -73,36 +58,4 @@ export const rejectStudio = async (token: string, studioId: number, reason: stri
         body: JSON.stringify({ reason })
     });
     if (!response.ok) throw new Error('Failed to reject studio');
-};
-
-export const getPendingBookings = async (token: string): Promise<PendingBooking[]> => {
-    const response = await fetch(`${API_BASE}/admin/bookings/pending`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!response.ok) throw new Error('Failed to fetch pending bookings');
-    const json = await response.json();
-    return json.data?.bookings || [];
-};
-
-export const approveBooking = async (token: string, bookingId: number): Promise<void> => {
-    const response = await fetch(`${API_BASE}/admin/bookings/${bookingId}/approve`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    if (!response.ok) throw new Error('Failed to approve booking');
-};
-
-export const rejectBooking = async (token: string, bookingId: number, reason: string): Promise<void> => {
-    const response = await fetch(`${API_BASE}/admin/bookings/${bookingId}/reject`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ reason })
-    });
-    if (!response.ok) throw new Error('Failed to reject booking');
 };
