@@ -8,10 +8,25 @@ import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
 import type { TimeSlot } from "../../api/availabilityApi";
 
+<<<<<<< HEAD
+import { createBooking } from '../../api/bookingApi';
+import { getRoomAvailability } from '../../api/availabilityApi';
+import { useAuth } from '../../context/AuthContext.tsx';
+import type { TimeSlot } from '../../types/booking';
+import TimeSlotPicker from './TimeSlotPicker';
+
+interface BookingModalProps {
+  roomId: number;
+  pricePerHour: number;
+  roomName: string;
+  studioName: string;
+  onClose: () => void;
+=======
 // Inline TimeSlotPicker component to resolve import issues
 interface TimeSlotPickerProps {
     slots: TimeSlot[];
     onSelect: (startHour: number, endHour: number) => void;
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 }
 
 const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ slots, onSelect }) => {

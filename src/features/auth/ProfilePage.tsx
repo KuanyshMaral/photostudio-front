@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getProfile, uploadFiles } from './auth.api';
+import { getProfile, uploadFiles } from './auth.api';
+import { useAuth } from '../../context/AuthContext.tsx';
 import { useAuth } from '../../context/AuthContext';
 import type { Profile } from './auth.types';
 import EditProfileForm from './EditProfileForm';
