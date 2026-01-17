@@ -5,8 +5,8 @@ import { LeftPanel } from './components/LeftPanel';
 import StudioDetailModal from '../../components/StudioDetailModal';
 import Pagination from '../../components/Pagination';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import type { Studio, StudioFilterParams } from '../../types/index';
-import { getStudiosWithRooms } from './api/studios';
+import type { Studio, StudioFilterParams } from '../../types/index_new';
+import { getStudiosWithRooms } from './api/studios_new';
 
 const StudioCatalog: React.FC = () => {
   const [filters, setFilters] = useState<StudioFilterParams>({

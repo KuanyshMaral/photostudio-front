@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin, Star, Clock, Filter, TrendingUp } from 'lucide-react';
-import { StudioFilters } from './StudioFilters';
-import type { StudioFilterParams } from '../../../types';
+import StudioFilters from './StudioFiltersFinal';
+import type { StudioFilterParams } from '../../../types/index_new';
 
 interface LeftPanelProps {
   filters: StudioFilterParams;
@@ -23,7 +23,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           <h3 className="font-semibold text-gray-900">Фильтры</h3>
         </div>
         <StudioFilters 
-          filters={filters} 
+          filters={filters}
           onFilterChange={onFilterChange}
         />
       </div>

@@ -1,54 +1,43 @@
-import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import { login } from "./auth.api";
-<<<<<<< HEAD
+import type { LoginRequest } from "./auth.types";
+import { useAuth } from "../../context/AuthContext";
 import type { LoginRequest } from "./auth.types";
 import { useAuth } from "../../context/AuthContext.tsx";
-=======
-import { useAuth } from "../../context/AuthContext";
-import { Loader2 } from "lucide-react";
-
-interface LoginFormData {
-  email: string;
-  password: string;
-}
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
+main
 
 export default function LoginForm() {
-  const [isLoading, setIsLoading] = useState(false);
   const { login: authLogin } = useAuth();
   const navigate = useNavigate();
 
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors } 
-  } = useForm<LoginFormData>();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
     try {
-      const response = await login(data);
-      authLogin(response.token, response.user);
-      toast.success('Вы успешно вошли!');
+      const data: LoginRequest = { email, password };
+      const res = await login(data);
+      authLogin(res.token, res.user);
+      toast.success('Вход выполнен успешно!');
       
       // Redirect based on user role
-      if (response.user?.role === 'admin') {
+      if (res.user?.role === 'admin') {
         navigate('/admin');
-      } else if (response.user?.role === 'studio_owner') {
+      } else if (res.user?.role === 'studio_owner') {
         navigate('/owner');
       } else {
         navigate('/dashboard');
       }
-    } catch (error: any) {
-      // Показываем ошибку от API
-      const message = error.response?.data?.error?.message || error.message || 'Ошибка входа';
-      toast.error(message);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Ошибка входа. Проверьте учетные данные.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -61,70 +50,33 @@ export default function LoginForm() {
           <p className="auth-sub">Войдите в свой аккаунт для продолжения</p>
         </header>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="auth-form space-y-4">
-          {/* Email field */}
-          <div>
-            <label className="auth-label">
-              <span className="visually-hidden">Email</span>
-              <input
-                type="email"
-                {...register('email', {
-                  required: 'Email обязателен',
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'Некорректный email'
-                  }
-                })}
-                className={`auth-input ${
-                  errors.email ? 'border-red-500 focus:border-red-500' : ''
-                }`}
-                placeholder="Электронная почта"
-              />
-            </label>
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-            )}
-          </div>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="auth-label">
+            <span className="visually-hidden">Email</span>
+            <input
+              className="auth-input"
+              type="email"
+              placeholder="Электронная почта"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
 
-          {/* Password field */}
-          <div>
-            <label className="auth-label">
-              <span className="visually-hidden">Пароль</span>
-              <input
-                type="password"
-                {...register('password', {
-                  required: 'Пароль обязателен',
-                  minLength: {
-                    value: 6,
-                    message: 'Минимум 6 символов'
-                  }
-                })}
-                className={`auth-input ${
-                  errors.password ? 'border-red-500 focus:border-red-500' : ''
-                }`}
-                placeholder="Пароль"
-              />
-            </label>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-          </div>
+          <label className="auth-label">
+            <span className="visually-hidden">Пароль</span>
+            <input
+              className="auth-input"
+              type="password"
+              placeholder="Пароль"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
 
-          {/* Submit button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="auth-button w-full flex items-center justify-center gap-2
-                     disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Вход...
-              </>
-            ) : (
-              'Войти'
-            )}
+          <button className="auth-button" type="submit" disabled={loading}>
+            {loading ? "Вход..." : "Войти"}
           </button>
         </form>
 

@@ -43,7 +43,6 @@ export type Profile = {
   address?: string;
   contactPerson?: string;
   studio_status?: string;
-  avatar?: string;
 };
 
 export type ApiError = {
