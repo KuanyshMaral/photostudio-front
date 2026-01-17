@@ -1,155 +1,119 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ReviewForm from '../booking/ReviewForm';
-import { getMyBookings } from '../../api/bookingApi';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { checkCanLeaveReview, createReview } from '../../api/reviewApi';
+import LoadingSpinner from '../../components/LoadingSpinner';
 
-interface Booking {
-  id: number;
-  room_id: string;
-  room_name?: string;
-  studio_id?: number;
-  studio_name?: string;
-  start_time: string;
-  end_time: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'finished';
-  created_at: string;
-  updated_at?: string;
-  price?: number;
-}
+// Временный компонент Star, если его нет глобально
+const Star = ({ className }: { className?: string }) => (
+  <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+    <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
+  </svg>
+);
 
-const WriteReviewPage: React.FC = () => {
+export default function WriteReviewPage() {
+  const { studioId } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showReviewForm, setShowReviewForm] = useState(false);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      if (!token) return;
-      
-      try {
-        const bookingsData = await getMyBookings(token);
-        
-        // Filter only completed bookings that can be reviewed
-        const completedBookings = bookingsData.filter((booking: any) => 
-          booking.status === 'completed' || booking.status === 'finished'
-        );
-        
-        setBookings(completedBookings);
-      } catch (error) {
-        console.error('Failed to load bookings:', error);
-        toast.error('Failed to load your bookings');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  // const [photos, setPhotos] = useState<File[]>([]); // Для будущей реализации
+  const [isLoading, setIsLoading] = useState(false);
 
-    fetchBookings();
-  }, [token]);
+  const { data: canReview, isLoading: checkingPermission } = useQuery({
+    queryKey: ['can-review', studioId],
+    queryFn: () => checkCanLeaveReview(Number(studioId)),
+    enabled: !!studioId
+  });
 
-  const handleBookingSelect = (booking: Booking) => {
-    setSelectedBooking(booking);
-    setShowReviewForm(true);
+  const handleSubmit = async () => {
+    if (rating === 0) {
+      toast.error('Укажите рейтинг');
+      return;
+    }
+    if (!comment.trim()) {
+      toast.error('Напишите отзыв');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await createReview({
+        studio_id: Number(studioId),
+        rating,
+        comment,
+        photos: [] // TODO: добавить загрузку фото
+      });
+
+      toast.success('Отзыв отправлен!');
+      navigate(`/studios/${studioId}`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error?.message || 'Ошибка');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleReviewSubmitted = () => {
-    toast.success('Review submitted successfully!');
-    navigate('/reviews');
-  };
+  if (checkingPermission) return <LoadingSpinner />;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (loading) {
+  if (!canReview) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <span className="ml-3 text-gray-600">Loading your bookings...</span>
-        </div>
+      <div className="text-center py-12">
+        <p className="text-gray-500 mb-4">
+          Вы можете оставить отзыв только после завершённого бронирования
+        </p>
+        <Link to="/studios" className="text-blue-600 hover:underline">
+          Вернуться к каталогу
+        </Link>
       </div>
-    );
-  }
-
-  if (showReviewForm && selectedBooking) {
-    return (
-      <ReviewForm
-        bookingId={selectedBooking.id}
-        studioId={selectedBooking.studio_id || 0}
-        roomId={selectedBooking.room_id}
-        roomName={selectedBooking.room_name}
-        onReviewSubmitted={handleReviewSubmitted}
-      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Оставить отзыв</h1>
-          <p className="text-gray-600 mt-1">Выберите бронирование, которое вы хотите оценить</p>
-        </div>
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Оставить отзыв</h1>
 
-        {bookings.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div className="text-gray-400 text-lg mb-4">У вас нет завершенных бронирований</div>
-            <p className="text-gray-500 mb-6">Вы можете оставить отзыв только после посещения студии</p>
-            <button
-              onClick={() => navigate('/studios')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Найти студию
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Ваши завершенные бронирования:</h2>
-            {bookings.map((booking) => (
-              <div key={booking.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-900">
-                      {booking.studio_name || 'Studio'}
-                    </h3>
-                    <p className="text-gray-600 mt-1">
-                      {booking.room_name || `Room ${booking.room_id}`}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      {formatDate(booking.start_time)} - {formatDate(booking.end_time)}
-                    </p>
-                    <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-2">
-                      {booking.status === 'completed' ? 'Завершено' : 
-                       booking.status === 'finished' ? 'Завершено' : 
-                       booking.status}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleBookingSelect(booking)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Оставить отзыв
-                  </button>
-                </div>
-              </div>
+      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+        <div>
+          <label className="block text-sm font-medium mb-2">Ваша оценка</label>
+          <div className="flex gap-2">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button
+                key={star}
+                onClick={() => setRating(star)}
+                className="focus:outline-none transition-transform hover:scale-110"
+              >
+                <Star
+                  className={`w-8 h-8 ${
+                    star <= rating
+                      ? 'fill-yellow-400 text-yellow-400'
+                      : 'text-gray-300'
+                  }`}
+                />
+              </button>
             ))}
           </div>
-        )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-2">Ваш отзыв</label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Расскажите о вашем опыте..."
+            className="w-full p-3 border rounded-lg resize-none h-32"
+          />
+        </div>
+
+        <button
+          onClick={handleSubmit}
+          disabled={isLoading}
+          className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {isLoading ? 'Отправка...' : 'Отправить отзыв'}
+        </button>
       </div>
     </div>
   );
-};
-
-export default WriteReviewPage;
+}
