@@ -20,9 +20,9 @@ import MyBookings from "./features/booking/MyBookings.tsx";
 import MyReviewsPage from "./features/reviews/MyReviewsPage.tsx";
 import WriteReviewPage from "./features/reviews/WriteReviewPage.tsx";
 
-// Studio catalog components (from Amir project)
-import StudioCatalog from "./features/catalog/StudioCatalog.tsx";
-import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
+// Studio catalog components
+import StudioCatalog from "./features/catalog/StudioCatalogClean.tsx";
+import StudioDetail from "./features/catalog/StudioDetailClean.tsx";
 
 // Admin components
 import AdminDashboard from "./features/admin/AdminDashboard";
