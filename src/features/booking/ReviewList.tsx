@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import StarRating from "../../components/StarRating";
-import { getRoomReviews } from "../../api/reviewApi";
+import { getStudioReviews } from "../../api/reviewApi";
 import type { Review } from "../../api/reviewApi";
 
 interface ReviewListProps {
-  roomId?: string;
   roomName?: string;
+  studioId?: number;
 }
 
 interface OwnerResponse {
@@ -16,7 +16,7 @@ interface OwnerResponse {
   responder_name: string;
 }
 
-const ReviewList: React.FC<ReviewListProps> = ({ roomId, roomName }) => {
+const ReviewList: React.FC<ReviewListProps> = ({ roomName, studioId }) => {
   const [reviews, setReviews] = useState<(Review & { ownerResponse?: OwnerResponse })[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,23 +24,23 @@ const ReviewList: React.FC<ReviewListProps> = ({ roomId, roomName }) => {
 
   useEffect(() => {
     const fetchReviews = async () => {
-      if (!roomId) return;
+      if (!studioId) return;
       
       setLoading(true);
       setError(null);
       
       try {
-        const data = await getRoomReviews(roomId);
+        const data = await getStudioReviews(studioId);
         
         // Mock owner responses for demonstration
-        const reviewsWithResponses = data.map(review => ({
+        const reviewsWithResponses = data.map((review: Review) => ({
           ...review,
           ownerResponse: Math.random() > 0.5 ? {
             id: Math.floor(Math.random() * 10000),
             review_id: review.id,
-            response: "Thank you for your feedback! We're glad you enjoyed your experience in our room. We've noted your suggestions and will work on improving our services.",
+            response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
             created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
-            responder_name: "Room Manager"
+            responder_name: "Studio Manager"
           } : undefined
         }));
         
@@ -53,7 +53,7 @@ const ReviewList: React.FC<ReviewListProps> = ({ roomId, roomName }) => {
     };
 
     fetchReviews();
-  }, [roomId]);
+  }, [studioId]);
 
   const sortReviews = (reviewsToSort: (Review & { ownerResponse?: OwnerResponse })[]) => {
     const sorted = [...reviewsToSort];
@@ -183,11 +183,11 @@ const ReviewList: React.FC<ReviewListProps> = ({ roomId, roomName }) => {
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
                             <span className="text-indigo-600 font-semibold">
-                              {review.room_name?.charAt(0) || 'U'}
+                              {review.user_name?.charAt(0) || 'U'}
                             </span>
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">Guest User</p>
+                            <p className="font-medium text-gray-900">{review.user_name || 'Guest User'}</p>
                             <p className="text-sm text-gray-500">{formatDate(review.created_at)}</p>
                           </div>
                         </div>

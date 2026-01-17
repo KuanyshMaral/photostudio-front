@@ -1,97 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import type { TimeSlot as TimeSlotType } from '../../types/booking';
+import React, { useState } from "react";
+import type { TimeSlot } from "../../api/availabilityApi";
 
 interface TimeSlotPickerProps {
-  slots: TimeSlotType[];
-  onSelect: (start: number, end: number) => void;
-  className?: string;
+    slots: TimeSlot[];
+    onSelect: (startHour: number, endHour: number) => void;
 }
 
-const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ 
-  slots, 
-  onSelect,
-  className = ''
-}) => {
-  const [selection, setSelection] = useState<{
-    start: number | null;
-    end: number | null;
-  }>({ start: null, end: null });
-
-  // Reset selection when slots change
-  useEffect(() => {
-    setSelection({ start: null, end: null });
-  }, [slots]);
-
-  const handleSlotClick = (hour: number, available: boolean) => {
-    if (!available) return;
-
-    const { start, end } = selection;
-
-    // If no start time selected or both start and end are selected, set new start
-    if (start === null || (start !== null && end !== null)) {
-      setSelection({ start: hour, end: null });
-    } 
-    // If start is selected but end is not
-    else if (start !== null && end === null) {
-      // If clicked time is before start, set it as new start
-      if (hour < start) {
-        setSelection({ start: hour, end: null });
-      } 
-      // If clicked time is after start, set it as end
-      else if (hour > start) {
-        const newEnd = hour;
-        setSelection({ start, end: newEnd });
-        onSelect(start, newEnd);
-      }
-      // If same hour is clicked again, clear selection
-      else {
-        setSelection({ start: null, end: null });
-      }
-    }
-  };
-
-  const isSlotInSelection = (hour: number) => {
-    const { start, end } = selection;
-    if (start === null || end === null) return false;
-    return hour >= start && hour <= end;
-  };
-
-  const isStartSlot = (hour: number) => hour === selection.start;
-  const isEndSlot = (hour: number) => hour === selection.end;
-
-  return (
-    <div className={`grid grid-cols-4 gap-2 ${className}`}>
-      {slots.map((slot) => {
-        const isSelected = isSlotInSelection(slot.hour);
-        const isStart = isStartSlot(slot.hour);
-        const isEnd = isEndSlot(slot.hour);
+export const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ slots, onSelect }) => {
+    const [startHour, setStartHour] = useState<number | null>(null);
+    const [endHour, setEndHour] = useState<number | null>(null);
+    
+    const handleSlotClick = (hour: number, available: boolean) => {
+        if (!available) return;
         
-        let className = 'p-2 text-center rounded border cursor-pointer transition-colors ';
-        
-        if (!slot.available) {
-          className += 'bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200';
-        } else if (isStart) {
-          className += 'bg-blue-500 text-white border-blue-600 rounded-r-none';
-        } else if (isEnd) {
-          className += 'bg-blue-500 text-white border-blue-600 rounded-l-none';
-        } else if (isSelected) {
-          className += 'bg-blue-300 text-white border-blue-400 rounded-none';
+        if (!startHour) {
+            setStartHour(hour);
+            setEndHour(null);
+        } else if (!endHour && hour > startHour) {
+            setEndHour(hour);
+            onSelect(startHour, hour);
         } else {
-          className += 'bg-white hover:bg-blue-50 border-gray-200';
+            setStartHour(hour);
+            setEndHour(null);
         }
-
-        return (
-          <div
-            key={slot.hour}
-            className={className}
-            onClick={() => handleSlotClick(slot.hour, slot.available)}
-          >
-            {`${slot.hour}:00`}
-          </div>
-        );
-      })}
-    </div>
-  );
+    };
+    
+    const isInRange = (hour: number): boolean => {
+        if (!startHour || !endHour) return false;
+        return hour > startHour && hour < endHour;
+    };
+    
+    const formatHour = (hour: number): string => {
+        return `${hour.toString().padStart(2, '0')}:00`;
+    };
+    
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-2">
+                {slots.map(slot => (
+                    <button
+                        key={slot.hour}
+                        className={`
+                            relative p-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium
+                            ${slot.available 
+                                ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer' 
+                                : 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
+                            }
+                            ${startHour === slot.hour 
+                                ? 'border-blue-500 bg-blue-100 text-blue-700' 
+                                : ''
+                            }
+                            ${endHour === slot.hour 
+                                ? 'border-blue-500 bg-blue-100 text-blue-700' 
+                                : ''
+                            }
+                            ${isInRange(slot.hour) 
+                                ? 'border-blue-300 bg-blue-50' 
+                                : ''
+                            }
+                        `}
+                        onClick={() => handleSlotClick(slot.hour, slot.available)}
+                        disabled={!slot.available}
+                        title={slot.available ? formatHour(slot.hour) : 'Занято'}
+                    >
+                        <div className="text-center">
+                            <div className="font-semibold">
+                                {formatHour(slot.hour)}
+                            </div>
+                            {slot.booking && (
+                                <div className="text-xs text-red-600 mt-1">
+                                    Занято
+                                </div>
+                            )}
+                        </div>
+                    </button>
+                ))}
+            </div>
+            
+            <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-blue-100 border-2 border-blue-500 rounded mr-2"></div>
+                        <span>Выбрано</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-blue-50 border-2 border-blue-300 rounded mr-2"></div>
+                        <span>В диапазоне</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-gray-50 border-2 border-gray-200 rounded opacity-50 mr-2"></div>
+                        <span>Недоступно</span>
+                    </div>
+                </div>
+                
+                {startHour && !endHour && (
+                    <div className="text-blue-600 font-medium">
+                        Выбрано начало: {formatHour(startHour)}
+                    </div>
+                )}
+                
+                {startHour && endHour && (
+                    <div className="text-green-600 font-medium">
+                        {formatHour(startHour)} - {formatHour(endHour)}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default TimeSlotPicker;

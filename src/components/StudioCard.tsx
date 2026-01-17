@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { MapPin, Star } from 'lucide-react';
 import { Studio } from '../types/types'; // Исправленный путь
 import { formatPrice } from '../utils/format'; // Исправленный путь
@@ -6,6 +7,14 @@ import { formatPrice } from '../utils/format'; // Исправленный пу�
 interface StudioCardProps {
   studio: Studio;
   onClick?: () => void; 
+=======
+import { MapPin, Star, Camera } from 'lucide-react';
+import type { Studio } from '../types';
+
+interface StudioCardProps {
+  studio: Studio;
+  onClick?: () => void;
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 }
 
 export const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {

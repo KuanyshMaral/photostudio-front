@@ -1,287 +1,133 @@
-# StudioBooking Frontend
+# Unified Studio App
 
-Фронтенд для платформы бронирования фотостудий.
+A comprehensive photo studio booking platform that combines features from 3 separate projects into one unified application.
 
-## 📁 Структура проекта
+## 🎯 Features
 
-```
-frontend/
-├── public/
-│   └── index.html
-├── src/
-│   ├── components/          # React компоненты
-│   │   ├── StudioCard.tsx
-│   │   ├── FilterPanel.tsx
-│   │   ├── StudioDetailModal.tsx
-│   │   └── Pagination.tsx
-│   ├── types/              # TypeScript типы
-│   │   └── index.ts
-│   ├── services/           # API сервисы
-│   │   └── api.ts
-│   ├── data/               # Mock данные
-│   │   └── mockData.ts
-│   ├── App.tsx             # Главный компонент
-│   ├── index.tsx           # Entry point
-│   └── index.css           # Стили
-├── .env.example            # Пример переменных окружения
-├── package.json
-├── tsconfig.json
-└── tailwind.config.js
-```
+### Authentication System (from Amir & Yerkanat projects)
+- User login and registration
+- Studio owner registration
+- Profile management
+- Protected routes
 
-## 🚀 Быстрый старт
+### Studio Catalog (from Amir project)
+- Browse photo studios
+- Advanced filtering (city, price, type)
+- Search functionality
+- Studio details and reviews
+- Pagination
 
-### 1. Установка зависимостей
+### Booking System (from Kiryu project)
+- Room booking forms
+- Availability calendar
+- My bookings management
+- Review system (write and read reviews)
 
+## 🚀 Quick Start
+
+### 1. Install dependencies
 ```bash
 npm install
 ```
 
-### 2. Настройка переменных окружения
-
-Скопируйте `.env.example` в `.env`:
-
+### 2. Start development server
 ```bash
-cp .env.example .env
+npm run dev
 ```
 
-Отредактируйте `.env` и укажите URL вашего backend API:
-
-```
-REACT_APP_API_URL=http://localhost:8080/api/v1
-```
-
-### 3. Запуск в режиме разработки
-
-```bash
-npm start
-```
-
-Приложение откроется по адресу [http://localhost:3000](http://localhost:3000)
-
-### 4. Сборка для production
-
+### 3. Build for production
 ```bash
 npm run build
 ```
 
-Готовые файлы будут в папке `build/`
+## 📁 Project Structure
 
-## 🔌 Интеграция с Backend
-
-По умолчанию используются **mock данные** из `src/data/mockData.ts`.
-
-Для подключения реального API:
-
-1. Откройте `src/App.tsx`
-2. Раскомментируйте строки с `catalogAPI`
-3. Закомментируйте строки с mock данными
-
-```typescript
-// Было:
-setStudios(mockStudios);
-
-// Станет:
-const response = await catalogAPI.getStudios(filters, currentPage, studiosPerPage);
-if (response.success) {
-  setStudios(response.data.studios);
-}
+```
+src/
+├── components/          # Shared UI components
+├── features/           # Feature modules
+│   ├── auth/          # Authentication features
+│   ├── booking/       # Booking system
+│   └── catalog/       # Studio catalog
+├── api/               # API services
+├── context/           # React contexts
+├── types/             # TypeScript types
+├── services/          # External services
+├── data/              # Mock data
+└── lib/               # Utility libraries
 ```
 
-## 📋 Реализованные функции
+## 🛠 Technologies
 
-### ✅ Day 1-2
-- [x] Структура проекта с TypeScript
-- [x] Компонент карточки студии
-- [x] Список студий с grid layout
-- [x] Фильтры (город, цена, тип зала)
-- [x] Поиск по названию
-- [x] Пагинация
+- **React 19** - UI framework
+- **TypeScript** - Type safety
+- **React Router** - Navigation
+- **Tailwind CSS** - Styling
+- **Axios** - HTTP client
+- **React Hook Form** - Form handling
+- **React Hot Toast** - Notifications
+- **Vite** - Build tool
 
-### ✅ Day 3
-- [x] Модальное окно деталей студии
-- [x] Вкладки: Обзор, Галерея, Оборудование, Отзывы
-- [x] Отображение списка залов
-- [x] Информация об оборудовании
+## 🌐 Available Routes
 
-### 🔜 Day 4-5 (TODO)
-- [ ] Форма создания студии (для владельцев)
-- [ ] Страница "Мои студии"
-- [ ] Форма добавления залов
-- [ ] Unit тесты
-- [ ] Loading states и skeleton screens
-- [ ] Error boundaries
+### Public Routes
+- `/login` - User login
+- `/register` - User registration
+- `/studio-register` - Studio owner registration
+- `/studios` - Browse studios
+- `/studios/:id` - Studio details
 
-## 🛠 Технологии
+### Protected Routes (require authentication)
+- `/` - Dashboard
+- `/profile` - User profile
+- `/booking` - Book a studio
+- `/availability` - Check availability
+- `/my-bookings` - View bookings
+- `/write-review` - Write a review
+- `/reviews` - View reviews
 
-- **React 18** - UI библиотека
-- **TypeScript** - Типизация
-- **Tailwind CSS** - Стили
-- **Lucide React** - Иконки
-- **Axios** - HTTP клиент
+## 🔧 Configuration
 
-## 📝 Основные компоненты
+The project uses mock data by default. To connect to a real API:
 
-### StudioCard
-Карточка студии в списке
+1. Update API endpoints in `src/services/api.ts`
+2. Configure environment variables
+3. Replace mock data with real API calls
 
-```tsx
-<StudioCard studio={studio} onClick={handleClick} />
-```
+## 📱 Responsive Design
 
-### FilterPanel
-Панель фильтров
+All components are fully responsive and work on:
+- Desktop (1200px+)
+- Tablet (768px-1199px)
+- Mobile (320px-767px)
 
-```tsx
-<FilterPanel 
-  filters={filters} 
-  onChange={setFilters} 
-  onClose={handleClose} 
-/>
-```
-
-### StudioDetailModal
-Детальная информация о студии
-
-```tsx
-<StudioDetailModal 
-  studio={studio}
-  rooms={rooms}
-  onClose={handleClose} 
-/>
-```
-
-### Pagination
-Пагинация списка
-
-```tsx
-<Pagination 
-  currentPage={currentPage}
-  totalPages={totalPages}
-  onPageChange={setCurrentPage}
-/>
-```
-
-## 🎨 Tailwind CSS
-
-Проект использует Tailwind CSS для стилизации. Основные утилиты:
-
-- `bg-blue-600` - фон
-- `text-white` - текст
-- `rounded-lg` - скругление
-- `shadow-md` - тень
-- `hover:scale-[1.02]` - анимация при наведении
-
-## 📱 Адаптивность
-
-Все компоненты адаптированы для мобильных устройств:
-
-```tsx
-// Grid адаптируется
-grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-
-// Модальные окна
-max-w-4xl w-full max-h-[90vh] overflow-y-auto
-```
-
-## 🔧 Настройка
-
-### API сервис (`src/services/api.ts`)
-
-Добавлен JWT токен в headers:
-
-```typescript
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-```
-
-### Типы данных (`src/types/index.ts`)
-
-Все типы соответствуют backend API:
-
-```typescript
-interface Studio {
-  id: number;
-  name: string;
-  address: string;
-  rating: number;
-  // ...
-}
-```
-
-## 🐛 Отладка
-
-### Включить React DevTools
-
-1. Установите расширение React DevTools для браузера
-2. Откройте DevTools (F12)
-3. Перейдите на вкладку "Components"
-
-### Логирование
-
-Добавьте `console.log` для отладки:
-
-```typescript
-console.log('Loaded studios:', studios);
-console.log('Current filters:', filters);
-```
-
-## 📦 Deployment
-
-### Vercel
+## 🧪 Testing
 
 ```bash
-npm install -g vercel
-vercel
+# Run tests
+npm run test
+
+# Run tests with UI
+npm run test:ui
 ```
 
-### Netlify
+## 📝 Development Notes
 
-```bash
-npm run build
-# Загрузите папку build/ на Netlify
-```
+This unified application combines:
+- **Kiryu Project**: Booking and review system
+- **Amir Project**: Authentication and studio catalog
+- **Yerkanat Project**: Enhanced authentication with context
 
-### Docker
+All conflicts have been resolved and features are integrated seamlessly.
 
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
-CMD ["npx", "serve", "-s", "build", "-l", "3000"]
-```
+## 🤝 Contributing
 
-## 🤝 Вклад
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-1. Fork проекта
-2. Создайте feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Push в branch (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
+## 📄 License
 
-## 📄 Лицензия
-
-MIT License - смотрите файл LICENSE
-
-## 👥 Авторы
-
-Team 3 - Catalog Module
-- Backend Developer 3
-- Frontend Developer 3
-
-## 📞 Контакты
-
-Вопросы? Пишите в Telegram: @your_username
-
----
-
-**Версия:** 1.0.0  
-**Дата:** 25.12.2025
+MIT License

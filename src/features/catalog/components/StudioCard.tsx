@@ -1,19 +1,23 @@
 import React from 'react';
-import { Studio } from '../../../types/types';
+import type { Studio } from '../../../types';
 import { Star, MapPin } from 'lucide-react'; // Assuming lucide-react is installed
 
 interface StudioCardProps {
   studio: Studio;
+  onClick?: () => void;
 }
 
-export const StudioCard: React.FC<StudioCardProps> = ({ studio }) => {
+export const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {
   return (
-    <div className="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md">
+    <div 
+      className="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+      onClick={onClick}
+    >
       {/* Image Placeholder */}
       <div className="h-48 w-full bg-gray-200 object-cover">
-        {studio.preview_image ? (
+        {studio.photos && studio.photos.length > 0 ? (
           <img 
-            src={studio.preview_image} 
+            src={studio.photos[0]} 
             alt={studio.name} 
             className="h-full w-full object-cover transition-transform group-hover:scale-105" 
           />
@@ -43,7 +47,7 @@ export const StudioCard: React.FC<StudioCardProps> = ({ studio }) => {
                 Starting from
             </div>
             <div className="text-lg font-bold text-primary">
-                {new Intl.NumberFormat('ru-KZ', { style: 'currency', currency: 'KZT' }).format(studio.min_price)}
+                {new Intl.NumberFormat('ru-KZ', { style: 'currency', currency: 'KZT' }).format(studio.min_price || 0)}
                 <span className="text-sm font-normal text-gray-500">/hour</span>
             </div>
         </div>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
@@ -31,3 +32,13 @@ apiClient.interceptors.response.use(
         return Promise.reject(error);
     }
 );
+=======
+import axios from 'axios';
+
+export const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410

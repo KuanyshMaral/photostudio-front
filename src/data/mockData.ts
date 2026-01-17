@@ -1,6 +1,6 @@
 // src/data/mockData.ts
 
-import { Studio, Room } from '../types';
+import type { Studio, Room } from '../types';
 
 export const mockStudios: Studio[] = [
   {

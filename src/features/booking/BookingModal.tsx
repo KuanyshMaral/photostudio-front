@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format, addDays } from 'date-fns';
-import { toast } from 'react-hot-toast';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useQuery } from "@tanstack/react-query";
+import { getRoomAvailability } from "../../api/availabilityApi";
+import { createBooking } from "../../api/bookingApi";
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
+import type { TimeSlot } from "../../api/availabilityApi";
 
+<<<<<<< HEAD
 import { createBooking } from '../../api/bookingApi';
 import { getRoomAvailability } from '../../api/availabilityApi';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -16,186 +21,274 @@ interface BookingModalProps {
   roomName: string;
   studioName: string;
   onClose: () => void;
+=======
+// Inline TimeSlotPicker component to resolve import issues
+interface TimeSlotPickerProps {
+    slots: TimeSlot[];
+    onSelect: (startHour: number, endHour: number) => void;
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 }
 
-const BookingModal: React.FC<BookingModalProps> = ({
-  roomId,
-  pricePerHour,
-  roomName,
-  studioName,
-  onClose,
-}) => {
-  const { token } = useAuth();
-  const queryClient = useQueryClient();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [timeRange, setTimeRange] = useState<{ start: number | null; end: number | null }>({
-    start: null,
-    end: null,
-  });
-
-  // Format date to YYYY-MM-DD for API
-  const formattedDate = format(selectedDate, 'yyyy-MM-dd');
-
-  // Fetch available time slots for the selected date
-  const {
-    data: timeSlots = [],
-    isLoading,
-    error,
-  } = useQuery<TimeSlot[]>({
-    queryKey: ['room-availability', roomId, formattedDate],
-    queryFn: () => getRoomAvailability(roomId, formattedDate),
-    enabled: !!roomId,
-  });
-
-  // Create booking mutation
-  const createBookingMutation = useMutation({
-    mutationFn: async () => {
-      if (!timeRange.start || !timeRange.end) {
-        throw new Error('Please select a time range');
-      }
-      
-      if (!token) {
-        throw new Error('You must be logged in to book a room');
-      }
-
-      const startTime = new Date(selectedDate);
-      startTime.setHours(timeRange.start, 0, 0, 0);
-      
-      const endTime = new Date(selectedDate);
-      endTime.setHours(timeRange.end, 0, 0, 0);
-
-      return createBooking(
-        {
-          room_id: roomId,
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
-        },
-        token
-      );
-    },
-    onSuccess: () => {
-      toast.success('Booking created successfully!');
-      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
-      onClose();
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create booking');
-    },
-  });
-
-  const handleTimeSelect = (start: number, end: number) => {
-    setTimeRange({ start, end });
-  };
-
-  const calculateTotalPrice = () => {
-    if (!timeRange.start || !timeRange.end) return 0;
-    return (timeRange.end - timeRange.start) * pricePerHour;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    createBookingMutation.mutate();
-  };
-
-  // Generate an array of available dates (next 30 days)
-  const availableDates = Array.from({ length: 30 }, (_, i) => addDays(new Date(), i));
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">Book {roomName}</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700"
-            aria-label="Close modal"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <p className="text-gray-600">{studioName}</p>
-          <p className="text-lg font-semibold">${pricePerHour} / hour</p>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Select Date
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {availableDates.map((date) => {
-                const dateStr = format(date, 'yyyy-MM-dd');
-                const isSelected = format(selectedDate, 'yyyy-MM-dd') === dateStr;
-                return (
-                  <button
-                    key={dateStr}
-                    type="button"
-                    onClick={() => setSelectedDate(date)}
-                    className={`p-2 rounded border ${
-                      isSelected
-                        ? 'bg-blue-500 text-white border-blue-600'
-                        : 'bg-white hover:bg-gray-50 border-gray-200'
-                    }`}
-                  >
-                    <div className="text-sm font-medium">{format(date, 'EEE')}</div>
-                    <div className="text-sm">{format(date, 'MMM d')}</div>
-                  </button>
-                );
-              })}
+const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ slots, onSelect }) => {
+    const [startHour, setStartHour] = useState<number | null>(null);
+    const [endHour, setEndHour] = useState<number | null>(null);
+    
+    const handleSlotClick = (hour: number, available: boolean) => {
+        if (!available) return;
+        
+        if (!startHour) {
+            setStartHour(hour);
+            setEndHour(null);
+        } else if (!endHour && hour > startHour) {
+            setEndHour(hour);
+            onSelect(startHour, hour);
+        } else {
+            setStartHour(hour);
+            setEndHour(null);
+        }
+    };
+    
+    const isInRange = (hour: number): boolean => {
+        if (!startHour || !endHour) return false;
+        return hour > startHour && hour < endHour;
+    };
+    
+    const formatHour = (hour: number): string => {
+        return `${hour.toString().padStart(2, '0')}:00`;
+    };
+    
+    return (
+        <div className="space-y-4">
+            <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-12 gap-2">
+                {slots.map(slot => (
+                    <button
+                        key={slot.hour}
+                        data-testid="time-slot"
+                        className={`
+                            relative p-3 rounded-lg border-2 transition-all duration-200 text-sm font-medium
+                            ${slot.available 
+                                ? 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 cursor-pointer' 
+                                : 'border-gray-100 bg-gray-50 cursor-not-allowed opacity-50'
+                            }
+                            ${startHour === slot.hour 
+                                ? 'border-blue-500 bg-blue-100 text-blue-700' 
+                                : ''
+                            }
+                            ${endHour === slot.hour 
+                                ? 'border-blue-500 bg-blue-100 text-blue-700' 
+                                : ''
+                            }
+                            ${isInRange(slot.hour) 
+                                ? 'border-blue-300 bg-blue-50' 
+                                : ''
+                            }
+                        `}
+                        onClick={() => handleSlotClick(slot.hour, slot.available)}
+                        disabled={!slot.available}
+                        title={slot.available ? formatHour(slot.hour) : 'Занято'}
+                    >
+                        <div className="text-center">
+                            <div className="font-semibold">
+                                {formatHour(slot.hour)}
+                            </div>
+                            {slot.booking && (
+                                <div className="text-xs text-red-600 mt-1">
+                                    Занято
+                                </div>
+                            )}
+                        </div>
+                    </button>
+                ))}
             </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Available Time Slots
-            </label>
-            {isLoading ? (
-              <div className="text-center py-4">Loading available slots...</div>
-            ) : error ? (
-              <div className="text-red-500 text-center py-4">
-                Error loading availability. Please try again.
-              </div>
-            ) : timeSlots.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">
-                No available time slots for this date. Please select another date.
-              </div>
-            ) : (
-              <TimeSlotPicker
-                slots={timeSlots}
-                onSelect={handleTimeSelect}
-                className="mb-4"
-              />
-            )}
-          </div>
-
-          <div className="flex justify-between items-center border-t pt-4">
-            <div>
-              <p className="text-sm text-gray-600">Total</p>
-              <p className="text-xl font-bold">${calculateTotalPrice()}</p>
-              {timeRange.start !== null && timeRange.end !== null && (
-                <p className="text-sm text-gray-600">
-                  {timeRange.start}:00 - {timeRange.end}:00 ({timeRange.end - timeRange.start} hours)
-                </p>
-              )}
+            
+            <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-blue-100 border-2 border-blue-500 rounded mr-2"></div>
+                        <span>Выбрано</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-blue-50 border-2 border-blue-300 rounded mr-2"></div>
+                        <span>В диапазоне</span>
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-4 h-4 bg-gray-50 border-2 border-gray-200 rounded opacity-50 mr-2"></div>
+                        <span>Недоступно</span>
+                    </div>
+                </div>
+                
+                {startHour && !endHour && (
+                    <div className="text-blue-600 font-medium">
+                        Выбрано начало: {formatHour(startHour)}
+                    </div>
+                )}
+                
+                {startHour && endHour && (
+                    <div className="text-green-600 font-medium">
+                        {formatHour(startHour)} - {formatHour(endHour)}
+                    </div>
+                )}
             </div>
-            <button
-              type="submit"
-              disabled={!timeRange.start || !timeRange.end || createBookingMutation.isPending}
-              className={`px-4 py-2 rounded-md text-white font-medium ${
-                !timeRange.start || !timeRange.end || createBookingMutation.isPending
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-            >
-              {createBookingMutation.isPending ? 'Booking...' : 'Book Now'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+        </div>
+    );
 };
 
-export default BookingModal;
+interface BookingModalProps {
+    roomId: number;
+    studioId: number;
+    pricePerHour: number;
+    onClose: () => void;
+}
+
+export const BookingModal: React.FC<BookingModalProps> = ({
+    roomId, studioId, pricePerHour, onClose
+}) => {
+    const { token } = useAuth();
+    const [date, setDate] = useState<Date>(new Date());
+    const [startHour, setStartHour] = useState<number | null>(null);
+    const [endHour, setEndHour] = useState<number | null>(null);
+    const [isBooking, setIsBooking] = useState(false);
+    
+    const { data: slots, isLoading, error } = useQuery({
+        queryKey: ['availability', roomId, date.toISOString().split('T')[0]],
+        queryFn: () => getRoomAvailability(roomId, date.toISOString().split('T')[0]),
+        enabled: !!roomId,
+    });
+    
+    const handleBook = async () => {
+        if (!startHour || !endHour || !token) return;
+        
+        setIsBooking(true);
+        
+        const startTime = new Date(date);
+        startTime.setHours(startHour, 0, 0, 0);
+        
+        const endTime = new Date(date);
+        endTime.setHours(endHour, 0, 0, 0);
+        
+        try {
+            await createBooking({
+                room_id: String(roomId),
+                start_time: startTime.toISOString(),
+                end_time: endTime.toISOString(),
+            }, token);
+            
+            toast.success('Бронирование создано!');
+            onClose();
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Failed to create booking';
+            toast.error(errorMessage);
+        } finally {
+            setIsBooking(false);
+        }
+    };
+    
+    const handleSlotSelect = (start: number, end: number) => {
+        setStartHour(start);
+        setEndHour(end);
+    };
+    
+    const hours = endHour && startHour ? endHour - startHour : 0;
+    const totalPrice = hours * pricePerHour;
+    
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" onClick={onClose} data-testid="booking-modal">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 rounded-t-2xl">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-bold text-white">Бронирование</h2>
+                            <p className="text-blue-100 mt-1">Комната #{roomId} • Студия #{studioId}</p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="text-white hover:text-blue-200 transition-colors"
+                        >
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div className="p-8 space-y-6">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Дата бронирования
+                        </label>
+                        <DatePicker
+                            selected={date}
+                            onChange={(date: Date | null) => date && setDate(date)}
+                            minDate={new Date()}
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                            data-testid="date-picker"
+                        />
+                    </div>
+                    
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Выберите время</h3>
+                        {isLoading ? (
+                            <div className="flex items-center justify-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                                <span className="ml-3 text-gray-600">Загрузка слотов...</span>
+                            </div>
+                        ) : error ? (
+                            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-red-700">Не удалось загрузить доступное время</p>
+                            </div>
+                        ) : (
+                            <TimeSlotPicker 
+                                slots={slots || []} 
+                                onSelect={handleSlotSelect}
+                            />
+                        )}
+                    </div>
+                    
+                    {hours > 0 && (
+                        <div className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-gray-700">
+                                    {hours} ч × {pricePerHour} ₸
+                                </span>
+                                <span className="text-2xl font-bold text-gray-900" data-testid="total-price">
+                                    {totalPrice} ₸
+                                </span>
+                            </div>
+                        </div>
+                    )}
+                    
+                    <div className="flex gap-4">
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-200"
+                        >
+                            Отмена
+                        </button>
+                        <button
+                            onClick={handleBook}
+                            disabled={!startHour || !endHour || !token || isBooking}
+                            className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isBooking ? (
+                                <div className="flex items-center justify-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                    Бронирование...
+                                </div>
+                            ) : (
+                                'Забронировать'
+                            )}
+                        </button>
+                    </div>
+                    
+                    {!token && (
+                        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg" data-testid="auth-error">
+                            <p className="text-yellow-700 text-sm">
+                                Пожалуйста, войдите в систему для бронирования
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};

@@ -1,39 +1,88 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { createBooking } from "../../api/bookingApi";
 import LoadingSpinner from "../../components/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage";
+<<<<<<< HEAD
 import type { BookingData } from "../../api/bookingApi"; // только тип
 import { useAuth } from "../../context/AuthContext.tsx";
 import toast from 'react-hot-toast';
+=======
+import type { BookingData } from "../../api/bookingApi";
+import { useAuth } from "../../context/AuthContext";
+import toast from "react-hot-toast";
+import PriceCalculator from "./PriceCalculator";
+import type { Studio, Room } from "../../types/index";
+import { getProfile } from "../auth/auth.api";
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 
 const BookingForm: React.FC = () => {
-  const { token } = useAuth();
-  const [roomId, setRoomId] = useState("");
+  const { token, user, login } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Get pre-selected studio and rooms from navigation state
+  const [studio, setStudio] = useState<Studio | null>(null);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingUser, setIsLoadingUser] = useState(false);
+
+  // Fetch user data if not available but token exists
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (token && !user) {
+        setIsLoadingUser(true);
+        try {
+          const userProfile = await getProfile(token);
+          login(token, userProfile);
+        } catch (error) {
+          console.error("Failed to fetch user profile:", error);
+          toast.error("Не удалось загрузить профиль пользователя. Войдите снова.");
+          navigate("/login");
+        } finally {
+          setIsLoadingUser(false);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [token, user, login, navigate, toast]);
+
+  useEffect(() => {
+    if (location.state?.studio && location.state?.rooms) {
+      setStudio(location.state.studio);
+      setRooms(location.state.rooms);
+    } else {
+      // If no studio/rooms data, redirect back to studios
+      toast.error("Сначала выберите студию");
+      navigate("/studios");
+    }
+  }, [location.state, navigate, toast]);
 
   const validateForm = (): string[] => {
     const newErrors: string[] = [];
     
-    if (!roomId.trim() || isNaN(Number(roomId))) {
-      newErrors.push("Room ID must be a valid number");
+    if (!selectedRoom) {
+      newErrors.push("Информация о комнате отсутствует");
     }
     
     if (!startTime) {
-      newErrors.push("Start time is required");
+      newErrors.push("Время начала обязательно");
     }
     
     if (!endTime) {
-      newErrors.push("End time is required");
+      newErrors.push("Время окончания обязательно");
     }
     
     if (startTime && endTime && endTime <= startTime) {
-      newErrors.push("End time must be after start time");
+      newErrors.push("Время окончания должно быть после времени начала");
     }
     
     return newErrors;
@@ -43,7 +92,12 @@ const BookingForm: React.FC = () => {
     e.preventDefault();
     
     if (!token) {
-      toast.error("You must be logged in to create a booking");
+      toast.error("Войдите для бронирования комнаты");
+      return;
+    }
+    
+    if (!user) {
+      toast.error("Информация о пользователе недоступна. Войдите снова.");
       return;
     }
     
@@ -58,54 +112,113 @@ const BookingForm: React.FC = () => {
     setMessage("");
     
     const data: BookingData = { 
-      room_id: Number(roomId), 
+      room_id: selectedRoom!.id.toString(), 
+      studio_id: studio!.id,
+      user_id: user.id,
       start_time: startTime!.toISOString(), 
       end_time: endTime!.toISOString() 
     };
 
     try {
       const result = await createBooking(data, token);
-      toast.success("Booking created successfully!");
+      toast.success(`Бронирование создано! ID: ${result.id}`);
+      setMessage(`Booking created! ID: ${result.id}`);
       // Reset form on success
-      setRoomId("");
       setStartTime(null);
       setEndTime(null);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to create booking. Please try again.";
+      const errorMessage = error instanceof Error ? error.message : "Не удалось создать бронирование";
       toast.error(errorMessage);
+      setMessage(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Show loading state while fetching user data
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 flex items-center justify-center">
+        <LoadingSpinner size="lg" text="Загрузка информации о пользователе..." />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-md mx-auto">
+      <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
-            <h2 className="text-2xl font-bold text-white">Book a Room</h2>
-            <p className="text-blue-100 mt-1">Schedule your meeting space</p>
+            <h2 className="text-2xl font-bold text-white">Забронировать комнату</h2>
+            <p className="text-blue-100 mt-1">Запланируйте вашу фотосессию</p>
           </div>
+          
+          {/* Studio Info */}
+          {studio && (
+            <div className="px-8 py-6 bg-gray-50 border-b">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{studio.name}</h3>
+                  <p className="text-sm text-gray-500 mt-1">{studio.address}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-blue-600">
+                    {rooms.length} {rooms.length === 1 ? 'комната' : 'комнат'} доступна
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           
           <div className="px-8 py-6">
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Room Selection */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Room ID
+                  Выберите комнату
                 </label>
-                <input
-                  type="text"
-                  placeholder="Enter room identifier"
-                  value={roomId}
-                  onChange={(e) => setRoomId(e.target.value)}
+                <select
+                  value={selectedRoom?.id || ''}
+                  onChange={(e) => {
+                    const room = rooms.find(r => r.id === Number(e.target.value));
+                    setSelectedRoom(room || null);
+                  }}
                   disabled={isSubmitting}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 placeholder-gray-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
-                />
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">Выберите комнату...</option>
+                  {rooms.map(room => (
+                    <option key={room.id} value={room.id}>
+                      {room.name} - {room.price_per_hour_min.toLocaleString()} ₸/час
+                    </option>
+                  ))}
+                </select>
               </div>
-              
+
+              {/* Selected Room Details */}
+              {selectedRoom && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-blue-900">{selectedRoom.name}</h4>
+                    <p className="text-blue-600 font-bold">
+                      {selectedRoom.price_per_hour_min.toLocaleString()} ₸/час
+                    </p>
+                  </div>
+                  {selectedRoom.description && (
+                    <p className="text-sm text-blue-700 mb-2">{selectedRoom.description}</p>
+                  )}
+                  <div className="flex gap-4 text-sm text-blue-600">
+                    <span>{selectedRoom.area_sqm} м²</span>
+                    <span>до {selectedRoom.capacity} чел</span>
+                    <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">
+                      {selectedRoom.room_type}
+                    </span>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Start Time
+                  Время начала
                 </label>
                 <DatePicker
                   selected={startTime}
@@ -120,7 +233,7 @@ const BookingForm: React.FC = () => {
               
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  End Time
+                  Время окончания
                 </label>
                 <DatePicker
                   selected={endTime}
@@ -132,6 +245,15 @@ const BookingForm: React.FC = () => {
                   placeholderText="Select end time"
                 />
               </div>
+
+              {/* Price Calculator */}
+              {selectedRoom && (
+                <PriceCalculator 
+                  room={selectedRoom} 
+                  startTime={startTime} 
+                  endTime={endTime} 
+                />
+              )}
               
               <button
                 type="submit"
@@ -141,7 +263,7 @@ const BookingForm: React.FC = () => {
                 {isSubmitting ? (
                   <LoadingSpinner size="sm" color="white" text="Booking..." />
                 ) : (
-                  "Book Room"
+                  "Забронировать комнату"
                 )}
               </button>
             </form>
@@ -152,6 +274,16 @@ const BookingForm: React.FC = () => {
                 onDismiss={() => setErrors([])}
                 type="error"
               />
+            )}
+            
+            {message && (
+              <div className={`mt-4 p-4 rounded-lg border ${
+                message.includes('created') 
+                  ? 'bg-green-50 border-green-200 text-green-700' 
+                  : 'bg-red-50 border-red-200 text-red-700'
+              }`}>
+                <p className="text-sm font-medium">{message}</p>
+              </div>
             )}
           </div>
         </div>
