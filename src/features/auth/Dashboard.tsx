@@ -1,8 +1,12 @@
+<<<<<<< HEAD
+import { useAuth } from "../../context/AuthContext.tsx";
+=======
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import { getProfile } from "./auth.api";
 import type { Profile } from "./auth.types";
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 
 export default function Dashboard() {
   const { token } = useAuth();

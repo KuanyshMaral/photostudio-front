@@ -3,6 +3,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from 'react-hot-toast';
 import { login } from "./auth.api";
+<<<<<<< HEAD
+import type { LoginRequest } from "./auth.types";
+import { useAuth } from "../../context/AuthContext.tsx";
+=======
 import { useAuth } from "../../context/AuthContext";
 import { Loader2 } from "lucide-react";
 
@@ -10,6 +14,7 @@ interface LoginFormData {
   email: string;
   password: string;
 }
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 
 export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getUserBookings, cancelBooking } from "../../api/myBookingsApi";
 import type { Booking } from "../../api/myBookingsApi";
+<<<<<<< HEAD
+import { useAuth } from "../../context/AuthContext.tsx";
+import toast from 'react-hot-toast';
+=======
+>>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 
 const MyBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
