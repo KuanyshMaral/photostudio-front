@@ -1,0 +1,134 @@
+.message-bubble {
+    display: flex;
+    margin-bottom: 16px;
+    max-width: 70%;
+}
+
+.message-bubble.mine {
+    margin-left: auto;
+    flex-direction: row-reverse;
+}
+
+.message-bubble.theirs {
+    margin-right: auto;
+    flex-direction: row;
+}
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin: 0 8px;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    border-radius: 50%;
+}
+
+.message-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.message-sender-name {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    padding-left: 8px;
+}
+
+.message-bubble.mine .message-sender-name {
+    text-align: right;
+    padding-left: 0;
+    padding-right: 8px;
+}
+
+.message-content {
+    background-color: #f1f3f4;
+    border-radius: 18px;
+    padding: 8px 12px;
+    position: relative;
+    word-wrap: break-word;
+}
+
+.message-bubble.mine .message-content {
+    background-color: #1976d2;
+    color: white;
+}
+
+.message-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.message-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    cursor: pointer;
+    object-fit: cover;
+}
+
+.message-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #666;
+    gap: 4px;
+}
+
+.message-bubble.mine .message-meta {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.message-time {
+    white-space: nowrap;
+}
+
+.message-status {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+.message-status.read {
+    opacity: 1;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .message-bubble {
+        max-width: 85%;
+    }
+    
+    .message-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .message-image {
+        max-width: 150px;
+        max-height: 150px;
+    }
+}
