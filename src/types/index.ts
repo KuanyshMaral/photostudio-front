@@ -108,6 +108,7 @@ export interface StudioFilterParams {
   room_type?: string;
   min_price?: number;
   max_price?: number;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -143,27 +144,12 @@ export interface StudioDetailResponse {
   };
 }
 
-// Added types
-export interface Booking {
-    id: number;
-    room_id: number;
-    studio_id: number;
-    start_time: string;
-    end_time: string;
-    total_price: number;
-    status: BookingStatus;
-    payment_status: PaymentStatus;
-}
-
-export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
-export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
-
-export interface Review {
-    id: number;
-    studio_id: number;
-    user_id: number;
-    rating: number;
-    comment?: string;
-    owner_response?: string;
-    created_at: string;
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
+  };
 }

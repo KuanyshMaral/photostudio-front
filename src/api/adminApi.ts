@@ -40,8 +40,4 @@ export const getStatistics = async (token: string) => {
     });
     if (!response.ok) throw new Error('Failed to fetch');
     return (await response.json()).data;
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410

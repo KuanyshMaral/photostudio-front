@@ -1,6 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Studio } from '../../../types';
-import { Star, MapPin } from 'lucide-react'; // Assuming lucide-react is installed
+import { Star, MapPin } from 'lucide-react';
 
 interface StudioCardProps {
   studio: Studio;
@@ -8,10 +9,20 @@ interface StudioCardProps {
 }
 
 export const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/studios/${studio.id}`);
+    }
+  };
+
   return (
     <div 
       className="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
-      onClick={onClick}
+      onClick={handleClick}
     >
       {/* Image Placeholder */}
       <div className="h-48 w-full bg-gray-200 object-cover">
@@ -32,8 +43,8 @@ export const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {
             <h3 className="text-lg font-semibold text-gray-900">{studio.name}</h3>
             <div className="flex items-center gap-1 text-sm font-medium">
                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span>{studio.rating}</span>
-                <span className="text-gray-500">({studio.total_reviews})</span>
+                <span>{studio.rating || '0.0'}</span>
+                <span className="text-gray-500">({studio.reviews_count || 0})</span>
             </div>
         </div>
 

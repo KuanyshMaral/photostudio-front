@@ -1,10 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-<<<<<<< HEAD
-import { getNotifications, markAsRead, markAllAsRead, Notification } from '../api/notificationApi';
-=======
 import { getNotifications, markAsRead, markAllAsRead, type Notification } from '../api/notificationApi';
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 import './NotificationBell.css';
 
 export default function NotificationBell() {
@@ -27,20 +23,12 @@ export default function NotificationBell() {
 
     useEffect(() => {
         fetchNotifications();
-<<<<<<< HEAD
-        // Polling every 30 seconds
-=======
         // Polling каждые 30 секунд
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, [token]);
 
-<<<<<<< HEAD
-    // Close on click outside
-=======
     // Закрытие при клике вне
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -120,8 +108,4 @@ export default function NotificationBell() {
             )}
         </div>
     );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
