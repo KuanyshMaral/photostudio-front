@@ -1,0 +1,128 @@
+.message-input {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px 16px;
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    border-radius: 0 0 12px 12px;
+}
+
+.attach-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.attach-btn:hover:not(:disabled) {
+    background-color: #e0e0e0;
+}
+
+.attach-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.message-input textarea {
+    flex: 1;
+    min-height: 40px;
+    max-height: 120px;
+    padding: 10px 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    resize: none;
+    font-size: 14px;
+    line-height: 1.4;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.message-input textarea:focus {
+    border-color: #1976d2;
+}
+
+.message-input textarea::placeholder {
+    color: #999;
+}
+
+.message-input textarea:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: #1976d2;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.send-btn:hover:not(:disabled) {
+    background-color: #1565c0;
+    transform: scale(1.05);
+}
+
+.send-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Auto-resize textarea */
+.message-input textarea {
+    overflow-y: hidden;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .message-input {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+    
+    .attach-btn,
+    .send-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    
+    .message-input textarea {
+        min-height: 36px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Focus states for accessibility */
+.attach-btn:focus,
+.send-btn:focus {
+    outline: 2px solid #1976d2;
+    outline-offset: 2px;
+}
+
+/* Animation for button press */
+.attach-btn:active:not(:disabled),
+.send-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
