@@ -1,7 +1,7 @@
 import React from 'react';
-import { MapPin, Star, Clock, Filter, TrendingUp } from 'lucide-react';
-import StudioFilters from './StudioFiltersFinal';
-import type { StudioFilterParams } from '../../../types/index_new';
+import { MapPin, Star, Clock, Filter, TrendingUp, RotateCcw } from 'lucide-react';
+import { StudioFilters } from './StudioFilters';
+import type { StudioFilterParams } from '../../../types';
 
 interface LeftPanelProps {
   filters: StudioFilterParams;
@@ -14,16 +14,36 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   onFilterChange, 
   totalStudios 
 }) => {
+  const handleResetAll = () => {
+    onFilterChange({ 
+      city: '', 
+      min_price: 0, 
+      max_price: 50000, 
+      room_type: '', 
+      search: '' 
+    });
+  };
+
   return (
     <div className="lg:w-1/4 space-y-6">
       {/* Search and Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <div className="flex items-center mb-4">
-          <Filter className="w-5 h-5 text-gray-600 mr-2" />
-          <h3 className="font-semibold text-gray-900">Фильтры</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            <Filter className="w-5 h-5 text-gray-600 mr-2" />
+            <h3 className="font-semibold text-gray-900">Фильтры</h3>
+          </div>
+          <button
+            onClick={handleResetAll}
+            className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 px-2 py-1 rounded transition"
+            title="Сбросить все фильтры"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Сбросить
+          </button>
         </div>
         <StudioFilters 
-          filters={filters}
+          filters={filters} 
           onFilterChange={onFilterChange}
         />
       </div>
