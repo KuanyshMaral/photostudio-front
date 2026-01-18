@@ -4,12 +4,12 @@ export interface Booking {
   room_name?: string;
   start_time: string;
   end_time: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   created_at: string;
   updated_at?: string;
 }
 
-export const getUserBookings = async (status?: 'pending' | 'confirmed' | 'cancelled', token?: string): Promise<Booking[]> => {
+export const getUserBookings = async (status?: 'pending' | 'confirmed' | 'cancelled' | 'completed', token?: string): Promise<Booking[]> => {
   try {
     const response = await fetch('http://localhost:3001/api/v1/users/me/bookings', {
       headers: { 

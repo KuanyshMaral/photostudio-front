@@ -8,6 +8,7 @@ export const getStudios = async (params: StudioFilterParams) => {
     if (params.room_type) searchParams.append('room_type', params.room_type);
     if (params.min_price) searchParams.append('min_price', String(params.min_price));
     if (params.max_price) searchParams.append('max_price', String(params.max_price));
+    if (params.search) searchParams.append('search', params.search);
     if (params.page) searchParams.append('page', String(params.page));
     if (params.limit) searchParams.append('limit', String(params.limit));
     
@@ -47,6 +48,7 @@ export const getStudiosWithRooms = async (params: StudioFilterParams) => {
     if (params.room_type) searchParams.append('room_type', params.room_type);
     if (params.min_price) searchParams.append('min_price', String(params.min_price));
     if (params.max_price) searchParams.append('max_price', String(params.max_price));
+    if (params.search) searchParams.append('search', params.search);
     if (params.page) searchParams.append('page', String(params.page));
     if (params.limit) searchParams.append('limit', String(params.limit));
     

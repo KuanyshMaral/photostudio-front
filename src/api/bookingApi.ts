@@ -6,6 +6,7 @@ export type BookingData = {
   user_id: number;
   start_time: string;
   end_time: string;
+  comment?: string;
 };
 
 export const createBooking = async (data: BookingData, token: string) => {

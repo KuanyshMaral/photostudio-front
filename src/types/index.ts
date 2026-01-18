@@ -108,6 +108,7 @@ export interface StudioFilterParams {
   room_type?: string;
   min_price?: number;
   max_price?: number;
+  search?: string;
   page?: number;
   limit?: number;
 }
@@ -140,5 +141,15 @@ export interface StudioDetailResponse {
   data: {
     studio: Studio;
     rooms: Room[];
+  };
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    total_pages: number;
   };
 }
