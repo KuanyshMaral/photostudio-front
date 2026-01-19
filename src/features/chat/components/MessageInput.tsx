@@ -5,6 +5,8 @@ import './MessageInput.css';
 interface MessageInputProps {
     onSend: (content: string) => void;
     onImageUpload?: (file: File) => void;
+    onTypingStart?: () => void;
+    onTypingStop?: () => void;
     disabled?: boolean;
     placeholder?: string;
 }
@@ -12,6 +14,8 @@ interface MessageInputProps {
 export default function MessageInput({
     onSend,
     onImageUpload,
+    onTypingStart,
+    onTypingStop,
     disabled = false,
     placeholder = 'Введите сообщение...',
 }: MessageInputProps) {
@@ -22,11 +26,13 @@ export default function MessageInput({
         const trimmed = text.trim();
         if (!trimmed || disabled) return;
         
+        onTypingStop?.();
         onSend(trimmed);
         setText('');
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+        onTypingStart?.();
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
@@ -71,8 +77,17 @@ export default function MessageInput({
             {/* Text input */}
             <textarea
                 value={text}
-                onChange={(e) => setText(e.target.value)}
+                onChange={(e) => {
+                    setText(e.target.value);
+                    if (e.target.value.trim()) {
+                        onTypingStart?.();
+                    } else {
+                        onTypingStop?.();
+                    }
+                }}
                 onKeyDown={handleKeyDown}
+                onFocus={() => onTypingStart?.()}
+                onBlur={() => onTypingStop?.()}
                 placeholder={placeholder}
                 disabled={disabled}
                 rows={1}
