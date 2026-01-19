@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import StarRating from "../../components/StarRating";
 import { createReview } from "../../api/reviewApi";
 import type { CreateReviewRequest } from "../../api/reviewApi";
-<<<<<<< HEAD
-import { useAuth } from "../../context/AuthContext.tsx"; 
-=======
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 
 interface ReviewFormProps {
   bookingId?: number;

@@ -13,7 +13,8 @@ const StudioCatalog: React.FC = () => {
     city: '',
     min_price: 0,
     max_price: 100000,
-    room_type: ''
+    room_type: '',
+    search: ''
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
@@ -26,17 +27,39 @@ const StudioCatalog: React.FC = () => {
       page: currentPage,
       limit: studiosPerPage
     }),
+    staleTime: 30000, // Cache 30 seconds
   });
 
   const studios = studiosData?.data || [];
   const totalPages = studiosData?.pagination?.total_pages || 1;
 
+  const handleFilterChange = (newFilters: StudioFilterParams) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (isLoading) {
-    return <LoadingSpinner />;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Ошибка загрузки студий</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 text-lg">Ошибка загрузки студий</p>
+          <p className="text-gray-600 mt-2">Попробуйте обновить страницу позже</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -51,30 +74,44 @@ const StudioCatalog: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             <LeftPanel 
               filters={filters}
-              onFilterChange={setFilters}
+              onFilterChange={handleFilterChange}
               totalStudios={studios.length}
             />
             
             <div className="lg:w-3/4">
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-                {studios.map((studio: Studio) => (
-                  <StudioWithRoomsCard 
-                    key={studio.id} 
-                    studio={studio}
-                    rooms={studio.rooms || []}
-                    onClick={() => setSelectedStudio(studio)}
-                  />
-                ))}
-              </div>
-              
-              {totalPages > 1 && (
-                <div className="mt-8">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                  />
+              {studios.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg">Студии не найдены</p>
+                  <button 
+                    onClick={() => handleFilterChange({ city: '', min_price: 0, max_price: 100000, room_type: '', search: '' })}
+                    className="mt-4 text-blue-600 hover:underline"
+                  >
+                    Сбросить фильтры
+                  </button>
                 </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+                    {studios.map((studio: Studio) => (
+                      <StudioWithRoomsCard 
+                        key={studio.id} 
+                        studio={studio}
+                        rooms={studio.rooms || []}
+                        onClick={() => setSelectedStudio(studio)}
+                      />
+                    ))}
+                  </div>
+                  
+                  {totalPages > 1 && (
+                    <div className="mt-8">
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                      />
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>

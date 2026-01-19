@@ -6,6 +6,8 @@ import { X, Star, MapPin, Users, DollarSign, Phone, Mail, Camera, Plus } from 'l
 // import ReviewsModal from './ReviewsModal';
 import { getStudioReviews } from '../api/reviewApi';
 import type { Review } from '../api/reviewApi';
+import AvailabilityCalendar from './AvailabilityCalendar';
+import BookingForm from './BookingForm';
 
 // Define types locally since they're not imported
 interface Studio {
@@ -63,6 +65,12 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  
+  // Booking state
+  const [showBookingCalendar, setShowBookingCalendar] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [showBookingForm, setShowBookingForm] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);
 
   // Fetch reviews when reviews tab is active
   useEffect(() => {
@@ -145,13 +153,36 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     : '0.0';
 
   const handleBooking = () => {
-    // Navigate to booking page with studio data (user will choose room there)
-    navigate('/booking', { 
-      state: { 
-        studio, 
-        rooms: rooms 
-      } 
-    });
+    if (rooms.length === 1) {
+      // If only one room, select it and show calendar
+      setSelectedRoom(rooms[0]);
+      setShowBookingCalendar(true);
+    } else {
+      // If multiple rooms, navigate to booking page for room selection
+      navigate('/booking', { 
+        state: { 
+          studio, 
+          rooms: rooms 
+        } 
+      });
+    }
+  };
+
+  const handleSlotSelect = (start: string, end: string) => {
+    setSelectedSlot({ start, end });
+    setShowBookingForm(true);
+  };
+
+  const handleBookingSuccess = () => {
+    setShowBookingForm(false);
+    setShowBookingCalendar(false);
+    setSelectedSlot(null);
+    // Could show success message or refresh bookings
+  };
+
+  const handleBookingCancel = () => {
+    setShowBookingForm(false);
+    setSelectedSlot(null);
   };
 
   // Форматирование рабочих часов
@@ -335,15 +366,58 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                 </div>
               )}
 
-              {/* Single Booking Button */}
+              {/* Booking Section */}
               <div className="mt-6">
-                <button
-                  onClick={handleBooking}
-                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold text-lg"
-                >
-                  Забронировать
-                </button>
+                {!showBookingCalendar ? (
+                  <button
+                    onClick={handleBooking}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold text-lg"
+                  >
+                    Забронировать
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    {selectedRoom && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-medium mb-2">Выбран зал: {selectedRoom.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          Цена: {selectedRoom.price_per_hour_min || studio.price_per_hour} ₸/час
+                        </p>
+                      </div>
+                    )}
+                    
+                    <AvailabilityCalendar
+                      roomId={selectedRoom?.id || rooms[0]?.id}
+                      pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour}
+                      onSlotSelect={handleSlotSelect}
+                    />
+                    
+                    <button
+                      onClick={() => setShowBookingCalendar(false)}
+                      className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
+                    >
+                      Назад
+                    </button>
+                  </div>
+                )}
               </div>
+
+              {/* Booking Form Modal */}
+              {showBookingForm && selectedSlot && selectedRoom && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+                  <BookingForm
+                    roomId={selectedRoom.id}
+                    roomName={selectedRoom.name}
+                    studioName={studio.name}
+                    date={new Date()}
+                    startTime={selectedSlot.start}
+                    endTime={selectedSlot.end}
+                    pricePerHour={selectedRoom.price_per_hour_min || studio.price_per_hour}
+                    onSuccess={handleBookingSuccess}
+                    onCancel={handleBookingCancel}
+                  />
+                </div>
+              )}
             </div>
           )}
 

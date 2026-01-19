@@ -103,7 +103,7 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
           Редактировать профиль
         </button>
         
-        {/* Password change disabled until backend implements endpoint */}
+        {/* Password change temporarily disabled */}
         <button
           disabled
           className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed opacity-50"

@@ -1,64 +1,78 @@
-import React from 'react';
-<<<<<<< HEAD
-import { MapPin, Star } from 'lucide-react';
-import { Studio } from '../types/types'; // Исправленный путь
-import { formatPrice } from '../utils/format'; // Исправленный путь
+// src/components/StudioCard.tsx
 
-interface StudioCardProps {
-  studio: Studio;
-  onClick?: () => void; 
-=======
+import React from 'react';
 import { MapPin, Star, Camera } from 'lucide-react';
 import type { Studio } from '../types';
 
 interface StudioCardProps {
   studio: Studio;
   onClick?: () => void;
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 }
 
-export const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {
+const StudioCard: React.FC<StudioCardProps> = ({ studio, onClick }) => {
   return (
     <div 
       onClick={onClick}
-      className="group relative overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md cursor-pointer"
+      className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
     >
-      <div className="h-48 w-full bg-gray-200 object-cover">
-        {studio.preview_image ? (
+      {/* Image */}
+      <div className="relative h-48 bg-gray-200">
+        {studio.photos && studio.photos.length > 0 ? (
           <img 
-            src={studio.preview_image} 
+            src={studio.photos[0]} 
             alt={studio.name} 
-            className="h-full w-full object-cover transition-transform group-hover:scale-105" 
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-gray-400">Нет фото</div>
+          <div className="w-full h-full flex items-center justify-center">
+            <Camera className="w-12 h-12 text-gray-400" />
+          </div>
         )}
       </div>
 
+      {/* Content */}
       <div className="p-4">
-        <div className="flex justify-between items-start">
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">{studio.name}</h3>
-            <div className="flex items-center gap-1 text-sm font-medium">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                <span>{studio.rating}</span>
-                <span className="text-gray-500">({studio.total_reviews})</span>
-            </div>
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+          {studio.name}
+        </h3>
+
+        {/* Address */}
+        <div className="flex items-center text-gray-600 mb-2">
+          <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+          <span className="text-sm line-clamp-1">{studio.address}</span>
         </div>
 
-        <div className="mt-2 flex items-center text-sm text-gray-500">
-          <MapPin className="mr-1 h-4 w-4" />
-          <span className="line-clamp-1">{studio.address}</span>
+        {/* Rating and Price */}
+        <div className="flex items-center justify-between mb-3">
+          {/* Rating */}
+          <div className="flex items-center">
+            <Star className="w-5 h-5 text-yellow-400 fill-current" />
+            <span className="ml-1 font-semibold">{studio.rating.toFixed(1)}</span>
+            <span className="ml-1 text-sm text-gray-500">
+              ({studio.total_reviews})
+            </span>
+          </div>
+
+          {/* Price */}
+          {studio.min_price && (
+            <div className="text-right">
+              <p className="text-xs text-gray-500">от</p>
+              <p className="font-bold text-blue-600">
+                {studio.min_price.toLocaleString()} ₸
+              </p>
+            </div>
+          )}
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
-                От
-            </div>
-            <div className="text-lg font-bold text-indigo-600">
-                {formatPrice(studio.min_price)}
-                <span className="text-sm font-normal text-gray-500">/час</span>
-            </div>
-        </div>
+        {/* District badge (optional) */}
+        {studio.district && (
+          <div className="mt-2">
+            <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+              {studio.district}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-<<<<<<< HEAD
-import { getProfile, uploadFiles } from './auth.api';
-import { useAuth } from '../../context/AuthContext.tsx';
-=======
 import { getProfile, updateProfile, changePassword } from './auth.api';
 import { useAuth } from '../../context/AuthContext';
->>>>>>> 2bd5a701eab2089c20aafe7f2ec441f3cf22f410
 import type { Profile } from './auth.types';
 import ProfileView from '../../components/ProfileView';
 import ProfileEditForm from '../../components/ProfileEditForm';
