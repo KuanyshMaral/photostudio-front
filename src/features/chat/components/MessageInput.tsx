@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import './MessageInput.css';
 
@@ -21,18 +21,60 @@ export default function MessageInput({
 }: MessageInputProps) {
     const [text, setText] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const typingTimeoutRef = useRef<number | null>(null);
+    const isTypingRef = useRef(false);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setText(e.target.value);
+        
+        // Typing indicator logic с debounce
+        if (onTypingStart && onTypingStop) {
+            // Начало печатания
+            if (!isTypingRef.current) {
+                isTypingRef.current = true;
+                onTypingStart();
+            }
+            
+            // Сбрасываем таймер
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+            
+            // Через 2 сек считаем что перестал печатать
+            typingTimeoutRef.current = setTimeout(() => {
+                isTypingRef.current = false;
+                onTypingStop();
+            }, 2000);
+        }
+    };
 
     const handleSend = () => {
         const trimmed = text.trim();
         if (!trimmed || disabled) return;
         
-        onTypingStop?.();
+        // Останавливаем typing indicator
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        if (isTypingRef.current && onTypingStop) {
+            isTypingRef.current = false;
+            onTypingStop();
+        }
+        
         onSend(trimmed);
         setText('');
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-        onTypingStart?.();
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
@@ -77,17 +119,8 @@ export default function MessageInput({
             {/* Text input */}
             <textarea
                 value={text}
-                onChange={(e) => {
-                    setText(e.target.value);
-                    if (e.target.value.trim()) {
-                        onTypingStart?.();
-                    } else {
-                        onTypingStop?.();
-                    }
-                }}
+                onChange={handleChange}
                 onKeyDown={handleKeyDown}
-                onFocus={() => onTypingStart?.()}
-                onBlur={() => onTypingStop?.()}
                 placeholder={placeholder}
                 disabled={disabled}
                 rows={1}
