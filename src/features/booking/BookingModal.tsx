@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQuery } from "@tanstack/react-query";
@@ -19,15 +19,23 @@ const TimeSlotPicker: React.FC<TimeSlotPickerProps> = ({ slots, onSelect }) => {
     const [endHour, setEndHour] = useState<number | null>(null);
     
     const handleSlotClick = (hour: number, available: boolean) => {
-        if (!available) return;
+        console.log('Slot clicked:', { hour, available });
+        
+        if (!available) {
+            console.log('Slot not available, ignoring');
+            return;
+        }
         
         if (!startHour) {
             setStartHour(hour);
             setEndHour(null);
+            console.log('Set start hour:', hour);
         } else if (!endHour && hour > startHour) {
             setEndHour(hour);
+            console.log('Set end hour:', hour, 'Range:', startHour, '-', hour);
             onSelect(startHour, hour);
         } else {
+            console.log('Resetting selection, new start hour:', hour);
             setStartHour(hour);
             setEndHour(null);
         }
@@ -128,7 +136,7 @@ interface BookingModalProps {
 export const BookingModal: React.FC<BookingModalProps> = ({
     roomId, studioId, pricePerHour, onClose
 }) => {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const [date, setDate] = useState<Date>(new Date());
     const [startHour, setStartHour] = useState<number | null>(null);
     const [endHour, setEndHour] = useState<number | null>(null);
@@ -136,26 +144,60 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     
     const { data: slots, isLoading, error } = useQuery({
         queryKey: ['availability', roomId, date.toISOString().split('T')[0]],
-        queryFn: () => getRoomAvailability(roomId, date.toISOString().split('T')[0]),
-        enabled: !!roomId,
+        queryFn: () => getRoomAvailability(roomId, date.toISOString().split('T')[0], token || undefined),
+        enabled: !!roomId && !!token,
     });
     
+    // Debug logging
+    useEffect(() => {
+        if (slots) {
+            console.log('Available slots loaded:', slots);
+            console.log('Available slots (available_slots):', slots.available_slots);
+            console.log('Booked slots:', slots.booked_slots);
+        }
+    }, [slots]);
+    
+    useEffect(() => {
+        if (error) {
+            console.log('Error loading slots:', error);
+        }
+    }, [error]);
+    
     const handleBook = async () => {
-        if (!startHour || !endHour || !token) return;
+        if (!startHour || !endHour || !token || !user) return;
         
         setIsBooking(true);
         
-        const startTime = new Date(date);
+        // Create date at midnight to avoid timezone issues
+        const startTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         startTime.setHours(startHour, 0, 0, 0);
         
-        const endTime = new Date(date);
+        const endTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
         endTime.setHours(endHour, 0, 0, 0);
+        
+        // Adjust for timezone to preserve local hours in ISO string
+        const adjustForTimezone = (date: Date) => {
+            const localOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() - localOffset).toISOString();
+        };
+        
+        const startDateTime = adjustForTimezone(startTime);
+        const endDateTime = adjustForTimezone(endTime);
+        
+        console.log('Booking times:', {
+            startDateTime,
+            endDateTime,
+            startHour,
+            endHour
+        });
         
         try {
             await createBooking({
                 room_id: String(roomId),
-                start_time: startTime.toISOString(),
-                end_time: endTime.toISOString(),
+                studio_id: studioId,
+                user_id: user.id,
+                start_time: startDateTime,
+                end_time: endDateTime,
             }, token);
             
             toast.success('Бронирование создано!');
@@ -219,11 +261,12 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                             </div>
                         ) : error ? (
                             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                                <p className="text-red-700">Не удалось загрузить доступное время</p>
+                                <p className="text-red-700 font-medium">Не удалось загрузить доступное время</p>
+                                <p className="text-red-600 text-sm mt-1">Пожалуйста, попробуйте позже или свяжитесь с поддержкой</p>
                             </div>
                         ) : (
                             <TimeSlotPicker 
-                                slots={slots || []} 
+                                slots={slots?.available_slots || []} 
                                 onSelect={handleSlotSelect}
                             />
                         )}

@@ -7,6 +7,7 @@ interface Props {
   roomId: number;
   roomName: string;
   studioName: string;
+  studioId: number;
   date: Date;
   startTime: string;
   endTime: string;
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export default function BookingForm({
-  roomId, roomName, studioName, date, startTime, endTime, pricePerHour,
+  roomId, roomName, studioName, studioId, date, startTime, endTime, pricePerHour,
   onSuccess, onCancel
 }: Props) {
   const { token, user } = useAuth();
@@ -37,18 +38,39 @@ export default function BookingForm({
         return;
       }
 
-      await createBooking({
+      const startDateTime = combineDateAndTime(date, startTime);
+      const endDateTime = combineDateAndTime(date, endTime);
+      
+      console.log('BookingForm times:', {
+        startDateTime,
+        endDateTime,
+        startTime,
+        endTime,
+        roomId,
+        studioId,
+        userId: user.id
+      });
+
+      const bookingData = {
         room_id: roomId.toString(),
-        studio_id: 0, // Will be set by API based on room
+        studio_id: studioId,
         user_id: user.id,
-        start_time: combineDateAndTime(date, startTime),
-        end_time: combineDateAndTime(date, endTime),
+        start_time: startDateTime,
+        end_time: endDateTime,
         comment
-      }, token);
+      };
+      
+      console.log('Sending booking request:', bookingData);
+
+      await createBooking(bookingData, token);
 
       toast.success('Бронирование создано!');
       onSuccess();
     } catch (error: any) {
+      console.log('Booking error details:', error);
+      console.log('Error response:', error.response);
+      console.log('Error data:', error.response?.data);
+      
       const message = error.response?.data?.error?.message || error.message || 'Ошибка бронирования';
       toast.error(message);
     } finally {
@@ -138,9 +160,14 @@ function calculateHours(startTime: string, endTime: string): number {
 
 function combineDateAndTime(date: Date, time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
-  const combined = new Date(date);
+  // Create date at midnight local time
+  const combined = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   combined.setHours(hours, minutes, 0, 0);
-  return combined.toISOString();
+  
+  // Return ISO string but preserve local hours by adjusting for timezone
+  const localOffset = combined.getTimezoneOffset() * 60000; // offset in milliseconds
+  const localTime = new Date(combined.getTime() - localOffset);
+  return localTime.toISOString();
 }
 
 function formatDate(date: Date): string {

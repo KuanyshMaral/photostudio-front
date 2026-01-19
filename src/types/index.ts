@@ -29,6 +29,9 @@ export interface Studio {
   rating?: number;
   reviews_count?: number;
   min_price?: number;
+  max_price?: number;
+  price_per_hour?: number;
+  amenities?: string[];
   rooms?: Room[];
   created_at: string;
 }

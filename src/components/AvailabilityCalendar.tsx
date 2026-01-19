@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAvailability } from '../api/availabilityApi';
 import DatePicker from 'react-datepicker';
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
   roomId: number;
@@ -10,21 +11,34 @@ interface Props {
 }
 
 export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelect }: Props) {
+  const { token } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['availability', roomId, selectedDate.toISOString().split('T')[0]],
-    queryFn: () => getAvailability(roomId, selectedDate),
+    queryFn: () => getAvailability(roomId, selectedDate, token || undefined),
+    enabled: !!token,
   });
 
-  // Генерируем слоты (09:00 - 22:00)
-  const allSlots = generateTimeSlots('09:00', '22:00', 60); // каждый час
+  // Use backend's available slots, but fallback to slots from 12:00 onwards if API fails
+  const allSlots = data?.available_slots?.map(slot => `${slot.hour.toString().padStart(2, '0')}:00`) || generateTimeSlots('12:00', '22:00', 60);
+
+  console.log('Calendar state:', { data, isLoading, error, allSlots });
 
   // Определяем занятые слоты
   const isSlotBooked = (slot: string) => {
     return data?.booked_slots?.some(
       (booked: { start: string }) => booked.start === slot
     );
+  };
+  
+  // Check if slot is actually available from backend (only if data exists)
+  const isSlotAvailable = (slot: string) => {
+    // If no data from backend, assume all slots are available
+    if (!data || !data.available_slots) return true;
+    
+    const hour = parseInt(slot.split(':')[0]);
+    return data?.available_slots?.some(availableSlot => availableSlot.hour === hour && availableSlot.available) || false;
   };
 
   return (
@@ -42,6 +56,18 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
         />
       </div>
 
+      {/* Error State */}
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+          <div className="text-yellow-700 font-medium">
+            Не удалось загрузить доступное время
+          </div>
+          <div className="text-yellow-600 text-sm mt-1">
+            Показаны слоты с 12:00. Время работы студии: 12:00 - 22:00
+          </div>
+        </div>
+      )}
+
       {/* Time Slots */}
       {isLoading ? (
         <div className="animate-pulse space-y-2">
@@ -54,14 +80,14 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
           {allSlots.map(slot => (
             <button
               key={slot}
-              disabled={isSlotBooked(slot)}
+              disabled={isSlotBooked(slot) || !isSlotAvailable(slot)}
               onClick={() => {
                 const end = addHour(slot);
                 onSlotSelect(slot, end);
               }}
               className={`
                 p-3 rounded-lg text-center font-medium transition
-                ${isSlotBooked(slot)
+                ${isSlotBooked(slot) || !isSlotAvailable(slot)
                   ? 'bg-red-100 text-red-400 cursor-not-allowed'
                   : 'bg-green-100 text-green-700 hover:bg-green-200 cursor-pointer'
                 }

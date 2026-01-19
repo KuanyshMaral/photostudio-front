@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { getMyBookings, updateBookingStatus } from "../../api/bookingApi";
 import { useAuth } from "../../context/AuthContext";
 import toast from "react-hot-toast";
+import BookingDetailModal from "../../components/BookingDetailModal";
+import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, User } from "lucide-react";
 
 interface Booking {
   id: number;
@@ -24,6 +26,7 @@ const MyBookings: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled' | 'completed'>('all');
   const [cancelling, setCancelling] = useState<number | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -219,8 +222,9 @@ const MyBookings: React.FC = () => {
                 {filteredBookings.map((booking) => (
                   <div
                     key={booking.id}
-                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200"
+                    className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer hover:border-blue-300"
                     data-testid="booking-item"
+                    onClick={() => setSelectedBooking(booking)}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -272,7 +276,7 @@ const MyBookings: React.FC = () => {
                           disabled={cancelling === booking.id}
                           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {cancelling === booking.id ? 'Отмена...' : 'Отменить бронирование'}
+                          {cancelling === booking.id ? 'Отмена...' : 'Отменить'}
                         </button>
                       </div>
                     )}
@@ -306,6 +310,14 @@ const MyBookings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Booking Detail Modal */}
+      {selectedBooking && (
+        <BookingDetailModal
+          booking={selectedBooking}
+          onClose={() => setSelectedBooking(null)}
+        />
+      )}
     </div>
   );
 };
