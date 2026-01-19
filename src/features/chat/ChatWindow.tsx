@@ -6,6 +6,7 @@ import {
     uploadImage, 
     markAsRead
 } from './chat.api';
+import { useChat } from './useChat';
 import type { 
     Conversation, 
     Message 
@@ -24,7 +25,25 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isSending, setIsSending] = useState(false);
+    const [isTyping, setIsTyping] = useState(false);  // NEW
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    
+    // WebSocket hook
+    const { isConnected, sendMessage: wsSendMessage, sendTyping } = useChat({
+        token,
+        onNewMessage: (convId, message) => {
+            // Добавляем новое сообщение если это наш диалог
+            if (convId === conversation.id) {
+                setMessages(prev => [...prev, message]);
+            }
+        },
+        onTyping: (convId, userId, typing) => {
+            // Показываем индикатор если это наш диалог и не мы
+            if (convId === conversation.id && userId !== user?.id) {
+                setIsTyping(typing);
+            }
+        },
+    });
 
     // Загрузка сообщений
     useEffect(() => {
@@ -53,18 +72,22 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
 
-    // Отправка сообщения
+    // Отправка через WebSocket или REST fallback
     const handleSend = async (content: string) => {
-        if (!token || isSending) return;
-        
-        setIsSending(true);
-        try {
-            const newMessage = await sendMessage(token, conversation.id, content);
-            setMessages(prev => [...prev, newMessage]);
-        } catch (error) {
-            console.error('Failed to send message:', error);
-        } finally {
-            setIsSending(false);
+        if (isConnected) {
+            // Через WebSocket
+            wsSendMessage(conversation.id, content);
+        } else {
+            // Fallback на REST
+            setIsSending(true);
+            try {
+                const newMessage = await sendMessage(token!, conversation.id, content);
+                setMessages(prev => [...prev, newMessage]);
+            } catch (error) {
+                console.error('Failed to send:', error);
+            } finally {
+                setIsSending(false);
+            }
         }
     };
 
@@ -78,6 +101,15 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         } catch (error) {
             console.error('Failed to upload image:', error);
         }
+    };
+    
+    // Typing indicator
+    const handleTypingStart = () => {
+        sendTyping(conversation.id, true);
+    };
+    
+    const handleTypingStop = () => {
+        sendTyping(conversation.id, false);
     };
 
     return (
@@ -121,6 +153,16 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
                         />
                     ))
                 )}
+                {isTyping && (
+                    <div className="typing-indicator">
+                        <span>{conversation.other_user.name} печатает</span>
+                        <div className="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
@@ -128,6 +170,8 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
             <MessageInput
                 onSend={handleSend}
                 onImageUpload={handleImageUpload}
+                onTypingStart={handleTypingStart}  // NEW
+                onTypingStop={handleTypingStop}    // NEW
                 disabled={isSending}
             />
         </div>
