@@ -33,6 +33,9 @@ import Analytics from "./features/admin/Analytics";
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
 
+// Chat components
+import ChatPage from "./features/chat/ChatPage";
+
 function App() {
   return (
     <>
@@ -203,6 +206,19 @@ function App() {
               <Layout>
                 <OwnerDashboard />
               </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Chat routes */}
+          <Route path="/messages" element={
+            <ProtectedRoute>
+              <ChatPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/messages/:conversationId" element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           } />
           
