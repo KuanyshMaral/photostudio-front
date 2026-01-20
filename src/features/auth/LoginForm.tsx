@@ -36,7 +36,7 @@ export default function LoginForm() {
       } else if (response.user?.role === 'studio_owner') {
         navigate('/owner');
       } else {
-        navigate('/dashboard');
+        navigate('/studios');
       }
     } catch (error: any) {
       // Показываем ошибку от API
