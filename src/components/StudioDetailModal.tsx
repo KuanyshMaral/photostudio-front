@@ -6,44 +6,9 @@ import { X, Star, MapPin, Users, DollarSign, Phone, Mail, Camera, Plus } from 'l
 // import ReviewsModal from './ReviewsModal';
 import { getStudioReviews } from '../api/reviewApi';
 import type { Review } from '../api/reviewApi';
+import type { Studio, Room } from '../types';
 import AvailabilityCalendar from './AvailabilityCalendar';
 import BookingForm from './BookingForm';
-
-// Define types locally since they're not imported
-interface Studio {
-  id: number;
-  name: string;
-  description: string;
-  address: string;
-  phone?: string;
-  email?: string;
-  price_per_hour: number;
-  rating: number;
-  amenities: string[];
-  photos: string[];
-  working_hours?: string;
-  total_reviews?: number;
-  district?: string;
-}
-
-interface Room {
-  id: number;
-  name: string;
-  description?: string;
-  price_per_hour_min?: number;
-  area_sqm?: number;
-  capacity?: number;
-  room_type?: string;
-  amenities?: string[];
-  equipment?: Array<{
-    id: number;
-    name: string;
-    brand?: string;
-    model?: string;
-    category?: string;
-    quantity: number;
-  }>;
-}
 
 interface StudioDetailModalProps {
   studio: Studio;
@@ -153,18 +118,11 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     : '0.0';
 
   const handleBooking = () => {
-    if (rooms.length === 1) {
-      // If only one room, select it and show calendar
+    // Always show calendar booking for consistent UX
+    if (rooms.length > 0) {
+      // If there are rooms, select the first one by default and show calendar
       setSelectedRoom(rooms[0]);
       setShowBookingCalendar(true);
-    } else {
-      // If multiple rooms, navigate to booking page for room selection
-      navigate('/booking', { 
-        state: { 
-          studio, 
-          rooms: rooms 
-        } 
-      });
     }
   };
 
@@ -246,8 +204,8 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
               <div className="flex items-center gap-6">
                 <div className="flex items-center">
                   <Star className="w-6 h-6 text-yellow-400 fill-current" />
-                  <span className="ml-2 text-2xl font-bold">{studio.rating.toFixed(1)}</span>
-                  <span className="ml-2 text-gray-500">({studio.total_reviews} отзывов)</span>
+                  <span className="ml-2 text-2xl font-bold">{(studio.rating || 0).toFixed(1)}</span>
+                  <span className="ml-2 text-gray-500">({studio.reviews_count || 0} отзывов)</span>
                 </div>
               </div>
 
@@ -377,18 +335,41 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                   </button>
                 ) : (
                   <div className="space-y-4">
+                    {/* Room Selector for multiple rooms */}
+                    {rooms.length > 1 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Выберите зал
+                        </label>
+                        <select
+                          value={selectedRoom?.id || rooms[0]?.id}
+                          onChange={(e) => {
+                            const room = rooms.find(r => r.id === Number(e.target.value));
+                            setSelectedRoom(room || rooms[0]);
+                          }}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          {rooms.map(room => (
+                            <option key={room.id} value={room.id}>
+                              {room.name} - {room.price_per_hour_min?.toLocaleString() || 0} ₸/час
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    
                     {selectedRoom && (
                       <div className="bg-gray-50 p-4 rounded-lg">
                         <h4 className="font-medium mb-2">Выбран зал: {selectedRoom.name}</h4>
                         <p className="text-sm text-gray-600">
-                          Цена: {selectedRoom.price_per_hour_min || studio.price_per_hour} ₸/час
+                          Цена: {selectedRoom.price_per_hour_min || studio.price_per_hour || studio.min_price || 0} ₸/час
                         </p>
                       </div>
                     )}
                     
                     <AvailabilityCalendar
                       roomId={selectedRoom?.id || rooms[0]?.id}
-                      pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour}
+                      pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour || studio.min_price || 0}
                       onSlotSelect={handleSlotSelect}
                     />
                     
@@ -409,10 +390,11 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                     roomId={selectedRoom.id}
                     roomName={selectedRoom.name}
                     studioName={studio.name}
+                    studioId={studio.id}
                     date={new Date()}
                     startTime={selectedSlot.start}
                     endTime={selectedSlot.end}
-                    pricePerHour={selectedRoom.price_per_hour_min || studio.price_per_hour}
+                    pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour || studio.min_price || 0}
                     onSuccess={handleBookingSuccess}
                     onCancel={handleBookingCancel}
                   />

@@ -6,7 +6,6 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
 import ProfilePage from "./features/auth/ProfilePage.tsx";
-import Dashboard from "./features/auth/Dashboard.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
@@ -54,7 +53,14 @@ function App() {
           <Route path="/register" element={<RegisterForm />} />
           <Route path="/studio-register" element={<StudioRegistrationForm />} />
           
-          {/* Studio catalog (protected with layout) */}
+          {/* Studio catalog (main page for authenticated users) */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Layout>
+                <StudioCatalog />
+              </Layout>
+            </ProtectedRoute>
+          } />
           <Route path="/studios" element={
             <ProtectedRoute>
               <Layout>
@@ -71,13 +77,6 @@ function App() {
           } />
           
           {/* Protected routes */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </ProtectedRoute>
-          } />
           
           <Route path="/profile" element={
             <ProtectedRoute>
@@ -155,7 +154,7 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute requiredRole={'admin'}>
               <Layout>
-                <Dashboard />
+                <StudioCatalog />
               </Layout>
             </ProtectedRoute>
           } />

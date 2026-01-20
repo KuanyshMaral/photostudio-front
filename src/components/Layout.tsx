@@ -12,7 +12,7 @@ export default function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     // Extract the current path and set active tab
-    const path = location.pathname.replace('/', '') || 'dashboard';
+    const path = location.pathname.replace('/', '') || 'studios';
     return path;
   });
 
@@ -25,9 +25,9 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const sidebarItems = [
-    { id: "dashboard", label: "Панель управления" },
-    { id: "studios", label: "Просмотр студий" },
+    { id: "studios", label: "Студии" },
     { id: "my-bookings", label: "Мои бронирования" },
+    { id: "messages", label: "Сообщения" },
     { id: "profile", label: "Мой профиль" },
   ];
 
@@ -41,7 +41,7 @@ export default function Layout({ children }: LayoutProps) {
       {/* Left Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200">
         <div className="p-6">
-          <h1 className="text-xl font-semibold text-gray-900 mb-8">PhotoStudio Hub</h1>
+          <h1 className="text-xl font-semibold text-gray-900 mb-8">StudioBooking</h1>
           
           <nav className="space-y-1">
             {sidebarItems.map((item) => (
@@ -49,9 +49,7 @@ export default function Layout({ children }: LayoutProps) {
                 key={item.id}
                 onClick={() => {
                   setActiveTab(item.id);
-                  if (item.id === "dashboard") {
-                    navigate("/dashboard");
-                  } else if (item.id === "owner") {
+                  if (item.id === "owner") {
                     navigate("/owner");
                   } else {
                     navigate(`/${item.id}`);
