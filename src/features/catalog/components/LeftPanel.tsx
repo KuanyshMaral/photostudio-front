@@ -1,18 +1,16 @@
 import React from 'react';
-import { MapPin, Star, Clock, Filter, TrendingUp, RotateCcw } from 'lucide-react';
+import { MapPin, Star, Filter, RotateCcw } from 'lucide-react';
 import { StudioFilters } from './StudioFilters';
 import type { StudioFilterParams } from '../../../types';
 
 interface LeftPanelProps {
   filters: StudioFilterParams;
   onFilterChange: (filters: StudioFilterParams) => void;
-  totalStudios: number;
 }
 
 export const LeftPanel: React.FC<LeftPanelProps> = ({ 
   filters, 
-  onFilterChange, 
-  totalStudios 
+  onFilterChange
 }) => {
   const handleResetAll = () => {
     onFilterChange({ 
@@ -25,7 +23,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   };
 
   return (
-    <div className="lg:w-1/4 space-y-6">
+    <div className="lg:w-1/4 space-y-6 lg:sticky lg:top-8 lg:h-fit">
       {/* Search and Filters */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
@@ -93,33 +91,6 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="font-semibold text-gray-900 mb-4">Статистика</h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-sm text-gray-600">
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Всего студий
-            </div>
-            <span className="font-semibold text-gray-900">{totalStudios}</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-sm text-gray-600">
-              <Star className="w-4 h-4 mr-2" />
-              Средний рейтинг
-            </div>
-            <span className="font-semibold text-gray-900">4.5</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-sm text-gray-600">
-              <Clock className="w-4 h-4 mr-2" />
-              Часы работы
-            </div>
-            <span className="font-semibold text-gray-900">24/7</span>
-          </div>
-        </div>
-      </div>
 
       {/* Popular Studios */}
       <div className="bg-white rounded-lg shadow-sm p-6">

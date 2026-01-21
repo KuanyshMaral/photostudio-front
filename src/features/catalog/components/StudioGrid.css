@@ -1,0 +1,154 @@
+/* StudioGrid.css */
+/* 3-column grid для карточек студий */
+
+/* Основной контейнер */
+.studio-grid {
+  background-color: #f9fafb;
+  padding: 0;
+}
+
+/* Внутренний grid контейнер - перекрываем все Tailwind классы */
+.studio-grid > .grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 24px !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 24px 20px !important;
+}
+
+/* Перекрываем конкретные Tailwind классы */
+.studio-grid .grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+.studio-grid .gap-6 {
+  gap: 24px !important;
+}
+
+.studio-grid .max-w-7xl {
+  max-width: 1200px !important;
+}
+
+.studio-grid .mx-auto {
+  margin: 0 auto !important;
+}
+
+.studio-grid .overflow-x-hidden {
+  overflow-x: visible !important;
+}
+
+/* Responsive стили */
+@media (max-width: 1024px) {
+  .studio-grid > .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+    padding: 20px 16px !important;
+  }
+  
+  .studio-grid .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .studio-grid .gap-6 {
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .studio-grid > .grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    padding: 16px !important;
+  }
+  
+  .studio-grid .grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .studio-grid .gap-6 {
+    gap: 16px !important;
+  }
+}
+
+/* Loading skeletons */
+.studio-grid--loading {
+  opacity: 0.7;
+}
+
+.studio-card-skeleton {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton--image {
+  aspect-ratio: 4 / 3;
+}
+
+.skeleton--text {
+  height: 16px;
+  margin: 16px;
+  border-radius: 4px;
+}
+
+.skeleton--short {
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Error state */
+.studio-grid__error {
+  text-align: center;
+  padding: 60px 20px;
+  color: #dc2626;
+  background-color: #f9fafb;
+}
+
+.studio-grid__error button {
+  margin-top: 16px;
+  padding: 10px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Empty state */
+.studio-grid__empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #6b7280;
+  background-color: #f9fafb;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.studio-grid__empty h3 {
+  font-size: 20px;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.studio-grid__empty p {
+  margin: 0;
+}

@@ -5,6 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
+import ProfilePage from "./features/auth/ProfilePage.tsx";
+import Dashboard from "./features/auth/Dashboard.tsx";
 import ProfileDashboard from "./features/auth/ProfileDashboard";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
@@ -148,7 +150,9 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute requiredRole={'admin'}>
               <Layout>
-                <StudioCatalog />
+                <div className="p-8">
+                  <Dashboard />
+                </div>
               </Layout>
             </ProtectedRoute>
           } />

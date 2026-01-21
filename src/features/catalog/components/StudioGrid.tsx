@@ -4,6 +4,7 @@ import { StudioWithRoomsCard } from './StudioWithRoomsCard';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import type { Studio } from '../../../types/index';
 import { getStudiosWithRooms } from '../api/studios';
+import './StudioGrid.css';
 
 interface FiltersState {
   city: string;
@@ -16,12 +17,14 @@ interface StudioGridProps {
   searchQuery: string;
   filters: FiltersState;
   onStudioClick: (studio: Studio) => void;
+  onContactOwner?: (studio: Studio) => void;
 }
 
 export const StudioGrid: React.FC<StudioGridProps> = ({ 
   searchQuery, 
   filters,
-  onStudioClick
+  onStudioClick,
+  onContactOwner
 }) => {
   const studiosPerPage = 12;
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -77,18 +80,15 @@ export const StudioGrid: React.FC<StudioGridProps> = ({
   }
 
   return (
-    <div className="studio-grid">
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div className="studio-grid overflow-x-hidden">
+      <div className="grid grid-cols-3 gap-6 max-w-7xl mx-auto">
         {studios.map((studio: Studio) => (
           <StudioWithRoomsCard
             key={studio.id}
             studio={studio}
             rooms={studio.rooms || []}
             onClick={() => onStudioClick(studio)}
-            onContactOwner={() => {
-              // Handle contact owner
-              console.log('Contact owner for studio:', studio.id);
-            }}
+            onContactOwner={onContactOwner ? (studio) => onContactOwner(studio) : undefined}
           />
         ))}
       </div>
