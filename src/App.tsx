@@ -5,12 +5,9 @@ import { Toaster } from 'react-hot-toast';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
-<<<<<<< HEAD
 import ProfilePage from "./features/auth/ProfilePage.tsx";
 import Dashboard from "./features/auth/Dashboard.tsx";
-=======
 import ProfileDashboard from "./features/auth/ProfileDashboard";
->>>>>>> origin/alisher-clean-v2
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
