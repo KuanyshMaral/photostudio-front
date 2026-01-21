@@ -1,17 +1,19 @@
 import React from 'react';
 import type { Studio, Room } from '../../../types';
-import { Star, MapPin, Users, DollarSign } from 'lucide-react';
+import { Star, MapPin, Users, DollarSign, MessageCircle } from 'lucide-react';
 
 interface StudioWithRoomsCardProps {
   studio: Studio;
   rooms?: Room[];
   onClick: () => void;
+  onContactOwner?: (studio: Studio) => void;
 }
 
 export const StudioWithRoomsCard: React.FC<StudioWithRoomsCardProps> = ({ 
   studio, 
   rooms = [],
-  onClick 
+  onClick,
+  onContactOwner 
 }) => {
   return (
     <div 
@@ -110,6 +112,22 @@ export const StudioWithRoomsCard: React.FC<StudioWithRoomsCardProps> = ({
             <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
               {studio.district}
             </span>
+          </div>
+        )}
+
+        {/* Contact Owner Button */}
+        {onContactOwner && (
+          <div className="mt-4 pt-3 border-t">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onContactOwner(studio);
+              }}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Написать владельцу
+            </button>
           </div>
         )}
       </div>

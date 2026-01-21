@@ -87,7 +87,7 @@ export async function getConversations(
     offset = 0
 ): Promise<ConversationsResponse> {
     const response = await fetch(
-        `${API_BASE}/conversations?limit=${limit}&offset=${offset}`,
+        `${API_BASE}/chat/conversations?limit=${limit}&offset=${offset}`,
         {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -110,7 +110,7 @@ export async function createConversation(
     token: string,
     request: CreateConversationRequest
 ): Promise<{ conversation: Conversation; message?: Message }> {
-    const response = await fetch(`${API_BASE}/conversations`, {
+    const response = await fetch(`${API_BASE}/chat/conversations`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -137,7 +137,7 @@ export async function getMessages(
     limit = 50,
     beforeId?: number
 ): Promise<MessagesResponse> {
-    let url = `${API_BASE}/conversations/${conversationId}/messages?limit=${limit}`;
+    let url = `${API_BASE}/chat/conversations/${conversationId}/messages?limit=${limit}`;
     if (beforeId) {
         url += `&before=${beforeId}`;
     }
@@ -165,7 +165,7 @@ export async function sendMessage(
     content: string
 ): Promise<Message> {
     const response = await fetch(
-        `${API_BASE}/conversations/${conversationId}/messages`,
+        `${API_BASE}/chat/conversations/${conversationId}/messages`,
         {
             method: 'POST',
             headers: {
@@ -192,7 +192,7 @@ export async function markAsRead(
     conversationId: number
 ): Promise<{ marked_count: number }> {
     const response = await fetch(
-        `${API_BASE}/conversations/${conversationId}/read`,
+        `${API_BASE}/chat/conversations/${conversationId}/read`,
         {
             method: 'PATCH',
             headers: {
@@ -221,7 +221,7 @@ export async function uploadImage(
     formData.append('image', file);
 
     const response = await fetch(
-        `${API_BASE}/conversations/${conversationId}/messages/upload`,
+        `${API_BASE}/chat/conversations/${conversationId}/messages/upload`,
         {
             method: 'POST',
             headers: {

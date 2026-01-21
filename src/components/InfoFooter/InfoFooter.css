@@ -1,0 +1,135 @@
+/* InfoFooter.css */
+
+.info-footer {
+  background: #f9fafb;
+  margin-top: 60px;
+}
+
+.info-footer__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Benefits */
+.info-footer__benefits {
+  padding: 60px 0;
+  background: white;
+}
+
+.info-footer__title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 40px 0;
+}
+
+.info-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.benefit-card {
+  text-align: center;
+  padding: 24px;
+}
+
+.benefit-card__icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.benefit-card__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.benefit-card__description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Partners */
+.info-footer__partners {
+  padding: 40px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.info-footer__partners-title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+}
+
+.info-footer__partners-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.partner-logo {
+  height: 40px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.partner-logo:hover {
+  opacity: 1;
+}
+
+.partner-logo img {
+  height: 100%;
+  width: auto;
+  filter: grayscale(100%);
+  transition: filter 0.2s;
+}
+
+.partner-logo:hover img {
+  filter: grayscale(0%);
+}
+
+/* Copyright */
+.info-footer__copyright {
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.info-footer__copyright p {
+  text-align: center;
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .info-footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .info-footer__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .info-footer__partners-grid {
+    gap: 24px;
+  }
+}

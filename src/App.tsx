@@ -1,12 +1,16 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 // Auth components (from Amir & Yerkanat projects)
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
+<<<<<<< HEAD
 import ProfilePage from "./features/auth/ProfilePage.tsx";
 import Dashboard from "./features/auth/Dashboard.tsx";
+=======
+import ProfileDashboard from "./features/auth/ProfileDashboard";
+>>>>>>> origin/alisher-clean-v2
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
@@ -55,13 +59,6 @@ function App() {
           <Route path="/studio-register" element={<StudioRegistrationForm />} />
           
           {/* Studio catalog (main page for authenticated users) */}
-          <Route path="/" element={
-            <ProtectedRoute>
-              <Layout>
-                <StudioCatalog />
-              </Layout>
-            </ProtectedRoute>
-          } />
           <Route path="/studios" element={
             <ProtectedRoute>
               <Layout>
@@ -69,6 +66,9 @@ function App() {
               </Layout>
             </ProtectedRoute>
           } />
+          
+          {/* Dashboard redirects */}
+          <Route path="/dashboard" element={<Navigate to="/studios" replace />} />
           <Route path="/studios/:id" element={
             <ProtectedRoute>
               <Layout>
@@ -82,9 +82,7 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Layout>
-                <div className="p-8">
-                  <ProfilePage />
-                </div>
+                <ProfileDashboard />
               </Layout>
             </ProtectedRoute>
           } />
