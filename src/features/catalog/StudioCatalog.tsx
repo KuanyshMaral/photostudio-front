@@ -165,7 +165,6 @@ const StudioCatalog: React.FC = () => {
             <LeftPanel
               filters={filters}
               onFilterChange={handleFilterChange}
-              totalStudios={studios.length}
             />
 
             <div className="lg:w-3/4">
