@@ -15,7 +15,8 @@ export const getNotifications = async (token: string): Promise<{ notifications: 
         headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to fetch notifications');
-    return (await response.json()).data;
+    const result = await response.json();
+    return result.data;
 };
 
 export const markAsRead = async (token: string, id: number): Promise<void> => {

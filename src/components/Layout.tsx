@@ -41,7 +41,9 @@ export default function Layout({ children }: LayoutProps) {
       {/* Left Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200">
         <div className="p-6">
-          <h1 className="text-xl font-semibold text-gray-900 mb-8">StudioBooking</h1>
+          <div className="sidebar-logo flex items-center mb-8">
+            <h1 className="text-xl font-semibold text-gray-900">StudioBooking</h1>
+          </div>
           
           <nav className="space-y-1">
             {sidebarItems.map((item) => (
