@@ -87,7 +87,11 @@ export async function getConversations(
     offset = 0
 ): Promise<ConversationsResponse> {
     const response = await fetch(
+<<<<<<< HEAD
         `${API_BASE}/conversations?limit=${limit}&offset=${offset}`,
+=======
+        `${API_BASE}/chat/conversations?limit=${limit}&offset=${offset}`,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -110,7 +114,11 @@ export async function createConversation(
     token: string,
     request: CreateConversationRequest
 ): Promise<{ conversation: Conversation; message?: Message }> {
+<<<<<<< HEAD
     const response = await fetch(`${API_BASE}/conversations`, {
+=======
+    const response = await fetch(`${API_BASE}/chat/conversations`, {
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -137,7 +145,11 @@ export async function getMessages(
     limit = 50,
     beforeId?: number
 ): Promise<MessagesResponse> {
+<<<<<<< HEAD
     let url = `${API_BASE}/conversations/${conversationId}/messages?limit=${limit}`;
+=======
+    let url = `${API_BASE}/chat/conversations/${conversationId}/messages?limit=${limit}`;
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
     if (beforeId) {
         url += `&before=${beforeId}`;
     }
@@ -165,7 +177,11 @@ export async function sendMessage(
     content: string
 ): Promise<Message> {
     const response = await fetch(
+<<<<<<< HEAD
         `${API_BASE}/conversations/${conversationId}/messages`,
+=======
+        `${API_BASE}/chat/conversations/${conversationId}/messages`,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         {
             method: 'POST',
             headers: {
@@ -192,7 +208,11 @@ export async function markAsRead(
     conversationId: number
 ): Promise<{ marked_count: number }> {
     const response = await fetch(
+<<<<<<< HEAD
         `${API_BASE}/conversations/${conversationId}/read`,
+=======
+        `${API_BASE}/chat/conversations/${conversationId}/read`,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         {
             method: 'PATCH',
             headers: {
@@ -221,7 +241,11 @@ export async function uploadImage(
     formData.append('image', file);
 
     const response = await fetch(
+<<<<<<< HEAD
         `${API_BASE}/conversations/${conversationId}/messages/upload`,
+=======
+        `${API_BASE}/chat/conversations/${conversationId}/messages/upload`,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         {
             method: 'POST',
             headers: {

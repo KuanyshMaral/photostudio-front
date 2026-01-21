@@ -1,7 +1,11 @@
 .chat-window {
     display: flex;
     flex-direction: column;
+<<<<<<< HEAD
     height: 100vh;
+=======
+    height: 100%;
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
     background-color: #fafafa;
 }
 

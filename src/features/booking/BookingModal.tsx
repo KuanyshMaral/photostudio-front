@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -277,3 +278,5 @@ export const BookingModal: React.FC<BookingModalProps> = ({
         </div>
     );
 };
+=======
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f

@@ -1,0 +1,29 @@
+/* StudioDetailModal.css */
+
+.studio-modal__status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.studio-modal__hours-compact {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.studio-modal__description-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #4b5563;
+}
+
+.studio-modal__contacts h3,
+.studio-modal__rooms h3,
+.studio-modal__description h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+}

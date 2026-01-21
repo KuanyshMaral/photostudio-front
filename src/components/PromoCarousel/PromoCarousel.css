@@ -1,0 +1,140 @@
+/* PromoCarousel.css */
+
+.promo-carousel {
+  margin: 0 20px 16px;
+}
+
+.promo-carousel__container {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.promo-carousel__slide {
+  aspect-ratio: 4 / 1;
+  background-size: cover;
+  background-position: center;
+}
+
+.promo-carousel__overlay {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
+  display: flex;
+  align-items: center;
+  padding: 20px;
+}
+
+.promo-carousel__content {
+  max-width: 50%;
+}
+
+.promo-carousel__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.promo-carousel__subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 12px 0;
+}
+
+.promo-carousel__cta {
+  display: inline-block;
+  padding: 10px 24px;
+  background: white;
+  color: #1f2937;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s;
+}
+
+.promo-carousel__cta:hover {
+  transform: scale(1.05);
+}
+
+/* Navigation Arrows */
+.promo-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.promo-carousel__arrow:hover {
+  background: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.promo-carousel__arrow--left {
+  left: 16px;
+}
+
+.promo-carousel__arrow--right {
+  right: 16px;
+}
+
+/* Dots */
+.promo-carousel__dots {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.promo-carousel__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.promo-carousel__dot--active {
+  background: white;
+  transform: scale(1.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .promo-carousel__slide {
+    aspect-ratio: 16 / 9;
+  }
+
+  .promo-carousel__content {
+    max-width: 80%;
+  }
+
+  .promo-carousel__title {
+    font-size: 20px;
+  }
+
+  .promo-carousel__subtitle {
+    font-size: 14px;
+  }
+}

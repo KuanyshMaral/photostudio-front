@@ -1,0 +1,153 @@
+/* HorizontalFilters.css */
+/* Горизонтальная панель фильтров под header */
+
+.horizontal-filters {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 20px;
+  position: sticky;
+  top: 130px; /* Под MainHeader */
+  z-index: 90;
+}
+
+.horizontal-filters__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Группа фильтра */
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-group:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.filter-icon {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* Select стили */
+.filter-select {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  padding-right: 20px;
+  min-width: 120px;
+}
+
+.filter-select:focus {
+  outline: none;
+}
+
+/* Input стили */
+.filter-input {
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #374151;
+  width: 100%;
+}
+
+.filter-input--small {
+  width: 70px;
+  text-align: center;
+}
+
+.filter-input:focus {
+  outline: none;
+}
+
+.filter-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Ценовой разделитель */
+.filter-separator {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.filter-currency {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Группа цены */
+.filter-group--price {
+  min-width: 200px;
+}
+
+/* Кнопка сброса */
+.filter-reset {
+  background: #fee2e2;
+  color: #dc2626;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.filter-reset:hover {
+  background: #fecaca;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .horizontal-filters {
+    top: 120px;
+    padding: 10px 16px;
+  }
+
+  .horizontal-filters__container {
+    gap: 10px;
+  }
+
+  .filter-group {
+    padding: 6px 10px;
+  }
+
+  .filter-select {
+    font-size: 13px;
+    min-width: 100px;
+  }
+
+  .filter-group--price {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .horizontal-filters__container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-select {
+    flex: 1;
+  }
+}

@@ -7,6 +7,10 @@ interface Props {
   roomId: number;
   roomName: string;
   studioName: string;
+<<<<<<< HEAD
+=======
+  studioId: number;
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
   date: Date;
   startTime: string;
   endTime: string;
@@ -16,7 +20,11 @@ interface Props {
 }
 
 export default function BookingForm({
+<<<<<<< HEAD
   roomId, roomName, studioName, date, startTime, endTime, pricePerHour,
+=======
+  roomId, roomName, studioName, studioId, date, startTime, endTime, pricePerHour,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
   onSuccess, onCancel
 }: Props) {
   const { token, user } = useAuth();
@@ -37,6 +45,7 @@ export default function BookingForm({
         return;
       }
 
+<<<<<<< HEAD
       await createBooking({
         room_id: roomId.toString(),
         studio_id: 0, // Will be set by API based on room
@@ -45,10 +54,44 @@ export default function BookingForm({
         end_time: combineDateAndTime(date, endTime),
         comment
       }, token);
+=======
+      const startDateTime = combineDateAndTime(date, startTime);
+      const endDateTime = combineDateAndTime(date, endTime);
+      
+      console.log('BookingForm times:', {
+        startDateTime,
+        endDateTime,
+        startTime,
+        endTime,
+        roomId,
+        studioId,
+        userId: user.id
+      });
+
+      const bookingData = {
+        room_id: roomId.toString(),
+        studio_id: studioId,
+        user_id: user.id,
+        start_time: startDateTime,
+        end_time: endDateTime,
+        comment
+      };
+      
+      console.log('Sending booking request:', bookingData);
+
+      await createBooking(bookingData, token);
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
       toast.success('Бронирование создано!');
       onSuccess();
     } catch (error: any) {
+<<<<<<< HEAD
+=======
+      console.log('Booking error details:', error);
+      console.log('Error response:', error.response);
+      console.log('Error data:', error.response?.data);
+      
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
       const message = error.response?.data?.error?.message || error.message || 'Ошибка бронирования';
       toast.error(message);
     } finally {
@@ -138,9 +181,20 @@ function calculateHours(startTime: string, endTime: string): number {
 
 function combineDateAndTime(date: Date, time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
+<<<<<<< HEAD
   const combined = new Date(date);
   combined.setHours(hours, minutes, 0, 0);
   return combined.toISOString();
+=======
+  // Create date at midnight local time
+  const combined = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  combined.setHours(hours, minutes, 0, 0);
+  
+  // Return ISO string but preserve local hours by adjusting for timezone
+  const localOffset = combined.getTimezoneOffset() * 60000; // offset in milliseconds
+  const localTime = new Date(combined.getTime() - localOffset);
+  return localTime.toISOString();
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 }
 
 function formatDate(date: Date): string {

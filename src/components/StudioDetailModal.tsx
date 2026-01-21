@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Star, MapPin, Users, DollarSign, Phone, Mail, Camera, Plus } from 'lucide-react';
+import { X, Star, Users, DollarSign, Plus, ArrowLeft } from 'lucide-react';
 // import ReviewsModal from './ReviewsModal';
 import { getStudioReviews } from '../api/reviewApi';
 import type { Review } from '../api/reviewApi';
+<<<<<<< HEAD
 import AvailabilityCalendar from './AvailabilityCalendar';
 import BookingForm from './BookingForm';
 
@@ -44,6 +45,15 @@ interface Room {
     quantity: number;
   }>;
 }
+=======
+import type { Studio, Room } from '../types';
+import AvailabilityCalendar from './AvailabilityCalendar';
+import BookingForm from './BookingForm';
+import { ImageCarousel } from './ImageCarousel/ImageCarousel';
+import { LiveStatusBadge } from './LiveStatusBadge/LiveStatusBadge';
+import { ClickableLinks } from './ClickableLinks/ClickableLinks';
+import './StudioDetailModal.css';
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
 interface StudioDetailModalProps {
   studio: Studio;
@@ -51,7 +61,7 @@ interface StudioDetailModalProps {
   onClose: () => void;
 }
 
-type TabType = 'overview' | 'gallery' | 'equipment' | 'reviews';
+type TabType = 'overview' | 'equipment' | 'reviews';
 
 const StudioDetailModal: React.FC<StudioDetailModalProps> = ({ 
   studio, 
@@ -108,13 +118,18 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
 
   const tabs = [
     { id: 'overview', label: 'Обзор' },
-    { id: 'gallery', label: 'Галерея' },
     { id: 'equipment', label: 'Оборудование' },
     { id: 'reviews', label: 'Отзывы' }
   ] as const;
 
   // Utility functions
   const token = localStorage.getItem('token');
+
+  // Обрезка текста с ellipsis
+  const truncateText = (text: string, maxLength: number): string => {
+    if (!text || text.length <= maxLength) return text;
+    return text.substring(0, maxLength).trim() + '...';
+  };
   
   const StarRating = ({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'lg' }) => {
     const sizeClass = size === 'lg' ? 'w-6 h-6' : 'w-4 h-4';
@@ -153,6 +168,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     : '0.0';
 
   const handleBooking = () => {
+<<<<<<< HEAD
     if (rooms.length === 1) {
       // If only one room, select it and show calendar
       setSelectedRoom(rooms[0]);
@@ -189,28 +205,49 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   const formatWorkingHours = (day: string) => {
     if (!studio.working_hours || !(studio.working_hours as any)[day]) {
       return 'Закрыто';
+=======
+    // Always show calendar booking for consistent UX
+    if (rooms.length > 0) {
+      // If there are rooms, select the first one by default and show calendar
+      setSelectedRoom(rooms[0]);
+      setShowBookingCalendar(true);
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
     }
-    const hours = (studio.working_hours as any)[day];
-    return `${hours.open} - ${hours.close}`;
   };
 
-  const daysOfWeek = [
-    { key: 'monday', label: 'Понедельник' },
-    { key: 'tuesday', label: 'Вторник' },
-    { key: 'wednesday', label: 'Среда' },
-    { key: 'thursday', label: 'Четверг' },
-    { key: 'friday', label: 'Пятница' },
-    { key: 'saturday', label: 'Суббота' },
-    { key: 'sunday', label: 'Воскресенье' }
-  ];
+  const handleSlotSelect = (start: string, end: string) => {
+    setSelectedSlot({ start, end });
+    setShowBookingForm(true);
+  };
+
+  const handleBookingSuccess = () => {
+    setShowBookingForm(false);
+    setShowBookingCalendar(false);
+    setSelectedSlot(null);
+    // Could show success message or refresh bookings
+  };
+
+  const handleBookingCancel = () => {
+    setShowBookingForm(false);
+    setSelectedSlot(null);
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto my-4">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b z-10">
           <div className="p-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">{studio.name}</h2>
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={onClose} 
+                className="p-2 hover:bg-gray-100 rounded-full transition"
+                title="Назад"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <h2 className="text-2xl font-bold text-gray-900">{studio.name}</h2>
+            </div>
             <button 
               onClick={onClose} 
               className="p-2 hover:bg-gray-100 rounded-full transition"
@@ -241,82 +278,45 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
         <div className="p-6">
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <div className="space-y-6">
-              {/* Rating */}
-              <div className="flex items-center gap-6">
-                <div className="flex items-center">
-                  <Star className="w-6 h-6 text-yellow-400 fill-current" />
-                  <span className="ml-2 text-2xl font-bold">{studio.rating.toFixed(1)}</span>
-                  <span className="ml-2 text-gray-500">({studio.total_reviews} отзывов)</span>
-                </div>
+            <div className="studio-modal__overview">
+              {/* Block 5: Hero Carousel */}
+              <ImageCarousel 
+                images={studio.photos?.slice(0, 5) || []} 
+                alt={studio.name}
+              />
+
+              {/* Live Status + Working Hours (compact) */}
+              <div className="studio-modal__status-row">
+                <LiveStatusBadge studioId={studio.id} />
+                <span className="studio-modal__hours-compact">
+                  Пн-Пт: 10:00-20:00
+                </span>
               </div>
 
-              {/* Description */}
-              {studio.description && (
-                <div>
-                  <h3 className="font-bold text-lg mb-2">О студии</h3>
-                  <p className="text-gray-700 leading-relaxed">{studio.description}</p>
-                </div>
-              )}
-
-              {/* Address */}
-              <div>
-                <h3 className="font-bold text-lg mb-2">Адрес</h3>
-                <div className="flex items-start">
-                  <MapPin className="w-5 h-5 text-gray-400 mr-2 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-gray-700">{studio.address}</p>
-                    {studio.district && (
-                      <p className="text-sm text-gray-500">{studio.district} район</p>
-                    )}
-                  </div>
-                </div>
+              {/* Block 5: Description truncated */}
+              <div className="studio-modal__description">
+                <h3>О студии</h3>
+                <p className="studio-modal__description-text">
+                  {truncateText(studio.description || '', 150)}
+                </p>
               </div>
 
-              {/* Contact Info */}
-              {(studio.phone || studio.email) && (
-                <div>
-                  <h3 className="font-bold text-lg mb-2">Контакты</h3>
-                  <div className="space-y-2">
-                    {studio.phone && (
-                      <div className="flex items-center text-gray-700">
-                        <Phone className="w-5 h-5 text-gray-400 mr-2" />
-                        <a href={`tel:${studio.phone}`} className="hover:text-blue-600">
-                          {studio.phone}
-                        </a>
-                      </div>
-                    )}
-                    {studio.email && (
-                      <div className="flex items-center text-gray-700">
-                        <Mail className="w-5 h-5 text-gray-400 mr-2" />
-                        <a href={`mailto:${studio.email}`} className="hover:text-blue-600">
-                          {studio.email}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Block 5: Clickable Links */}
+              <div className="studio-modal__contacts">
+                <h3>Контакты</h3>
+                <ClickableLinks
+                  address={studio.address}
+                  phone={studio.phone}
+                  email={studio.email}
+                  city="almaty"
+                />
+              </div>
 
-              {/* Working Hours */}
-              {studio.working_hours && (
-                <div>
-                  <h3 className="font-bold text-lg mb-2">Время работы</h3>
-                  <div className="space-y-1">
-                    {daysOfWeek.map(day => (
-                      <div key={day.key} className="flex justify-between text-sm">
-                        <span className="text-gray-600">{day.label}</span>
-                        <span className="font-medium">{formatWorkingHours(day.key)}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Rooms */}
-              {rooms.length > 0 && (
-                <div>
-                  <h3 className="font-bold text-lg mb-3">Доступные залы</h3>
+              {/* Rooms / Halls */}
+              <div className="studio-modal__rooms">
+                <h3>Залы</h3>
+                {/* HallSelector здесь - см. Dev 2 */}
+                {rooms.length > 0 && (
                   <div className="space-y-3">
                     {rooms.map(room => (
                       <div 
@@ -363,6 +363,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                       </div>
                     ))}
                   </div>
+<<<<<<< HEAD
                 </div>
               )}
 
@@ -420,23 +421,85 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
               )}
             </div>
           )}
+=======
+                )}
+              </div>
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
-          {/* Gallery Tab */}
-          {activeTab === 'gallery' && (
-            <div className="grid grid-cols-2 gap-4">
-              {studio.photos && studio.photos.length > 0 ? (
-                studio.photos.map((photo, i) => (
-                  <img 
-                    key={i} 
-                    src={photo} 
-                    alt={`${studio.name} ${i + 1}`} 
-                    className="w-full h-64 object-cover rounded-lg"
+              {/* Booking Section */}
+              <div className="mt-6">
+                {!showBookingCalendar ? (
+                  <button
+                    onClick={handleBooking}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold text-lg"
+                  >
+                    Забронировать
+                  </button>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Room Selector for multiple rooms */}
+                    {rooms.length > 1 && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Выберите зал
+                        </label>
+                        <select
+                          value={selectedRoom?.id || rooms[0]?.id}
+                          onChange={(e) => {
+                            const room = rooms.find(r => r.id === Number(e.target.value));
+                            setSelectedRoom(room || rooms[0]);
+                          }}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                          {rooms.map(room => (
+                            <option key={room.id} value={room.id}>
+                              {room.name} - {room.price_per_hour_min?.toLocaleString() || 0} ₸/час
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    
+                    {selectedRoom && (
+                      <div className="bg-gray-50 p-4 rounded-lg">
+                        <h4 className="font-medium mb-2">Выбран зал: {selectedRoom.name}</h4>
+                        <p className="text-sm text-gray-600">
+                          Цена: {selectedRoom.price_per_hour_min || studio.price_per_hour || studio.min_price || 0} ₸/час
+                        </p>
+                      </div>
+                    )}
+                    
+                    <AvailabilityCalendar
+                      roomId={selectedRoom?.id || rooms[0]?.id}
+                      pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour || studio.min_price || 0}
+                      onSlotSelect={handleSlotSelect}
+                    />
+                    
+                    <button
+                      onClick={() => setShowBookingCalendar(false)}
+                      className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition"
+                    >
+                      Назад
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Booking Form Modal */}
+              {showBookingForm && selectedSlot && selectedRoom && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
+                  <BookingForm
+                    roomId={selectedRoom.id}
+                    roomName={selectedRoom.name}
+                    studioName={studio.name}
+                    studioId={studio.id}
+                    date={new Date()}
+                    startTime={selectedSlot.start}
+                    endTime={selectedSlot.end}
+                    pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour || studio.min_price || 0}
+                    onSuccess={handleBookingSuccess}
+                    onCancel={handleBookingCancel}
                   />
-                ))
-              ) : (
-                <div className="col-span-2 text-center py-16">
-                  <Camera className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Фотографии скоро появятся</p>
                 </div>
               )}
             </div>

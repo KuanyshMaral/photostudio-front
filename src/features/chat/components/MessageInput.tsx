@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useRef } from 'react';
+=======
+import { useState, useRef, useEffect } from 'react';
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 import type { KeyboardEvent } from 'react';
 import './MessageInput.css';
 
@@ -21,18 +25,71 @@ export default function MessageInput({
 }: MessageInputProps) {
     const [text, setText] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+<<<<<<< HEAD
+=======
+    const typingTimeoutRef = useRef<number | null>(null);
+    const isTypingRef = useRef(false);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setText(e.target.value);
+        
+        // Typing indicator logic с debounce
+        if (onTypingStart && onTypingStop) {
+            // Начало печатания
+            if (!isTypingRef.current) {
+                isTypingRef.current = true;
+                onTypingStart();
+            }
+            
+            // Сбрасываем таймер
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+            
+            // Через 2 сек считаем что перестал печатать
+            typingTimeoutRef.current = setTimeout(() => {
+                isTypingRef.current = false;
+                onTypingStop();
+            }, 2000);
+        }
+    };
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
     const handleSend = () => {
         const trimmed = text.trim();
         if (!trimmed || disabled) return;
         
+<<<<<<< HEAD
         onTypingStop?.();
+=======
+        // Останавливаем typing indicator
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+        if (isTypingRef.current && onTypingStop) {
+            isTypingRef.current = false;
+            onTypingStop();
+        }
+        
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         onSend(trimmed);
         setText('');
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+<<<<<<< HEAD
         onTypingStart?.();
+=======
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSend();
@@ -77,6 +134,7 @@ export default function MessageInput({
             {/* Text input */}
             <textarea
                 value={text}
+<<<<<<< HEAD
                 onChange={(e) => {
                     setText(e.target.value);
                     if (e.target.value.trim()) {
@@ -88,6 +146,10 @@ export default function MessageInput({
                 onKeyDown={handleKeyDown}
                 onFocus={() => onTypingStart?.()}
                 onBlur={() => onTypingStop?.()}
+=======
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
                 placeholder={placeholder}
                 disabled={disabled}
                 rows={1}

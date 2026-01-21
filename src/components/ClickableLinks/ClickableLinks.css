@@ -1,0 +1,52 @@
+/* ClickableLinks.css */
+
+.clickable-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clickable-links__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.clickable-links__item:hover {
+  background: #f3f4f6;
+  transform: translateX(4px);
+}
+
+.clickable-links__icon {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.clickable-links__text {
+  flex: 1;
+  font-size: 14px;
+}
+
+.clickable-links__external {
+  color: #9ca3af;
+}
+
+/* WhatsApp styling */
+.clickable-links__item--whatsapp:hover {
+  background: #dcfce7;
+}
+
+.clickable-links__badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #22c55e;
+  background: #dcfce7;
+  padding: 2px 8px;
+  border-radius: 10px;
+}

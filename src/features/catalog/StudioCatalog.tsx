@@ -1,25 +1,38 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { StudioWithRoomsCard } from './components/StudioWithRoomsCard';
-import { LeftPanel } from './components/LeftPanel';
+import { MainHeader } from '../../components/MainHeader';
+import { HorizontalFilters } from './components/HorizontalFilters';
+import { PromoCarousel } from '../../components/PromoCarousel/PromoCarousel';
+import { StudioGrid } from './components/StudioGrid';
+import { InfoFooter } from '../../components/InfoFooter/InfoFooter';
 import StudioDetailModal from '../../components/StudioDetailModal';
-import Pagination from '../../components/Pagination';
-import LoadingSpinner from '../../components/LoadingSpinner';
-import type { Studio, StudioFilterParams } from '../../types/index';
-import { getStudiosWithRooms } from './api/studios';
+import type { Studio } from '../../types/index';
+import './StudioCatalog.css';
 
-const StudioCatalog: React.FC = () => {
-  const [filters, setFilters] = useState<StudioFilterParams>({
+interface FiltersState {
+  city: string;
+  district: string;
+  priceMin: number;
+  priceMax: number;
+}
+
+export const StudioCatalog: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<FiltersState>({
     city: '',
+<<<<<<< HEAD
     min_price: 0,
     max_price: 100000,
     room_type: '',
     search: ''
+=======
+    district: '',
+    priceMin: 0,
+    priceMax: 100000,
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
   });
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
-  const studiosPerPage = 12;
 
+<<<<<<< HEAD
   const { data: studiosData, isLoading, error } = useQuery({
     queryKey: ['studios', filters, currentPage],
     queryFn: () => getStudiosWithRooms({
@@ -29,10 +42,19 @@ const StudioCatalog: React.FC = () => {
     }),
     staleTime: 30000, // Cache 30 seconds
   });
+=======
+  // Обработка поиска из Header
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
-  const studios = studiosData?.data || [];
-  const totalPages = studiosData?.pagination?.total_pages || 1;
+  // Обработка клика на студию
+  const handleStudioClick = (studio: Studio) => {
+    setSelectedStudio(studio);
+  };
 
+<<<<<<< HEAD
   const handleFilterChange = (newFilters: StudioFilterParams) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
     setCurrentPage(1); // Reset to first page when filters change
@@ -61,16 +83,35 @@ const StudioCatalog: React.FC = () => {
       </div>
     );
   }
+=======
+  // Закрытие модального окна
+  const handleCloseModal = () => {
+    setSelectedStudio(null);
+  };
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
   return (
-    <>
-      <div className={`min-h-screen bg-gray-50 transition-all duration-300 ${selectedStudio ? 'blur-sm' : ''}`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Фотостудии</h1>
-            <p className="text-gray-600">Найдите идеальную студию для вашей фотосессии</p>
-          </div>
+    <div className="studio-catalog">
+      {/* Header with Search */}
+      <MainHeader onSearch={handleSearch} />
+      
+      {/* Block 8: Promo Carousel */}
+      <PromoCarousel />
+      
+      {/* Filters */}
+      <HorizontalFilters 
+        filters={filters}
+        onFiltersChange={setFilters}
+      />
+      
+      {/* Grid */}
+      <StudioGrid 
+        searchQuery={searchQuery}
+        filters={filters}
+        onStudioClick={handleStudioClick}
+      />
 
+<<<<<<< HEAD
           <div className="flex flex-col lg:flex-row gap-8">
             <LeftPanel 
               filters={filters}
@@ -117,16 +158,20 @@ const StudioCatalog: React.FC = () => {
           </div>
         </div>
       </div>
+=======
+      {/* Block 8: Info Footer */}
+      <InfoFooter />
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
-      {/* Studio Detail Modal - outside the blurred container */}
+      {/* Studio Detail Modal */}
       {selectedStudio && (
         <StudioDetailModal
           studio={selectedStudio}
           rooms={selectedStudio.rooms || []}
-          onClose={() => setSelectedStudio(null)}
+          onClose={handleCloseModal}
         />
       )}
-    </>
+    </div>
   );
 };
 

@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { getRoomAvailability } from "../../api/availabilityApi";
 import type { TimeSlot } from "../../api/availabilityApi";
+<<<<<<< HEAD
+=======
+import { useAuth } from "../../context/AuthContext";
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
 interface AvailabilityCalendarProps {
   roomId: string | number;
@@ -8,20 +12,33 @@ interface AvailabilityCalendarProps {
 }
 
 const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({ roomId, selectedDate }) => {
+<<<<<<< HEAD
+=======
+  const { token } = useAuth();
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+<<<<<<< HEAD
     if (!roomId) return;
+=======
+    if (!roomId || !token) return;
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
     
     const fetchAvailability = async () => {
       setLoading(true);
       setError(null);
       
       try {
+<<<<<<< HEAD
         const slots = await getRoomAvailability(Number(roomId), selectedDate.toISOString().split('T')[0]);
         setTimeSlots(slots);
+=======
+        const slots = await getRoomAvailability(Number(roomId), selectedDate.toISOString().split('T')[0], token);
+        setTimeSlots(slots.available_slots);
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to fetch availability");
       } finally {
@@ -30,7 +47,11 @@ const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({ roomId, sel
     };
 
     fetchAvailability();
+<<<<<<< HEAD
   }, [roomId, selectedDate]);
+=======
+  }, [roomId, selectedDate, token]);
+>>>>>>> 84f6a53614713bc954b547877d42a54b6bd4022f
 
   const formatHour = (hour: number): string => {
     const period = hour >= 12 ? 'PM' : 'AM';
