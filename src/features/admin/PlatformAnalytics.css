@@ -1,0 +1,190 @@
+.platform-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.platform-analytics__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.platform-analytics__header h1 {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 1.5rem;
+  color: #0f172a;
+}
+
+.platform-analytics__filters select {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  cursor: pointer;
+}
+
+.formula-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 1rem;
+}
+
+.formula-card h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.125rem;
+  color: #94a3b8;
+}
+
+.formula-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.formula-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formula-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.formula-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+}
+
+.formula-operator {
+  font-size: 2rem;
+  color: #64748b;
+  font-weight: 300;
+}
+
+.formula-item--result .formula-value {
+  color: #4ade80;
+}
+
+.platform-analytics__section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #0f172a;
+}
+
+/* Tables */
+.studios-table-wrapper {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.studios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.studios-table th {
+  background: #f8fafc;
+  padding: 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.studios-table td {
+  padding: 1rem;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.9375rem;
+}
+
+.studios-table a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.vip {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status-badge.gold {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fcd34d;
+}
+
+/* Cities Grid */
+.cities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.city-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.city-card h4 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.city-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.city-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+
+/* Roles Grid */
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.role-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.role-card--client { background: #eff6ff; color: #1e40af; }
+.role-card--studio_owner { background: #fdf2f8; color: #9d174d; }
+.role-card--admin { background: #f0fdf4; color: #166534; }
+
+.role-label { font-size: 0.875rem; font-weight: 600; }
+.role-count { font-size: 2rem; font-weight: 700; }

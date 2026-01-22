@@ -76,3 +76,85 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem; /* increased gap for better spacing */
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* Color variants for the icon background */
+.stat-card--primary .stat-card__icon {
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.stat-card--success .stat-card__icon {
+  background-color: #f0fdf4;
+  color: #22c55e;
+}
+
+.stat-card--warning .stat-card__icon {
+  background-color: #fffbeb;
+  color: #f59e0b;
+}
+
+.stat-card--danger .stat-card__icon {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.stat-card__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-card__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.stat-card__label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* New Styles for SubValue */
+.stat-card__sub-value {
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.stat-card__sub-value--up {
+  color: #10b981; /* Green */
+}
+
+.stat-card__sub-value--down {
+  color: #ef4444; /* Red */
+}

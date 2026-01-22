@@ -25,11 +25,16 @@ import WriteReviewPage from "./features/reviews/WriteReviewPage.tsx";
 import StudioCatalog from "./features/catalog/StudioCatalog.tsx";
 import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
 
-// Admin components
-import AdminDashboard from "./features/admin/AdminDashboard";
+// Admin components (Updated)
+import { AdminLayout } from "./features/admin/AdminLayout";
+import { AdminDashboard } from "./features/admin/AdminDashboard";
+import { PlatformAnalytics } from "./features/admin/PlatformAnalytics";
+import { AdManager } from "./features/admin/AdManager";
+import { ReviewModerator } from "./features/admin/ReviewModerator";
+import { StudioVIPManager } from "./features/admin/StudioVIPManager";
+// Keeping existing management components
 import UserManagement from "./features/admin/UserManagement";
 import StudioManagement from "./features/admin/StudioManagement";
-import Analytics from "./features/admin/Analytics";
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -149,41 +154,23 @@ function App() {
             </ProtectedRoute>
           } />
           
-          
-          {/* Admin routes */}
+          {/* Admin routes (Updated Structure) */}
           <Route path="/admin" element={
-            <ProtectedRoute requiredRole={'admin'}>
-              <Layout>
-                <div className="p-8">
-                  <Dashboard />
-                </div>
-              </Layout>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute requiredRole={'admin'}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/users" element={
             <ProtectedRoute requiredRole="admin">
-              <UserManagement />
+              <AdminLayout />
             </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/studios" element={
-            <ProtectedRoute requiredRole="admin">
-              <StudioManagement />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/analytics" element={
-            <ProtectedRoute requiredRole="admin">
-              <Analytics />
-            </ProtectedRoute>
-          } />
+          }>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="studios" element={<StudioManagement />} />
+            <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="ads" element={<AdManager />} />
+            <Route path="reviews" element={<ReviewModerator />} />
+            <Route path="studios/vip" element={<StudioVIPManager />} />
+            {/* Fallback for admin settings or unknown admin routes */}
+            <Route path="*" element={<Navigate to="dashboard" replace />} />
+          </Route>
           
           {/* Owner routes */}
           <Route path="/owner" element={
