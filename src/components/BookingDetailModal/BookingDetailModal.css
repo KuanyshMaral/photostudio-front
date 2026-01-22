@@ -1,0 +1,179 @@
+/* BookingDetailModal.css */
+
+.booking-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.booking-detail-modal {
+  background: white;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+.booking-detail-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.booking-detail-modal__header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.booking-detail-modal__close {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.booking-detail-modal__close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Image */
+.booking-detail-modal__image {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.booking-detail-modal__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Content */
+.booking-detail-modal__content {
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.booking-detail-modal__title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+}
+
+/* Status Badge */
+.booking-detail-modal__status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.status--success {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status--warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.status--danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status--neutral {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Info Grid */
+.booking-detail-modal__info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.booking-detail-modal__info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.booking-detail-modal__info-item svg {
+  color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.info-label {
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.info-value--price {
+  color: #667eea;
+  font-weight: 600;
+}
+
+/* Notes */
+.booking-detail-modal__notes {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.booking-detail-modal__notes h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.booking-detail-modal__notes p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}

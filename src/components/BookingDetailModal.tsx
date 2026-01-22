@@ -180,6 +180,14 @@ export default function BookingDetailModal({ booking, onClose }: BookingDetailMo
               <p className="text-sm text-yellow-700">{booking.contact_info}</p>
             </div>
           )}
+
+          {/* Notes/Comment */}
+          {booking.comment && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h4 className="font-medium text-green-800 mb-2">Примечания</h4>
+              <p className="text-sm text-green-700">{booking.comment}</p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

@@ -21,7 +21,7 @@ export default function BookingForm({
   onSuccess, onCancel
 }: Props) {
   const { token, user } = useAuth();
-  const [comment, setComment] = useState('');
+  const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   // Расчёт стоимости
@@ -57,7 +57,7 @@ export default function BookingForm({
         user_id: user.id,
         start_time: startDateTime,
         end_time: endDateTime,
-        comment
+        notes: notes, // Добавлено
       };
       
       console.log('Sending booking request:', bookingData);
@@ -111,18 +111,39 @@ export default function BookingForm({
         </div>
       </div>
 
-      {/* Comment */}
+      {/* Notes */}
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-1">
-          Комментарий (опционально)
+        <label htmlFor="notes" className="block text-sm font-medium mb-1">
+          Примечание (опционально)
         </label>
         <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="Особые пожелания..."
-          className="w-full p-3 border rounded-lg resize-none h-24"
+          id="notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Например: подготовьте свет заранее"
+          rows={3}
+          className="booking-form__textarea"
         />
       </div>
+
+      <style>{`
+        .booking-form__textarea {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          resize: vertical;
+          font-size: 14px;
+          line-height: 1.5;
+          font-family: inherit;
+        }
+
+        .booking-form__textarea:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+      `}</style>
 
       {/* Actions */}
       <div className="flex gap-3">

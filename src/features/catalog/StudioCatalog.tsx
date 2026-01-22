@@ -5,7 +5,10 @@ import { PromoCarousel } from '../../components/PromoCarousel/PromoCarousel';
 import { StudioGrid } from './components/StudioGrid';
 import { InfoFooter } from '../../components/InfoFooter/InfoFooter';
 import StudioDetailModal from '../../components/StudioDetailModal';
+import ChatModal from '../../components/ChatModal';
 import type { Studio } from '../../types/index';
+import { createConversation } from '../chat/chat.api';
+import { useAuth } from '../../context/AuthContext';
 import './StudioCatalog.css';
 
 interface FiltersState {
@@ -24,6 +27,9 @@ export const StudioCatalog: React.FC = () => {
     priceMax: 100000,
   });
   const [selectedStudio, setSelectedStudio] = useState<Studio | null>(null);
+  const [chatConversation, setChatConversation] = useState<any>(null);
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const { token } = useAuth();
 
   // Обработка поиска из Header
   const handleSearch = (query: string) => {
@@ -38,6 +44,33 @@ export const StudioCatalog: React.FC = () => {
   // Закрытие модального окна
   const handleCloseModal = () => {
     setSelectedStudio(null);
+  };
+
+  // Обработка нажатия на "Написать владельцу"
+  const handleContactOwner = async (studio: Studio) => {
+    if (!token || !studio.owner_id) {
+      console.error('No token or studio owner ID');
+      return;
+    }
+
+    try {
+      const response = await createConversation(token, {
+        recipient_id: studio.owner_id,
+        studio_id: studio.id,
+        initial_message: `Здравствуйте! Мне интересна ваша студия "${studio.name}"`
+      });
+      
+      setChatConversation(response.conversation);
+      setIsChatModalOpen(true);
+    } catch (error) {
+      console.error('Failed to create conversation:', error);
+    }
+  };
+
+  // Закрытие чат модального окна
+  const handleCloseChatModal = () => {
+    setIsChatModalOpen(false);
+    setChatConversation(null);
   };
 
   return (
@@ -59,6 +92,7 @@ export const StudioCatalog: React.FC = () => {
         searchQuery={searchQuery}
         filters={filters}
         onStudioClick={handleStudioClick}
+        onContactOwner={handleContactOwner}
       />
 
       {/* Block 8: Info Footer */}
@@ -72,6 +106,13 @@ export const StudioCatalog: React.FC = () => {
           onClose={handleCloseModal}
         />
       )}
+
+      {/* Chat Modal */}
+      <ChatModal
+        conversation={chatConversation}
+        isOpen={isChatModalOpen}
+        onClose={handleCloseChatModal}
+      />
     </div>
   );
 };

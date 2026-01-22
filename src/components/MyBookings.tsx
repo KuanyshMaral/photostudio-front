@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import LoadingSpinner from './LoadingSpinner';
 import BookingDetailModal from './BookingDetailModal';
-import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, MapPin, Phone, Mail, DollarSign, User } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, User } from 'lucide-react';
 
 export default function MyBookings() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -77,6 +77,25 @@ export default function MyBookings() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      <style>{`
+        .booking-card {
+          background: white;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e5e7eb;
+          padding: 24px;
+        }
+        
+        .booking-card--clickable {
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .booking-card--clickable:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+      `}</style>
       <h1 className="text-2xl font-bold mb-6">Мои бронирования</h1>
 
       {/* Status filter */}
@@ -108,8 +127,10 @@ export default function MyBookings() {
           {filteredBookings.map((booking: Booking) => (
             <div 
               key={booking.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all duration-200 cursor-pointer hover:border-blue-300"
+              className="booking-card booking-card--clickable"
               onClick={() => setSelectedBooking(booking)}
+              role="button"
+              tabIndex={0}
             >
               <div className="flex justify-between items-start mb-4">
                 <div>

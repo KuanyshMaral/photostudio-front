@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { X, Star, Users, DollarSign, Plus, ArrowLeft } from 'lucide-react';
+import { X, Star, Plus, ArrowLeft } from 'lucide-react';
 // import ReviewsModal from './ReviewsModal';
 import { getStudioReviews } from '../api/reviewApi';
 import type { Review } from '../api/reviewApi';
@@ -12,6 +12,7 @@ import BookingForm from './BookingForm';
 import { ImageCarousel } from './ImageCarousel/ImageCarousel';
 import { LiveStatusBadge } from './LiveStatusBadge/LiveStatusBadge';
 import { ClickableLinks } from './ClickableLinks/ClickableLinks';
+import { HallSelector } from './HallSelector';
 import './StudioDetailModal.css';
 
 interface StudioDetailModalProps {
@@ -235,54 +236,15 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
               {/* Rooms / Halls */}
               <div className="studio-modal__rooms">
                 <h3>Залы</h3>
-                {/* HallSelector здесь - см. Dev 2 */}
                 {rooms.length > 0 && (
-                  <div className="space-y-3">
-                    {rooms.map(room => (
-                      <div 
-                        key={room.id} 
-                        className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition"
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold text-lg">{room.name}</h4>
-                          <p className="text-blue-600 font-bold">
-                            {room.price_per_hour_min?.toLocaleString() || 0} ₸/час
-                          </p>
-                        </div>
-                        
-                        {room.description && (
-                          <p className="text-sm text-gray-600 mb-2">{room.description}</p>
-                        )}
-                        
-                        <div className="flex gap-4 text-sm text-gray-600 mb-2">
-                          <div className="flex items-center">
-                            <DollarSign className="w-4 h-4 mr-1" />
-                            {room.area_sqm} м²
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-1" />
-                            до {room.capacity} чел
-                          </div>
-                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                            {room.room_type}
-                          </span>
-                        </div>
-                        
-                        {room.amenities && room.amenities.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-2">
-                            {room.amenities.map((amenity, i) => (
-                              <span 
-                                key={i} 
-                                className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
-                              >
-                                {amenity}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  <HallSelector
+                    rooms={rooms}
+                    selectedRoomId={selectedRoom?.id || null}
+                    onSelect={(roomId) => {
+                      const room = rooms.find(r => r.id === roomId);
+                      setSelectedRoom(room || null);
+                    }}
+                  />
                 )}
               </div>
 

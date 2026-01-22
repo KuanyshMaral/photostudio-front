@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Studio, Room } from '../../../types';
 import { Star, MapPin, Users, DollarSign, MessageCircle } from 'lucide-react';
+import { FavoriteButton } from '../../../components/FavoriteButton';
+import { useAuth } from '../../../context/AuthContext';
 
 interface StudioWithRoomsCardProps {
   studio: Studio;
@@ -15,6 +17,21 @@ export const StudioWithRoomsCard: React.FC<StudioWithRoomsCardProps> = ({
   onClick,
   onContactOwner 
 }) => {
+  const { token } = useAuth();
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Проверяем localStorage для состояния избранного
+  useEffect(() => {
+    if (token) {
+      const favorites = JSON.parse(localStorage.getItem(`favorites_${token}`) || '[]');
+      const isFav = favorites.includes(studio.id);
+      setIsFavorite(isFav);
+    }
+  }, [studio.id, token]);
+
+  const handleFavoriteToggle = (newState: boolean) => {
+    setIsFavorite(newState);
+  };
   return (
     <div 
       className="bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
@@ -41,6 +58,16 @@ export const StudioWithRoomsCard: React.FC<StudioWithRoomsCardProps> = ({
         <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-full shadow-md flex items-center">
           <Star className="w-4 h-4 text-yellow-400 fill-current" />
           <span className="ml-1 text-sm font-semibold">{(studio.rating || 0).toFixed(1)}</span>
+        </div>
+
+        {/* Favorite Button */}
+        <div className="absolute top-2 left-2">
+          <FavoriteButton 
+            studioId={studio.id}
+            initialState={isFavorite}
+            size="md"
+            onToggle={handleFavoriteToggle}
+          />
         </div>
       </div>
 

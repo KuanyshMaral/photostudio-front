@@ -5,6 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
+import ProfilePage from "./features/auth/ProfilePage.tsx";
+import Dashboard from "./features/auth/Dashboard.tsx";
 import ProfileDashboard from "./features/auth/ProfileDashboard";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
@@ -31,6 +33,10 @@ import Analytics from "./features/admin/Analytics";
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
+
+// Manager components
+import { ManagerCalendar } from "./features/manager/ManagerCalendar";
+import { ClientsPage } from "./features/manager/ClientsPage";
 
 // Chat components
 import ChatPage from "./features/chat/ChatPage";
@@ -148,7 +154,9 @@ function App() {
           <Route path="/admin" element={
             <ProtectedRoute requiredRole={'admin'}>
               <Layout>
-                <StudioCatalog />
+                <div className="p-8">
+                  <Dashboard />
+                </div>
               </Layout>
             </ProtectedRoute>
           } />
@@ -198,6 +206,23 @@ function App() {
             <ProtectedRoute requiredRole={'studio_owner'}>
               <Layout>
                 <OwnerDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Manager routes */}
+          <Route path="/manager/bookings" element={
+            <ProtectedRoute requiredRole={'studio_owner'}>
+              <Layout>
+                <ManagerCalendar />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/manager/clients" element={
+            <ProtectedRoute requiredRole={'studio_owner'}>
+              <Layout>
+                <ClientsPage />
               </Layout>
             </ProtectedRoute>
           } />
