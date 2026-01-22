@@ -34,6 +34,8 @@ export default function Layout({ children }: LayoutProps) {
   // Add owner dashboard for studio owners
   if (user?.role === 'studio_owner') {
     sidebarItems.splice(1, 0, { id: "owner", label: "Управление студией" });
+    sidebarItems.splice(2, 0, { id: "manager/bookings", label: "Календарь бронирований" });
+    sidebarItems.splice(3, 0, { id: "manager/clients", label: "Клиенты" });
   }
 
   return (
@@ -53,6 +55,8 @@ export default function Layout({ children }: LayoutProps) {
                   setActiveTab(item.id);
                   if (item.id === "owner") {
                     navigate("/owner");
+                  } else if (item.id.startsWith("manager/")) {
+                    navigate(`/${item.id}`);
                   } else {
                     navigate(`/${item.id}`);
                   }

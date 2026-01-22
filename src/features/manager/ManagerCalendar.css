@@ -1,0 +1,163 @@
+.manager-calendar {
+  padding: 24px;
+  background: #fff;
+  min-height: 100vh;
+}
+
+.manager-calendar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.manager-calendar__header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.manager-calendar__legend {
+  display: flex;
+  gap: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.legend-item::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-pending::before { background: #f59e0b; }
+.legend-confirmed::before { background: #3b82f6; }
+.legend-completed::before { background: #10b981; }
+.legend-cancelled::before { background: #ef4444; }
+
+.manager-calendar__container {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+/* FullCalendar overrides */
+.manager-calendar .fc {
+  font-family: inherit;
+}
+
+.manager-calendar .fc-toolbar-title {
+  font-size: 1.25rem !important;
+  font-weight: 600;
+}
+
+.manager-calendar .fc-button {
+  background: #6366f1 !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  text-transform: capitalize !important;
+}
+
+.manager-calendar .fc-button:hover {
+  background: #4f46e5 !important;
+}
+
+.manager-calendar .fc-button-active {
+  background: #4338ca !important;
+}
+
+.manager-calendar .fc-today-button {
+  background: #fff !important;
+  color: #6366f1 !important;
+  border: 1px solid #6366f1 !important;
+}
+
+.manager-calendar .fc-today-button:hover {
+  background: #eef2ff !important;
+}
+
+.manager-calendar .fc-day-today {
+  background: #fef3c7 !important;
+}
+
+.manager-calendar .fc-timegrid-slot {
+  height: 40px !important;
+}
+
+.manager-calendar .fc-event {
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.manager-calendar .fc-event:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.manager-calendar__event {
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.manager-calendar__event-time {
+  font-weight: 600;
+}
+
+.manager-calendar__event-title {
+  font-weight: 500;
+}
+
+.manager-calendar__event-client {
+  opacity: 0.8;
+}
+
+.manager-calendar__event-deposit {
+  margin-top: 4px;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.manager-calendar__event-deposit.paid {
+  background: rgba(16, 185, 129, 0.2);
+  color: #065f46;
+}
+
+.manager-calendar__event-deposit.partial {
+  background: rgba(245, 158, 11, 0.2);
+  color: #92400e;
+}
+
+.manager-calendar__loading {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.manager-calendar__spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

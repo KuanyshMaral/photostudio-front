@@ -3,7 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { getMyStudios, getStudioBookings, updateBookingStatus, type OwnerBooking, type OwnerStudio } from '../../api/ownerApi';
 import { getConversations, type Conversation } from '../chat/chat.api';
 import ChatModal from '../../components/ChatModal';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Calendar, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 export default function OwnerDashboard() {
@@ -176,6 +177,35 @@ export default function OwnerDashboard() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Панель владельца студии</h1>
+        
+        {/* Navigation Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Link 
+            to="/manager/bookings"
+            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+          >
+            <div className="flex items-center">
+              <Calendar className="w-8 h-8 text-blue-600 mr-3" />
+              <div>
+                <h3 className="font-semibold text-gray-900">Календарь</h3>
+                <p className="text-sm text-gray-600">Управление бронированиями</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link 
+            to="/manager/clients"
+            className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer border border-gray-200"
+          >
+            <div className="flex items-center">
+              <Users className="w-8 h-8 text-green-600 mr-3" />
+              <div>
+                <h3 className="font-semibold text-gray-900">Клиенты</h3>
+                <p className="text-sm text-gray-600">База клиентов</p>
+              </div>
+            </div>
+          </Link>
+        </div>
         
         {/* Studio Selector */}
         {studios.length > 1 && (
