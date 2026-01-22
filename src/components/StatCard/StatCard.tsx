@@ -33,3 +33,6 @@ export const StatCard: React.FC<StatCardProps> = ({
     </div>
   );
 };
+
+// ADD THIS LINE
+export default StatCard;
