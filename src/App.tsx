@@ -34,6 +34,10 @@ import Analytics from "./features/admin/Analytics";
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
 
+// Manager components
+import { ManagerCalendar } from "./features/manager/ManagerCalendar";
+import { ClientsPage } from "./features/manager/ClientsPage";
+
 // Chat components
 import ChatPage from "./features/chat/ChatPage";
 
@@ -202,6 +206,23 @@ function App() {
             <ProtectedRoute requiredRole={'studio_owner'}>
               <Layout>
                 <OwnerDashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          {/* Manager routes */}
+          <Route path="/manager/bookings" element={
+            <ProtectedRoute requiredRole={'studio_owner'}>
+              <Layout>
+                <ManagerCalendar />
+              </Layout>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/manager/clients" element={
+            <ProtectedRoute requiredRole={'studio_owner'}>
+              <Layout>
+                <ClientsPage />
               </Layout>
             </ProtectedRoute>
           } />
