@@ -30,6 +30,12 @@ import AdminDashboard from "./features/admin/AdminDashboard";
 import UserManagement from "./features/admin/UserManagement";
 import StudioManagement from "./features/admin/StudioManagement";
 import Analytics from "./features/admin/Analytics";
+import { AdminLayout } from './features/admin/AdminLayout';
+import { AdminDashboard as NewAdminDashboard } from './features/admin/AdminDashboard';
+import { PlatformAnalytics } from './features/admin/PlatformAnalytics';
+import { AdManager } from './features/admin/AdManager';
+import { ReviewModerator } from './features/admin/ReviewModerator';
+import { StudioVIPManager } from './features/admin/StudioVIPManager';
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -152,20 +158,17 @@ function App() {
           
           {/* Admin routes */}
           <Route path="/admin" element={
-            <ProtectedRoute requiredRole={'admin'}>
-              <Layout>
-                <div className="p-8">
-                  <Dashboard />
-                </div>
-              </Layout>
+            <ProtectedRoute requiredRole="admin">
+              <AdminLayout />
             </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/dashboard" element={
-            <ProtectedRoute requiredRole={'admin'}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
+          }>
+            <Route index element={<Navigate to="dashboard" />} />
+            <Route path="dashboard" element={<NewAdminDashboard />} />
+            <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="ads" element={<AdManager />} />
+            <Route path="reviews" element={<ReviewModerator />} />
+            <Route path="studios/vip" element={<StudioVIPManager />} />
+          </Route>
           
           <Route path="/admin/users" element={
             <ProtectedRoute requiredRole="admin">
@@ -176,12 +179,6 @@ function App() {
           <Route path="/admin/studios" element={
             <ProtectedRoute requiredRole="admin">
               <StudioManagement />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/analytics" element={
-            <ProtectedRoute requiredRole="admin">
-              <Analytics />
             </ProtectedRoute>
           } />
           
