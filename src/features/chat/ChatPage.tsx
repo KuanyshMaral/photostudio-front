@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import Layout from '../../components/Layout';
 import ChatList from './ChatList';
 import ChatWindow from './ChatWindow';
 import type { Conversation } from './chat.types';
@@ -25,32 +26,34 @@ export default function ChatPage() {
     };
     
     return (
-        <div className="chat-page">
-            {/* Sidebar со списком диалогов */}
-            {showList && (
-                <aside className="chat-sidebar">
-                    <ChatList
-                        activeConversationId={conversationId ? parseInt(conversationId) : undefined}
-                        onSelectConversation={handleSelectConversation}
-                    />
-                </aside>
-            )}
-            
-            {/* Основное окно чата */}
-            <main className="chat-main">
-                {selectedConversation ? (
-                    <ChatWindow
-                        conversation={selectedConversation}
-                        onBack={isMobile ? handleBack : undefined}
-                    />
-                ) : (
-                    <div className="chat-empty-state">
-                        <div className="empty-icon">💬</div>
-                        <h3>Выберите диалог</h3>
-                        <p>Выберите диалог из списка слева или начните новый</p>
-                    </div>
+        <Layout>
+            <div className="chat-page">
+                {/* Sidebar со списком диалогов */}
+                {showList && (
+                    <aside className="chat-sidebar">
+                        <ChatList
+                            activeConversationId={conversationId ? parseInt(conversationId) : undefined}
+                            onSelectConversation={handleSelectConversation}
+                        />
+                    </aside>
                 )}
-            </main>
-        </div>
+                
+                {/* Основное окно чата */}
+                <main className="chat-main">
+                    {selectedConversation ? (
+                        <ChatWindow
+                            conversation={selectedConversation}
+                            onBack={isMobile ? handleBack : undefined}
+                        />
+                    ) : (
+                        <div className="chat-empty-state">
+                            <div className="empty-icon">💬</div>
+                            <h3>Выберите диалог</h3>
+                            <p>Выберите диалог из списка слева или начните новый</p>
+                        </div>
+                    )}
+                </main>
+            </div>
+        </Layout>
     );
 }

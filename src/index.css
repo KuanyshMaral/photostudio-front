@@ -306,3 +306,8 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Modal scroll lock */
+body.modal-open {
+  overflow: hidden;
+}
