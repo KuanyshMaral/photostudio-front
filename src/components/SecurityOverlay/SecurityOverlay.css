@@ -1,0 +1,130 @@
+.security-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.security-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.security-overlay__modal {
+  position: relative;
+  background: linear-gradient(180deg, #1e1e2e 0%, #12121a 100%);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.security-overlay__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 8px;
+  transition: color 0.2s;
+}
+
+.security-overlay__close:hover {
+  color: #fff;
+}
+
+.security-overlay__icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  background: linear-gradient(135deg, #6f42c1 0%, #8b5cf6 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.security-overlay__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.security-overlay__subtitle {
+  color: #888;
+  margin-bottom: 32px;
+  font-size: 0.9rem;
+}
+
+.security-overlay__inputs {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.security-overlay__input {
+  width: 48px;
+  height: 56px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.security-overlay__input:focus {
+  outline: none;
+  border-color: #6f42c1;
+  background: rgba(111, 66, 193, 0.1);
+  box-shadow: 0 0 20px rgba(111, 66, 193, 0.3);
+}
+
+.security-overlay__input.filled {
+  border-color: #6f42c1;
+}
+
+.security-overlay__toggle-visibility {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto 16px;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.security-overlay__toggle-visibility:hover {
+  color: #fff;
+}
+
+.security-overlay__error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+}
+
+.security-overlay__loading {
+  color: #6f42c1;
+  font-size: 0.9rem;
+  margin-top: 16px;
+}

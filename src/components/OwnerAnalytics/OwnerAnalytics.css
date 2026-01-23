@@ -1,0 +1,238 @@
+.owner-analytics {
+  background: linear-gradient(180deg, #1e1e2e 0%, #12121a 100%);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.owner-analytics__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: 0 0 24px 0;
+}
+
+.owner-analytics__title svg {
+  color: #6f42c1;
+}
+
+.owner-analytics__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.owner-analytics__section {
+  margin-bottom: 32px;
+}
+
+.owner-analytics__section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin: 0 0 16px 0;
+}
+
+.owner-analytics__section h3 svg {
+  color: #6f42c1;
+}
+
+.owner-analytics__rooms {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.owner-analytics__room {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s;
+}
+
+.owner-analytics__room:last-child {
+  border-bottom: none;
+}
+
+.owner-analytics__room:hover {
+  background: rgba(255, 255, 255, 0.02);
+  margin: 0 -8px;
+  padding: 12px 8px;
+  border-radius: 8px;
+}
+
+.owner-analytics__room-rank {
+  background: linear-gradient(135deg, #6f42c1 0%, #8b5cf6 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  min-width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.owner-analytics__room-name {
+  flex: 1;
+  color: #fff;
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.owner-analytics__room-count {
+  color: #888;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.owner-analytics__room-revenue {
+  color: #28a745;
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.owner-analytics__statuses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.owner-analytics__status {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.owner-analytics__status:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.owner-analytics__status--pending {
+  border-left: 4px solid #ffc107;
+}
+
+.owner-analytics__status--confirmed {
+  border-left: 4px solid #17a2b8;
+}
+
+.owner-analytics__status--completed {
+  border-left: 4px solid #28a745;
+}
+
+.owner-analytics__status--cancelled {
+  border-left: 4px solid #dc3545;
+}
+
+.owner-analytics__status-label {
+  color: #888;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.owner-analytics__status-count {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Loading state */
+.owner-analytics--loading {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.owner-analytics__skeleton {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.05) 25%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Empty state */
+.owner-analytics--empty {
+  text-align: center;
+  padding: 64px 32px;
+  color: #888;
+}
+
+.owner-analytics--empty p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .owner-analytics {
+    padding: 16px;
+  }
+  
+  .owner-analytics__title {
+    font-size: 1.1rem;
+  }
+  
+  .owner-analytics__stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  
+  .owner-analytics__room {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .owner-analytics__room-name {
+    flex: 1 1 100%;
+    order: -1;
+  }
+  
+  .owner-analytics__statuses {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .owner-analytics__stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .owner-analytics__statuses {
+    grid-template-columns: 1fr;
+  }
+}

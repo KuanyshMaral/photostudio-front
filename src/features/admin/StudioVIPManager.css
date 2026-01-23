@@ -1,0 +1,237 @@
+.vip-manager {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.vip-manager--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.vip-manager__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.vip-manager__header h1 {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.vip-manager__header svg {
+  color: #fbbf24;
+}
+
+.vip-legend {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 32px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.legend-item span:last-child {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge--vip {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge--gold {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* VIP Table */
+.vip-table {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vip-table thead {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vip-table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.vip-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.vip-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.vip-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.studio-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.studio-name svg {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.rating svg {
+  color: #f59e0b;
+  flex-shrink: 0;
+}
+
+/* Toggle Buttons */
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: transparent;
+  color: #fff;
+}
+
+.toggle-btn--gold.active {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+}
+
+.toggle-btn.active:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.toggle-btn--gold.active:hover {
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .vip-manager {
+    padding: 20px;
+  }
+  
+  .vip-manager__header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .vip-legend {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .vip-table {
+    font-size: 0.9rem;
+  }
+  
+  .vip-table th,
+  .vip-table td {
+    padding: 12px 16px;
+  }
+  
+  .studio-name {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .toggle-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vip-manager {
+    padding: 16px;
+  }
+  
+  .vip-table {
+    font-size: 0.85rem;
+  }
+  
+  .vip-table th,
+  .vip-table td {
+    padding: 10px 12px;
+  }
+  
+  .toggle-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .toggle-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
