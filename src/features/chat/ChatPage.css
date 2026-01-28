@@ -1,6 +1,6 @@
 .chat-page {
     display: flex;
-    height: calc(100vh - 64px); /* Минус высота навбара */
+    height: calc(100vh - 64px); /* Account for any header space */
     background: #f5f5f5;
 }
 
