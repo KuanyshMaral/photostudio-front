@@ -1,6 +1,6 @@
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StudioRegisterRequest, Profile, ApiError } from './auth.types';
 
-const API_BASE = 'http://localhost:3001/api/v1';
+const API_BASE = '/api/v1';
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE}/auth/login`, {

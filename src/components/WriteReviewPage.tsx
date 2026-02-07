@@ -12,7 +12,7 @@ const checkCanLeaveReview = async (studioId: number): Promise<boolean> => {
   const token = localStorage.getItem('token');
   if (!token) return false;
   
-  const response = await fetch(`http://localhost:3001/api/v1/studios/${studioId}/can-review`, {
+  const response = await fetch(`/api/v1/studios/${studioId}/can-review`, {
     headers: {
       'Authorization': `Bearer ${token}`,
     },

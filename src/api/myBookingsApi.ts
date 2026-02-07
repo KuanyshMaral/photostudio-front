@@ -11,7 +11,7 @@ export interface Booking {
 
 export const getUserBookings = async (status?: 'pending' | 'confirmed' | 'cancelled' | 'completed', token?: string): Promise<Booking[]> => {
   try {
-    const response = await fetch('http://localhost:3001/api/v1/users/me/bookings', {
+    const response = await fetch('/api/v1/users/me/bookings', {
       headers: { 
         'Authorization': token ? `Bearer ${token}` : ''
       },
@@ -36,7 +36,7 @@ export const getUserBookings = async (status?: 'pending' | 'confirmed' | 'cancel
 
 export const cancelBooking = async (bookingId: number, token?: string): Promise<void> => {
   try {
-    const response = await fetch(`http://localhost:3001/api/v1/bookings/${bookingId}`, {
+    const response = await fetch(`/api/v1/bookings/${bookingId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': token ? `Bearer ${token}` : ''

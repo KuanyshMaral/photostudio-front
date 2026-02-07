@@ -27,7 +27,7 @@ export interface OwnerResponse {
   responder_name: string;
 }
 
-const API_BASE = 'http://localhost:3001/api/v1';
+const API_BASE = '/api/v1';
 
 export const getStudioReviews = async (studioId: number): Promise<Review[]> => {
     const response = await fetch(`${API_BASE}/studios/${studioId}/reviews`);
