@@ -1,13 +1,15 @@
-name: Deploy Photostudio Backend
+name: Deploy Photostudio Frontend
 
 on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
+  # Слушаем сигнал от бэкенда
+  repository_dispatch:
+    types: [backend_updated]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-deploy:
@@ -19,6 +21,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # 1. Тоже исправляем заглавные буквы для фронта
+      - name: Lowercase Repo Name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
@@ -43,15 +49,17 @@ jobs:
           script: |
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
             
+            # Скачиваем свежий образ ФРОНТА
+            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            
+            # ВАЖНО: Идем в папку БЭКЕНДА (там лежит docker-compose.yml)
             cd /srv/apps/photostudio
             
-            # Обновляем конфиги
+            # Обновляем docker-compose на всякий случай
             git reset --hard
             git pull origin main
             
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-            
-            # Перезапускаем бэкенд (убедись, что сервис называется api или backend)
-            docker compose up -d --no-deps --build api
+            # Перезапускаем ФРОНТЕНД (убедись, что сервис называется 'web' или 'frontend')
+            docker compose up -d --no-deps --build web
             
             docker image prune -f
