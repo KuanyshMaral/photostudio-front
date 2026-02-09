@@ -165,22 +165,12 @@ function App() {
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<NewAdminDashboard />} />
             <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="studios" element={<StudioManagement />} />
             <Route path="ads" element={<AdManager />} />
             <Route path="reviews" element={<ReviewModerator />} />
             <Route path="studios/vip" element={<StudioVIPManager />} />
           </Route>
-          
-          <Route path="/admin/users" element={
-            <ProtectedRoute requiredRole="admin">
-              <UserManagement />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/admin/studios" element={
-            <ProtectedRoute requiredRole="admin">
-              <StudioManagement />
-            </ProtectedRoute>
-          } />
           
           {/* Owner routes */}
           <Route path="/owner" element={
