@@ -54,7 +54,10 @@ export const PlatformAnalytics: React.FC = () => {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('API Response:', data); // Debug log
         setAnalytics(data.data?.analytics);
+      } else {
+        console.error('API Error:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch analytics:', error);
@@ -142,7 +145,7 @@ export const PlatformAnalytics: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {analytics.top_studios.map((studio, index) => (
+              {(analytics.top_studios || []).map((studio, index) => (
                 <tr key={studio.studio_id}>
                   <td>{index + 1}</td>
                   <td>
@@ -175,7 +178,7 @@ export const PlatformAnalytics: React.FC = () => {
           По городам
         </h2>
         <div className="cities-grid">
-          {analytics.top_cities.map(city => (
+          {(analytics.top_cities || []).map(city => (
             <div key={city.city} className="city-card">
               <h4>{city.city}</h4>
               <div className="city-stats">
@@ -201,7 +204,7 @@ export const PlatformAnalytics: React.FC = () => {
       <div className="platform-analytics__section">
         <h2>Пользователи по ролям</h2>
         <div className="roles-grid">
-          {Object.entries(analytics.users_by_role).map(([role, count]) => (
+          {Object.entries(analytics.users_by_role || {}).map(([role, count]) => (
             <div key={role} className={`role-card role-card--${role}`}>
               <span className="role-label">{getRoleLabel(role)}</span>
               <span className="role-count">{count}</span>
