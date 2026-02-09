@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { Building2, Search } from 'lucide-react';
+import './StudioManagement.css';
 
 interface Studio {
   id: number;
@@ -49,94 +51,95 @@ export default function StudioManagement() {
   };
 
   if (loading) {
-    return <div className="p-8">Loading studios...</div>;
+    return <div className="studio-management--loading">Загрузка студий...</div>;
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Studio Management</h1>
+    <div className="studio-management">
+      <div className="studio-management__header">
+        <h1>
+          <Building2 size={28} />
+          Управление студиями
+        </h1>
+        <div className="studio-management__filters">
+          <div className="filter-group">
+            <Search size={16} />
+            <input 
+              type="text" 
+              placeholder="Поиск студий..."
+              onChange={() => {
+                // Add search functionality here
+              }}
+            />
+          </div>
+          <select>
+            <option value="all">Все статусы</option>
+            <option value="verified">Подтвержденные</option>
+            <option value="pending">В ожидании</option>
+            <option value="rejected">Отклоненные</option>
+          </select>
+        </div>
+      </div>
       
-      <div className="bg-white rounded-lg shadow">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Studio Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Address
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Created
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {studios.map((studio) => (
-                <tr key={studio.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {studio.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+      <div className="studios-table-wrapper">
+        <table className="studios-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Название студии</th>
+              <th>Email</th>
+              <th>Адрес</th>
+              <th>Статус</th>
+              <th>Создана</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {studios.map((studio) => (
+              <tr key={studio.id}>
+                <td>{studio.id}</td>
+                <td>
+                  <a href={`/admin/studios/${studio.id}`}>
                     {studio.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {studio.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {studio.address}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      studio.status === 'verified' ? 'bg-green-100 text-green-800' :
-                      studio.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {studio.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(studio.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-indigo-600 hover:text-indigo-900 mr-3">
-                      View
+                  </a>
+                </td>
+                <td>{studio.email}</td>
+                <td>{studio.address}</td>
+                <td>
+                  <span className={`status-badge ${studio.status}`}>
+                    {studio.status === 'verified' ? 'Подтверждена' :
+                     studio.status === 'pending' ? 'В ожидании' :
+                     'Отклонена'}
+                  </span>
+                </td>
+                <td>{new Date(studio.created_at).toLocaleDateString('ru-RU')}</td>
+                <td>
+                  <div className="action-buttons">
+                    <button className="action-button">
+                      Просмотр
                     </button>
                     {studio.status === 'pending' && (
                       <>
                         <button 
                           onClick={() => handleStatusChange(studio.id, 'verified')}
-                          className="text-green-600 hover:text-green-900 mr-3"
+                          className="action-button approve"
                         >
-                          Approve
+                          Одобрить
                         </button>
                         <button 
                           onClick={() => handleStatusChange(studio.id, 'rejected')}
-                          className="text-red-600 hover:text-red-900"
+                          className="action-button reject"
                         >
-                          Reject
+                          Отклонить
                         </button>
                       </>
                     )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

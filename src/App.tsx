@@ -175,11 +175,14 @@ function App() {
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<NewAdminDashboard />} />
             <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="studios" element={<StudioManagement />} />
             <Route path="ads" element={<AdManager />} />
             <Route path="reviews" element={<ReviewModerator />} />
             <Route path="studios/vip" element={<StudioVIPManager />} />
           </Route>
           
+<<<<<<< HEAD
           <Route path="/admin/users" element={
 >>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
             <ProtectedRoute requiredRole="admin">
@@ -208,6 +211,8 @@ function App() {
           } />
 >>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
           
+=======
+>>>>>>> 31a33c48372292d27f8ad2d88891f98f8e610d17
           {/* Owner routes */}
           <Route path="/owner" element={
             <ProtectedRoute requiredRole={'studio_owner'}>
