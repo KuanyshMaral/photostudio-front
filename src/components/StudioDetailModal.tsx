@@ -13,6 +13,7 @@ import { ImageCarousel } from './ImageCarousel/ImageCarousel';
 import { LiveStatusBadge } from './LiveStatusBadge/LiveStatusBadge';
 import { ClickableLinks } from './ClickableLinks/ClickableLinks';
 import { HallSelector } from './HallSelector';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import './StudioDetailModal.css';
 
 interface StudioDetailModalProps {
@@ -35,6 +36,9 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  
+  // Use the custom hook to lock body scroll when modal is open
+  useBodyScrollLock(true);
   
   // Booking state
   const [showBookingCalendar, setShowBookingCalendar] = useState(false);

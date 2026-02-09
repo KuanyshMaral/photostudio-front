@@ -46,7 +46,11 @@ export const AdminLayout: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) => 
+<<<<<<< HEAD
                   `admin-nav-item ${isActive ? 'active' : ''}`
+=======
+                  `admin-nav-item ${isActive ? 'active' : ''}` 
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
                 }
               >
                 <Icon size={20} />
@@ -80,4 +84,8 @@ export const AdminLayout: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AdminLayout;
+=======
+export default AdminLayout;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

@@ -4,7 +4,11 @@ import {
   TrendingUp, ArrowUpRight, MessageSquare, Megaphone
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+<<<<<<< HEAD
 import { StatCard } from '../../components/StatCard/StatCard';
+=======
+import { StatCard } from '../../components/StatCard';
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 import './AdminDashboard.css';
 
 interface DashboardStats {
@@ -71,6 +75,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Main Stats */}
       <div className="admin-dashboard__stats">
         <StatCard
+<<<<<<< HEAD
           icon={<Users size={24} />}
           label="Пользователей"
           value={stats.total_users}
@@ -100,6 +105,54 @@ export const AdminDashboard: React.FC = () => {
           subValue={`${formatCurrency(stats.revenue_this_month)} за месяц`}
           color="warning"
         />
+=======
+          icon={<Users size={20} />}
+          label="Пользователей"
+          value={stats.total_users}
+          color="primary"
+        />
+        <StatCard
+          icon={<Building2 size={20} />}
+          label="Студий"
+          value={stats.total_studios}
+          color="success"
+        />
+        <StatCard
+          icon={<Calendar size={20} />}
+          label="Бронирований"
+          value={stats.total_bookings}
+          color="warning"
+        />
+        <StatCard
+          icon={<DollarSign size={20} />}
+          label="Оборот"
+          value={formatCurrency(stats.total_revenue)}
+          color="danger"
+        />
+      </div>
+
+      {/* Monthly Stats */}
+      <div className="admin-dashboard__monthly-stats">
+        <h3>За этот месяц</h3>
+        <div className="monthly-stats-grid">
+          <div className="monthly-stat">
+            <span className="monthly-stat__label">Новые пользователи</span>
+            <span className="monthly-stat__value">+{stats.new_users_this_month}</span>
+          </div>
+          <div className="monthly-stat">
+            <span className="monthly-stat__label">Новые студии</span>
+            <span className="monthly-stat__value">+{stats.new_studios_this_month}</span>
+          </div>
+          <div className="monthly-stat">
+            <span className="monthly-stat__label">Бронирования</span>
+            <span className="monthly-stat__value">{stats.bookings_this_month}</span>
+          </div>
+          <div className="monthly-stat">
+            <span className="monthly-stat__label">Доход</span>
+            <span className="monthly-stat__value">{formatCurrency(stats.revenue_this_month)}</span>
+          </div>
+        </div>
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
       </div>
 
       {/* Commission Stats */}
@@ -151,4 +204,8 @@ export const AdminDashboard: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AdminDashboard;
+=======
+export default AdminDashboard;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

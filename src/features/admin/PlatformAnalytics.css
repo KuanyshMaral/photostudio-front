@@ -1,18 +1,43 @@
 .platform-analytics {
+<<<<<<< HEAD
   display: flex;
   flex-direction: column;
   gap: 2rem;
+=======
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.platform-analytics--loading,
+.platform-analytics--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .platform-analytics__header {
   display: flex;
+<<<<<<< HEAD
   justify-content: space-between;
   align-items: center;
+=======
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .platform-analytics__header h1 {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 1rem;
   font-size: 1.5rem;
   color: #0f172a;
@@ -37,16 +62,74 @@
   margin-bottom: 1.5rem;
   font-size: 1.125rem;
   color: #94a3b8;
+=======
+  gap: 12px;
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.platform-analytics__header svg {
+  color: #6366f1;
+}
+
+.platform-analytics__filters select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.platform-analytics__filters select:focus {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.platform-analytics__filters select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+/* Revenue Formula */
+.platform-analytics__formula {
+  margin-bottom: 40px;
+}
+
+.formula-card {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(99, 102, 241, 0.3);
+}
+
+.formula-card h3 {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .formula-content {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 2rem;
+=======
+  gap: 16px;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
   flex-wrap: wrap;
 }
 
 .formula-item {
+<<<<<<< HEAD
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -71,11 +154,52 @@
 
 .formula-item--result .formula-value {
   color: #4ade80;
+=======
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 140px;
+  text-align: center;
+}
+
+.formula-item--result {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.4);
+  transform: scale(1.05);
+}
+
+.formula-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.formula-value {
+  display: block;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.formula-operator {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+/* Sections */
+.platform-analytics__section {
+  margin-bottom: 40px;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .platform-analytics__section h2 {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 0.75rem;
   font-size: 1.25rem;
   margin-bottom: 1.5rem;
@@ -88,11 +212,32 @@
   border-radius: 1rem;
   border: 1px solid #e2e8f0;
   overflow: hidden;
+=======
+  gap: 12px;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+}
+
+.platform-analytics__section svg {
+  color: #6366f1;
+}
+
+/* Studios Table */
+.studios-table-wrapper {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow-x: auto;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .studios-table {
   width: 100%;
   border-collapse: collapse;
+<<<<<<< HEAD
 }
 
 .studios-table th {
@@ -120,10 +265,60 @@
   padding: 0.25rem 0.75rem;
   border-radius: 1rem;
   font-size: 0.75rem;
+=======
+  color: #fff;
+}
+
+.studios-table th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.studios-table td {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.95rem;
+}
+
+.studios-table tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.studios-table a {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.studios-table a:hover {
+  color: #8b5cf6;
+}
+
+.rating-badge {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
   font-weight: 600;
 }
 
 .status-badge.vip {
+<<<<<<< HEAD
   background: #fef3c7;
   color: #d97706;
 }
@@ -132,11 +327,26 @@
   background: #fffbeb;
   color: #b45309;
   border: 1px solid #fcd34d;
+=======
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.status-badge.gold {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.status-badge.regular {
+  background: rgba(107, 114, 128, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 /* Cities Grid */
 .cities-grid {
   display: grid;
+<<<<<<< HEAD
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1.5rem;
 }
@@ -151,26 +361,67 @@
 .city-card h4 {
   font-size: 1.125rem;
   margin-bottom: 1rem;
+=======
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.city-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.city-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.city-card h4 {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .city-stats {
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   gap: 0.75rem;
+=======
+  gap: 12px;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 .city-stat {
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   gap: 0.75rem;
   color: #64748b;
   font-size: 0.9375rem;
+=======
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.city-stat svg {
+  color: #6366f1;
+  flex-shrink: 0;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 }
 
 /* Roles Grid */
 .roles-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+<<<<<<< HEAD
   gap: 1.5rem;
 }
 
@@ -188,3 +439,128 @@
 
 .role-label { font-size: 0.875rem; font-weight: 600; }
 .role-count { font-size: 2rem; font-weight: 700; }
+=======
+  gap: 16px;
+}
+
+.role-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.role-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.role-card--client {
+  border-left: 4px solid #10b981;
+}
+
+.role-card--studio_owner {
+  border-left: 4px solid #6366f1;
+}
+
+.role-card--admin {
+  border-left: 4px solid #ef4444;
+}
+
+.role-label {
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.role-count {
+  display: block;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .platform-analytics {
+    padding: 20px;
+  }
+  
+  .platform-analytics__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .platform-analytics__header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .formula-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .formula-item {
+    min-width: auto;
+  }
+  
+  .formula-operator {
+    text-align: center;
+  }
+  
+  .studios-table-wrapper {
+    padding: 16px;
+  }
+  
+  .studios-table th,
+  .studios-table td {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+  
+  .cities-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .roles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .platform-analytics {
+    padding: 16px;
+  }
+  
+  .formula-card {
+    padding: 20px;
+  }
+  
+  .formula-item {
+    padding: 12px 16px;
+  }
+  
+  .formula-value {
+    font-size: 1rem;
+  }
+  
+  .studios-table {
+    font-size: 0.8rem;
+  }
+  
+  .studios-table th,
+  .studios-table td {
+    padding: 6px 8px;
+  }
+  
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

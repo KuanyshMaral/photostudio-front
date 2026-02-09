@@ -35,6 +35,16 @@ import { StudioVIPManager } from "./features/admin/StudioVIPManager";
 // Keeping existing management components
 import UserManagement from "./features/admin/UserManagement";
 import StudioManagement from "./features/admin/StudioManagement";
+<<<<<<< HEAD
+=======
+import Analytics from "./features/admin/Analytics";
+import { AdminLayout } from './features/admin/AdminLayout';
+import { AdminDashboard as NewAdminDashboard } from './features/admin/AdminDashboard';
+import { PlatformAnalytics } from './features/admin/PlatformAnalytics';
+import { AdManager } from './features/admin/AdManager';
+import { ReviewModerator } from './features/admin/ReviewModerator';
+import { StudioVIPManager } from './features/admin/StudioVIPManager';
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -156,9 +166,26 @@ function App() {
           
           {/* Admin routes (Updated Structure) */}
           <Route path="/admin" element={
+<<<<<<< HEAD
+=======
             <ProtectedRoute requiredRole="admin">
               <AdminLayout />
             </ProtectedRoute>
+          }>
+            <Route index element={<Navigate to="dashboard" />} />
+            <Route path="dashboard" element={<NewAdminDashboard />} />
+            <Route path="analytics" element={<PlatformAnalytics />} />
+            <Route path="ads" element={<AdManager />} />
+            <Route path="reviews" element={<ReviewModerator />} />
+            <Route path="studios/vip" element={<StudioVIPManager />} />
+          </Route>
+          
+          <Route path="/admin/users" element={
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
+            <ProtectedRoute requiredRole="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+<<<<<<< HEAD
           }>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
@@ -171,6 +198,15 @@ function App() {
             {/* Fallback for admin settings or unknown admin routes */}
             <Route path="*" element={<Navigate to="dashboard" replace />} />
           </Route>
+=======
+          } />
+          
+          <Route path="/admin/studios" element={
+            <ProtectedRoute requiredRole="admin">
+              <StudioManagement />
+            </ProtectedRoute>
+          } />
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
           
           {/* Owner routes */}
           <Route path="/owner" element={

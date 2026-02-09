@@ -121,7 +121,11 @@ export const StudioVIPManager: React.FC = () => {
                 </span>
               </td>
               <td>
+<<<<<<< HEAD
                 <button 
+=======
+                <button
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
                   className={`toggle-btn ${studio.is_vip ? 'active' : ''}`}
                   onClick={() => toggleVIP(studio.id, studio.is_vip)}
                 >
@@ -129,7 +133,11 @@ export const StudioVIPManager: React.FC = () => {
                 </button>
               </td>
               <td>
+<<<<<<< HEAD
                 <button 
+=======
+                <button
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
                   className={`toggle-btn toggle-btn--gold ${studio.is_gold ? 'active' : ''}`}
                   onClick={() => toggleGold(studio.id, studio.is_gold)}
                 >
@@ -144,4 +152,8 @@ export const StudioVIPManager: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default StudioVIPManager;
+=======
+export default StudioVIPManager;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

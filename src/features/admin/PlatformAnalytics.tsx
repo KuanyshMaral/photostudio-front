@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
+<<<<<<< HEAD
   BarChart3, MapPin, Building2, Calendar, DollarSign
+=======
+  BarChart3, MapPin, Building2,
+  Calendar, DollarSign
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './PlatformAnalytics.css';
@@ -78,6 +83,7 @@ export const PlatformAnalytics: React.FC = () => {
     return <div className="platform-analytics--error">Ошибка загрузки</div>;
   }
 
+<<<<<<< HEAD
   const getRoleLabel = (role: string): string => {
     const labels: Record<string, string> = {
       client: 'Клиенты',
@@ -87,6 +93,8 @@ export const PlatformAnalytics: React.FC = () => {
     return labels[role] || role;
   };
 
+=======
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
   return (
     <div className="platform-analytics">
       <div className="platform-analytics__header">
@@ -221,4 +229,17 @@ export const PlatformAnalytics: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default PlatformAnalytics;
+=======
+const getRoleLabel = (role: string): string => {
+  const labels: Record<string, string> = {
+    client: 'Клиенты',
+    studio_owner: 'Владельцы',
+    admin: 'Админы'
+  };
+  return labels[role] || role;
+};
+
+export default PlatformAnalytics;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

@@ -192,4 +192,8 @@ export const ReviewModerator: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default ReviewModerator;
+=======
+export default ReviewModerator;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb

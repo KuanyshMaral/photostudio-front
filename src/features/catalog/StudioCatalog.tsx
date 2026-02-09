@@ -56,8 +56,7 @@ export const StudioCatalog: React.FC = () => {
     try {
       const response = await createConversation(token, {
         recipient_id: studio.owner_id,
-        studio_id: studio.id,
-        initial_message: `Здравствуйте! Мне интересна ваша студия "${studio.name}"`
+        studio_id: studio.id
       });
       
       setChatConversation(response.conversation);

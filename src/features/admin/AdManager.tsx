@@ -20,6 +20,7 @@ interface Ad {
   created_at: string;
 }
 
+<<<<<<< HEAD
 interface AdFormModalProps {
   ad: Ad | null;
   onClose: () => void;
@@ -157,6 +158,8 @@ const AdFormModal: React.FC<AdFormModalProps> = ({ ad, onClose, onSave }) => {
   );
 };
 
+=======
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
 export const AdManager: React.FC = () => {
   const { token } = useAuth();
   const [ads, setAds] = useState<Ad[]>([]);
@@ -343,6 +346,10 @@ export const AdManager: React.FC = () => {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {/* Модалка создания/редактирования */}
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
       {showForm && (
         <AdFormModal
           ad={editingAd}
@@ -357,4 +364,146 @@ export const AdManager: React.FC = () => {
   );
 };
 
+<<<<<<< HEAD
 export default AdManager;
+=======
+// Компонент формы
+interface AdFormModalProps {
+  ad: Ad | null;
+  onClose: () => void;
+  onSave: () => void;
+}
+
+const AdFormModal: React.FC<AdFormModalProps> = ({ ad, onClose, onSave }) => {
+  const { token } = useAuth();
+  const [formData, setFormData] = useState({
+    title: ad?.title || '',
+    image_url: ad?.image_url || '',
+    target_url: ad?.target_url || '',
+    placement: ad?.placement || 'home_banner',
+    is_active: ad?.is_active ?? true,
+    start_date: ad?.start_date?.split('T')[0] || '',
+    end_date: ad?.end_date?.split('T')[0] || ''
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+
+    try {
+      const url = ad 
+        ? `/api/v1/admin/ads/${ad.id}` 
+        : '/api/v1/admin/ads';
+      const method = ad ? 'PATCH' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        onSave();
+      }
+    } catch (error) {
+      console.error('Failed to save ad:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal ad-form-modal" onClick={e => e.stopPropagation()}>
+        <h2>{ad ? 'Редактировать рекламу' : 'Создать рекламу'}</h2>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label>Название</label>
+            <input
+              type="text"
+              value={formData.title}
+              onChange={e => setFormData({...formData, title: e.target.value})}
+              required
+            />
+          </div>
+
+          <div className="form-field">
+            <label>URL изображения</label>
+            <input
+              type="url"
+              value={formData.image_url}
+              onChange={e => setFormData({...formData, image_url: e.target.value})}
+              required
+            />
+          </div>
+
+          <div className="form-field">
+            <label>Ссылка перехода</label>
+            <input
+              type="url"
+              value={formData.target_url}
+              onChange={e => setFormData({...formData, target_url: e.target.value})}
+            />
+          </div>
+
+          <div className="form-field">
+            <label>Размещение</label>
+            <select
+              value={formData.placement}
+              onChange={e => setFormData({...formData, placement: e.target.value})}
+            >
+              <option value="home_banner">Главный баннер</option>
+              <option value="sidebar">Сайдбар</option>
+              <option value="promo_carousel">Промо карусель</option>
+            </select>
+          </div>
+
+          <div className="form-row">
+            <div className="form-field">
+              <label>Дата начала</label>
+              <input
+                type="date"
+                value={formData.start_date}
+                onChange={e => setFormData({...formData, start_date: e.target.value})}
+              />
+            </div>
+            <div className="form-field">
+              <label>Дата окончания</label>
+              <input
+                type="date"
+                value={formData.end_date}
+                onChange={e => setFormData({...formData, end_date: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="form-field form-field--checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={formData.is_active}
+                onChange={e => setFormData({...formData, is_active: e.target.checked})}
+              />
+              Активна
+            </label>
+          </div>
+
+          <div className="form-actions">
+            <button type="button" onClick={onClose}>Отмена</button>
+            <button type="submit" className="btn-primary" disabled={isSaving}>
+              {isSaving ? 'Сохранение...' : 'Сохранить'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AdManager;
+>>>>>>> e5f455b231255c8509021dc9ed0381e12b32b4fb
