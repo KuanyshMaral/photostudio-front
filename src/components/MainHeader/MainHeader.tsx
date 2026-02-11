@@ -1,24 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, Camera } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import './MainHeader.css';
 
 interface MainHeaderProps {
   onSearch?: (query: string) => void;
 }
 
-/**
- * MainHeader — главный header приложения после редизайна.
- * 
- * Содержит:
- * - Аватар пользователя (кликабельный → /profile)
- * - Имя пользователя
- * - Кнопку уведомлений с badge
- * - Строку поиска
- * 
- * Используется на главной странице (Каталог студий).
- */
 export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
@@ -77,57 +65,69 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
   };
 
   return (
-    <header className="main-header">
-      <div className="main-header__container">
-        {/* Верхняя строка: Аватар и Уведомления */}
-        <div className="main-header__top">
-          {/* Левая часть: Аватар + Имя */}
-          <Link to="/profile" className="main-header__user">
-            <div className="main-header__avatar">
-              {user?.avatar_url ? (
-                <img 
-                  src={user.avatar_url} 
-                  alt={user.name} 
-                  className="main-header__avatar-img"
-                />
-              ) : (
-                <div className="main-header__avatar-fallback">
-                  {user ? getInitials(user.name) : <User size={20} />}
-                </div>
-              )}
+    <header className="glass sticky top-0 z-50 border-b border-gray-200/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center">
+            <div className="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl mr-4">
+              <Camera className="w-6 h-6 text-white" />
             </div>
-            <span className="main-header__username">
-              {user?.name || 'Гость'}
-            </span>
-          </Link>
+            <h1 className="text-xl font-bold gradient-text">StudioBooking</h1>
+          </div>
 
-          {/* Правая часть: Уведомления */}
-          <button 
-            className="main-header__notifications"
-            onClick={() => navigate('/notifications')}
-            aria-label="Уведомления"
-          >
-            <Bell size={24} />
-            {unreadCount > 0 && (
-              <span className="main-header__badge">
-                {unreadCount > 9 ? '9+' : unreadCount}
+          {/* Search Bar */}
+          <form className="flex-1 max-w-xl mx-8" onSubmit={handleSearch}>
+            <div className="relative">
+              <Search size={20} className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                className="modern-input pl-12 pr-4 py-3 w-full"
+                placeholder="Поиск студий, локаций..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                aria-label="Поиск студий"
+              />
+            </div>
+          </form>
+
+          {/* User Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            <button 
+              className="relative p-2 text-gray-600 hover:text-primary-600 transition-colors"
+              onClick={() => navigate('/notifications')}
+              aria-label="Уведомления"
+            >
+              <Bell size={24} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* User Profile */}
+            <Link to="/profile" className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-50 transition-colors">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
+                {user?.avatar_url ? (
+                  <img 
+                    src={user.avatar_url} 
+                    alt={user.name} 
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white font-semibold text-sm">
+                    {user ? getInitials(user.name) : <User size={16} className="text-white" />}
+                  </span>
+                )}
+              </div>
+              <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                {user?.name || 'Гость'}
               </span>
-            )}
-          </button>
+            </Link>
+          </div>
         </div>
-
-        {/* Строка поиска */}
-        <form className="main-header__search" onSubmit={handleSearch}>
-          <Search size={20} className="main-header__search-icon" />
-          <input
-            type="text"
-            className="main-header__search-input"
-            placeholder="Поиск студий..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            aria-label="Поиск студий"
-          />
-        </form>
       </div>
     </header>
   );

@@ -63,7 +63,7 @@ export default function StudioRegistrationForm() {
 
       // Загружаем документы если есть
       if (formData.documents?.length) {
-        // Note: We need the token for authentication, but we don't have it here
+        // Note: We need token for authentication, but we don't have it here
         // This would need to be passed from AuthContext or handled differently
         console.log('Documents need to be uploaded with authentication token');
         // await uploadVerificationDocs(response.user.token, formData.documents);
@@ -86,7 +86,7 @@ export default function StudioRegistrationForm() {
         <header className="auth-header">
           <div className="auth-logo">StudioBooking</div>
           <h2 className="auth-title">Регистрация студии</h2>
-          <p className="auth-sub">Создайте аккаунт студии</p>
+          <p className="auth-sub">создайте аккаунт студии</p>
         </header>
 
         {/* Progress indicator */}
