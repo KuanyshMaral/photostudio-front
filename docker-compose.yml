@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  web:
+    # Убедись, что имя образа совпадает с тем, что в deploy.yml (photostudio-front или photostudio-frontend)
+    image: ghcr.io/kuanyshmaral/photostudio-front:latest
+    container_name: photostudio-frontend
+    restart: unless-stopped
+    ports:
+      # Сайт будет доступен по http://IP-СЕРВЕРА:3002
+      - "3002:80"
+    networks:
+      - photostudio_net
+
+networks:
+  photostudio_net:
+    external: true
+    # Здесь должно быть имя сети, которую создал Бэкенд.
+    # В прошлом файле бэкенда мы назвали её 'photostudio_net', так что оставляем так.
+    # Если docker скажет "network not found", проверь имя сети командой: docker network ls
+    name: photostudio_net

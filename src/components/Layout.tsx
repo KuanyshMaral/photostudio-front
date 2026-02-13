@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Building2, Calendar, MessageSquare, User, 
-  Settings, BarChart2, Users, LogOut 
+  Settings, BarChart2, Users, LogOut, Camera
 } from "lucide-react";
 
 interface LayoutProps {
@@ -26,7 +26,6 @@ export default function Layout({ children }: LayoutProps) {
     // Для владельца студии — CRM-ориентированное меню
     if (role === 'studio_owner') {
       return [
-        { id: "owner", label: "Дашборд", icon: BarChart2 },
         { id: "manager/bookings", label: "Бронирования", icon: Calendar },
         { id: "manager/clients", label: "Клиенты", icon: Users },
         { id: "studio-management", label: "Мои студии", icon: Building2 },
@@ -58,27 +57,37 @@ export default function Layout({ children }: LayoutProps) {
   const sidebarItems = getSidebarItems();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
       {/* Left Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200">
+      <aside className="w-72 glass border-r border-gray-200/50">
         <div className="p-6">
           <div className="sidebar-logo flex items-center mb-8">
-            <h1 className="text-xl font-semibold text-gray-900">StudioBooking</h1>
+            <div className="p-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl mr-3">
+              <Camera className="w-6 h-6 text-white" />
+            </div>
+            <h1 className="text-xl font-bold gradient-text">StudioBooking</h1>
           </div>
           
           {/* Роль пользователя */}
           {user && (
-            <div className="mb-6 px-3 py-2 bg-purple-50 rounded-lg">
-              <p className="text-xs text-purple-600 font-medium">
-                {user.role === 'studio_owner' && '👑 Владелец студии'}
-                {user.role === 'admin' && '🛡️ Администратор'}
-                {user.role === 'client' && '👤 Клиент'}
-              </p>
-              <p className="text-sm text-gray-700 truncate">{user.name}</p>
+            <div className="mb-8 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl border border-primary-100">
+              <div className="flex items-center mb-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mr-3">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-primary-600 uppercase tracking-wide">
+                    {user.role === 'studio_owner' && 'Владелец студии'}
+                    {user.role === 'admin' && 'Администратор'}
+                    {user.role === 'client' && 'Клиент'}
+                  </p>
+                  <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                </div>
+              </div>
             </div>
           )}
           
-          <nav className="space-y-1">
+          <nav className="space-y-2">
             {sidebarItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname.includes(item.id);
@@ -89,13 +98,19 @@ export default function Layout({ children }: LayoutProps) {
                   onClick={() => {
                     navigate(`/${item.id}`);
                   }}
-                  className={`w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-3 ${
+                  className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-3 group ${
                     isActive
-                      ? "bg-purple-50 text-purple-700 border-l-2 border-purple-600"
-                      : "text-gray-600 hover:text-purple-600 hover:bg-purple-50"
+                      ? "bg-gradient-to-r from-primary-500 to-secondary-500 text-white shadow-lg scale-[1.02]"
+                      : "text-gray-600 hover:text-primary-600 hover:bg-primary-50 hover:scale-[1.01]"
                   }`}
                 >
-                  <Icon size={18} />
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors ${
+                    isActive 
+                      ? "bg-white/20" 
+                      : "bg-gray-100 group-hover:bg-primary-100"
+                  }`}>
+                    <Icon size={16} className={isActive ? "text-white" : "text-gray-600 group-hover:text-primary-600"} />
+                  </div>
                   {item.label}
                 </button>
               );
@@ -105,9 +120,11 @@ export default function Layout({ children }: LayoutProps) {
           <div className="mt-8 pt-8 border-t border-gray-200">
             <button
               onClick={handleLogout}
-              className="w-full text-left px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors flex items-center gap-3"
+              className="w-full text-left px-4 py-3 rounded-xl text-sm font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200 flex items-center gap-3 group"
             >
-              <LogOut size={18} />
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center group-hover:bg-red-200 transition-colors">
+                <LogOut size={16} />
+              </div>
               Выйти
             </button>
           </div>
@@ -115,8 +132,10 @@ export default function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
+      <main className="flex-1 overflow-hidden">
+        <div className="h-full overflow-y-auto">
+          {children}
+        </div>
       </main>
     </div>
   );
