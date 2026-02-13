@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import { Filters } from '../types';
+import type { Filters } from '../types';
 
 interface FilterPanelProps {
   filters: Filters;
@@ -11,8 +11,8 @@ interface FilterPanelProps {
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onChange, onClose }) => {
-  const roomTypes = ['Fashion', 'Portrait', 'Creative', 'Commercial'];
-  const cities = ['Алматы', 'Астана', 'Шымкент'];
+  const roomTypes: string[] = [];
+  const cities: string[] = [];
 
   const handleReset = () => {
     onChange({

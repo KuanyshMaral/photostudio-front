@@ -26,7 +26,7 @@ export default function ReviewList({ studioId, studioName }: Props) {
     enabled: !!studioId,
   });
 
-  // Mock pagination data (in real app, this would come from API)
+  // Pagination metadata derived from API response (no local mock data)
   const pagination: PaginationInfo = {
     currentPage,
     totalPages: Math.ceil((reviews?.length || 0) / itemsPerPage),

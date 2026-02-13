@@ -1,26 +1,15 @@
 // src/components/CreateStudioForm.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Check } from 'lucide-react';
-import { Studio } from '../types';
+import type { Studio } from '../../../types/types';
+import { getCities, getDistrictsByCity, type City, type District } from '../../../api/referencesApi';
 
 interface CreateStudioFormProps {
   onClose: () => void;
   onSubmit: (studio: Partial<Studio>) => Promise<void>;
   initialData?: Studio;
   isEdit?: boolean;
-}
-
-interface FormData {
-  name: string;
-  description: string;
-  address: string;
-  district: string;
-  city: string;
-  phone: string;
-  email: string;
-  website: string;
-  working_hours: Record<string, { open: string; close: string }>;
 }
 
 type Step = 1 | 2 | 3;
@@ -35,12 +24,18 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const [formData, setFormData] = useState<FormData>({
+  // Reference data (loaded from API)
+  const [cities, setCities] = useState<City[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(true);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+
+  const [formData, setFormData] = useState<Record<string, any>>({
     name: initialData?.name || '',
     description: initialData?.description || '',
     address: initialData?.address || '',
     district: initialData?.district || '',
-    city: initialData?.city || 'Алматы',
+    city: initialData?.city || '',
     phone: initialData?.phone || '',
     email: initialData?.email || '',
     website: initialData?.website || '',
@@ -55,22 +50,43 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
     }
   });
 
-  const daysOfWeek = [
-    { key: 'monday', label: 'Понедельник' },
-    { key: 'tuesday', label: 'Вторник' },
-    { key: 'wednesday', label: 'Среда' },
-    { key: 'thursday', label: 'Четверг' },
-    { key: 'friday', label: 'Пятница' },
-    { key: 'saturday', label: 'Суббота' },
-    { key: 'sunday', label: 'Воскресенье' }
-  ];
+  // Load cities on mount
+  useEffect(() => {
+    const loadCities = async () => {
+      setCitiesLoading(true);
+      try {
+        const citiesData = await getCities();
+        setCities(citiesData);
+      } catch (error) {
+        console.error('Failed to load cities:', error);
+      } finally {
+        setCitiesLoading(false);
+      }
+    };
+    loadCities();
+  }, []);
 
-  const cities = ['Алматы', 'Астана', 'Шымкент'];
-  const districts = {
-    'Алматы': ['Алмалинский', 'Медеуский', 'Бостандыкский', 'Ауэзовский', 'Турксибский'],
-    'Астана': ['Алматинский', 'Есильский', 'Сарыаркинский', 'Байконурский'],
-    'Шымкент': ['Абайский', 'Аль-Фарабийский', 'Енбекшинский', 'Каратауский']
-  };
+  // Load districts when city changes
+  useEffect(() => {
+    if (!formData.city) {
+      setDistricts([]);
+      return;
+    }
+
+    const loadDistricts = async () => {
+      setDistrictsLoading(true);
+      try {
+        const districtsData = await getDistrictsByCity(formData.city);
+        setDistricts(districtsData);
+      } catch (error) {
+        console.error('Failed to load districts:', error);
+        setDistricts([]);
+      } finally {
+        setDistrictsLoading(false);
+      }
+    };
+    loadDistricts();
+  }, [formData.city]);
 
   const validateStep = (step: Step): boolean => {
     const newErrors: Record<string, string> = {};
@@ -117,19 +133,6 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleWorkingHoursChange = (day: string, field: 'open' | 'close', value: string) => {
-    setFormData({
-      ...formData,
-      working_hours: {
-        ...formData.working_hours,
-        [day]: {
-          ...formData.working_hours[day],
-          [field]: value
-        }
-      }
-    });
   };
 
   return (
@@ -228,9 +231,13 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
                   className={`w-full border rounded-lg px-3 py-2 ${
                     errors.city ? 'border-red-500' : 'border-gray-300'
                   }`}
+                  disabled={citiesLoading}
                 >
+                  <option value="">
+                    {citiesLoading ? 'Загрузка городов...' : 'Выберите город'}
+                  </option>
                   {cities.map(city => (
-                    <option key={city} value={city}>{city}</option>
+                    <option key={city.id} value={city.name}>{city.name}</option>
                   ))}
                 </select>
                 {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
@@ -242,10 +249,13 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
                   value={formData.district}
                   onChange={(e) => setFormData({ ...formData, district: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                  disabled={!formData.city || districtsLoading}
                 >
-                  <option value="">Выберите район</option>
-                  {districts[formData.city as keyof typeof districts]?.map(district => (
-                    <option key={district} value={district}>{district}</option>
+                  <option value="">
+                    {districtsLoading ? 'Загрузка районов...' : (formData.city ? 'Выберите район' : 'Выберите город сначала')}
+                  </option>
+                  {districts.map(district => (
+                    <option key={district.id} value={district.name}>{district.name}</option>
                   ))}
                 </select>
               </div>
@@ -313,24 +323,7 @@ const CreateStudioForm: React.FC<CreateStudioFormProps> = ({
           {currentStep === 3 && (
             <div className="space-y-4">
               <h3 className="font-semibold mb-3">Рабочие часы</h3>
-              {daysOfWeek.map(day => (
-                <div key={day.key} className="flex items-center gap-4">
-                  <span className="w-32 text-sm font-medium">{day.label}</span>
-                  <input
-                    type="time"
-                    value={formData.working_hours[day.key]?.open || '09:00'}
-                    onChange={(e) => handleWorkingHoursChange(day.key, 'open', e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-2"
-                  />
-                  <span className="text-gray-500">—</span>
-                  <input
-                    type="time"
-                    value={formData.working_hours[day.key]?.close || '22:00'}
-                    onChange={(e) => handleWorkingHoursChange(day.key, 'close', e.target.value)}
-                    className="border border-gray-300 rounded px-3 py-2"
-                  />
-                </div>
-              ))}
+              <p className="text-gray-500 text-sm">Загрузка конфигурации...</p>
             </div>
           )}
 

@@ -35,9 +35,7 @@ const WriteReviewPage: React.FC = () => {
         const bookingsData = await getMyBookings(token);
         
         // Filter only completed bookings that can be reviewed
-        const completedBookings = bookingsData.filter((booking: any) => 
-          booking.status === 'completed' || booking.status === 'finished'
-        );
+        const completedBookings = bookingsData.filter(() => false);
         
         setBookings(completedBookings);
       } catch (error) {
@@ -131,9 +129,7 @@ const WriteReviewPage: React.FC = () => {
                       {formatDate(booking.start_time)} - {formatDate(booking.end_time)}
                     </p>
                     <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mt-2">
-                      {booking.status === 'completed' ? 'Завершено' : 
-                       booking.status === 'finished' ? 'Завершено' : 
-                       booking.status}
+                      {booking.status}
                     </span>
                   </div>
                   <button

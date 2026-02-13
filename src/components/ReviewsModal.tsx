@@ -44,19 +44,8 @@ const ReviewsModal: React.FC<ReviewsModalProps> = ({
         try {
           const data = await getStudioReviews(studioId);
           
-          // Mock owner responses for demonstration
-          const reviewsWithResponses = data.map((review: Review) => ({
-            ...review,
-            ownerResponse: Math.random() > 0.5 ? {
-              id: Math.floor(Math.random() * 10000),
-              review_id: review.id,
-              response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
-              created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
-              responder_name: "Studio Manager"
-            } : undefined
-          }));
-          
-          setReviews(reviewsWithResponses);
+          // Owner responses should come from backend; do not synthesize.
+          setReviews(data);
         } catch (err) {
           setError(err instanceof Error ? err.message : "Failed to fetch reviews");
         } finally {

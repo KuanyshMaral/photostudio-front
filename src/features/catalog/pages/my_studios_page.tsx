@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Eye, EyeOff, MapPin, Star } from 'lucide-react';
-import { Studio, Room } from '../types';
-import CreateStudioForm from '../components/CreateStudioForm';
-import AddRoomForm from '../components/AddRoomForm';
-import { mockStudios, mockRooms } from '../data/mockData';
+import type { Studio, Room } from '../../../types/types';
+import CreateStudioForm from '../components/create_studio_form';
+import AddRoomForm from '../components/add_room_form';
 // import { catalogAPI } from '../services/api'; // Uncomment for real API
 
 const MyStudios: React.FC = () => {
@@ -25,9 +24,12 @@ const MyStudios: React.FC = () => {
     try {
       setLoading(true);
       
-      // MOCK DATA (replace with real API)
-      // Симулируем "мои" студии (первые 2)
-      setStudios(mockStudios.slice(0, 2));
+      // TODO: Replace with real API call
+      // const response = await catalogAPI.getMyStudios();
+      // setStudios(response.data);
+      
+      // For now, start with empty array
+      setStudios([]);
 
       /* REAL API:
       const response = await catalogAPI.getMyStudios();
@@ -126,7 +128,8 @@ const MyStudios: React.FC = () => {
   };
 
   const getRoomsForStudio = (studioId: number): Room[] => {
-    return mockRooms[studioId] || [];
+    const studio = studios.find(s => s.id === studioId);
+    return studio ? (studio as any).rooms || [] : [];
   };
 
   if (loading) {
@@ -300,7 +303,7 @@ const MyStudios: React.FC = () => {
                                   </div>
                                   {room.amenities && room.amenities.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-2">
-                                      {room.amenities.slice(0, 3).map((amenity, i) => (
+                                      {room.amenities.slice(0, 3).map((amenity: string, i: number) => (
                                         <span
                                           key={i}
                                           className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded"

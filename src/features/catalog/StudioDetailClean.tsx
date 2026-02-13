@@ -4,7 +4,6 @@ import { ArrowLeft, Star, MapPin, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { getStudioById } from './catalog.api';
-import type { Studio } from '../../types/index_new';
 
 export default function StudioDetail() {
   const { id } = useParams<{ id: string }>();
@@ -154,7 +153,7 @@ export default function StudioDetail() {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Залы ({studio.rooms?.length || 0})</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {studio.rooms?.map(room => (
+              {studio.rooms?.map((room: any) => (
                 <div key={room.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
                   <h3 className="font-semibold text-lg text-gray-900 mb-2">{room.name}</h3>
                   <p className="text-gray-600 text-sm mb-3">{room.description}</p>
@@ -172,7 +171,7 @@ export default function StudioDetail() {
                   
                   {room.amenities && room.amenities.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-3">
-                      {room.amenities.map(amenity => (
+                      {room.amenities.map((amenity: string) => (
                         <span 
                           key={amenity}
                           className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full"

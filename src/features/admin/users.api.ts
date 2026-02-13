@@ -42,12 +42,12 @@ export const getAllUsers = async (token: string): Promise<User[]> => {
   }
 };
 
-export const updateUser = async (token: string, userId: number, userData: Partial<User>): Promise<void> => {
+export const updateUser = async (_token: string, userId: number, userData: Partial<User>): Promise<void> => {
   // TODO: Реализовать когда API будет готов
   console.log('Update user:', userId, userData);
 };
 
-export const deleteUser = async (token: string, userId: number): Promise<void> => {
+export const deleteUser = async (_token: string, userId: number): Promise<void> => {
   // TODO: Реализовать когда API будет готов
   console.log('Delete user:', userId);
 };

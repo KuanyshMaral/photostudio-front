@@ -8,35 +8,9 @@ interface Benefit {
   description: string;
 }
 
-const benefits: Benefit[] = [
-  {
-    icon: <Shield size={32} />,
-    title: 'Безопасные платежи',
-    description: 'Все транзакции защищены',
-  },
-  {
-    icon: <CheckCircle size={32} />,
-    title: 'Проверенные студии',
-    description: 'Каждая студия проходит верификацию',
-  },
-  {
-    icon: <Clock size={32} />,
-    title: 'Быстрое бронирование',
-    description: 'Забронируйте за 2 минуты',
-  },
-  {
-    icon: <Award size={32} />,
-    title: 'Лучшие цены',
-    description: 'Гарантия лучшей цены на рынке',
-  },
-];
+const benefits: Benefit[] = [];
 
-const partners = [
-  { name: 'Partner 1', logo: '/images/partners/partner1.png' },
-  { name: 'Partner 2', logo: '/images/partners/partner2.png' },
-  { name: 'Partner 3', logo: '/images/partners/partner3.png' },
-  { name: 'Partner 4', logo: '/images/partners/partner4.png' },
-];
+const partners: { name: string; logo: string }[] = [];
 
 export const InfoFooter: React.FC = () => {
   return (

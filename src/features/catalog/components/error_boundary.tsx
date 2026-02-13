@@ -1,6 +1,7 @@
 // src/components/ErrorBoundary.tsx
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 
 interface Props {
@@ -66,7 +67,7 @@ class ErrorBoundary extends Component<Props, State> {
               Произошла непредвиденная ошибка. Попробуйте обновить страницу.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {import.meta.env.MODE === 'development' && this.state.error && (
               <details className="mb-4 p-4 bg-gray-50 rounded text-sm">
                 <summary className="cursor-pointer font-medium mb-2">
                   Детали ошибки (dev mode)

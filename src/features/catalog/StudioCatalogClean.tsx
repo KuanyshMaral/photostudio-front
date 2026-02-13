@@ -125,7 +125,7 @@ export default function StudioCatalog() {
 
                 {/* Сетка студий */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {data?.studios?.map(studio => (
+                  {data?.studios?.map((studio: any) => (
                     <StudioCard key={studio.id} studio={studio} />
                   ))}
                 </div>
@@ -134,7 +134,7 @@ export default function StudioCatalog() {
                 {data?.studios && data?.studios.length > 0 && (
                   <div className="mt-8">
                     <Pagination
-                      currentPage={filters.page}
+                      currentPage={filters.page || 1}
                       totalPages={Math.ceil((data?.studios?.length || 0) / (filters.limit || 12))}
                       onPageChange={handlePageChange}
                     />

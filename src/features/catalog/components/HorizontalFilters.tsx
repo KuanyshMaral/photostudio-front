@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Building2, DollarSign } from 'lucide-react';
+import { getCities, getDistrictsByCity, type City, type District } from '../../../api/referencesApi';
 import './HorizontalFilters.css';
 
 interface FiltersState {
@@ -14,31 +15,68 @@ interface HorizontalFiltersProps {
   onFiltersChange: (filters: FiltersState) => void;
 }
 
-// Константы для dropdowns
-const CITIES = [
-  { value: '', label: 'Все города' },
-  { value: 'almaty', label: 'Алматы' },
-  { value: 'astana', label: 'Астана' },
-  { value: 'shymkent', label: 'Шымкент' },
-];
-
-const DISTRICTS = [
-  { value: '', label: 'Все районы' },
-  { value: 'medeu', label: 'Медеуский' },
-  { value: 'bostandyk', label: 'Бостандыкский' },
-  { value: 'almaly', label: 'Алмалинский' },
-  { value: 'auezov', label: 'Ауэзовский' },
-];
-
 export const HorizontalFilters: React.FC<HorizontalFiltersProps> = ({
   filters,
   onFiltersChange,
 }) => {
+  // Reference data from API
+  const [cities, setCities] = useState<City[]>([]);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(true);
+  const [districtsLoading, setDistrictsLoading] = useState(false);
+
+  // Load cities on mount
+  useEffect(() => {
+    const loadCities = async () => {
+      setCitiesLoading(true);
+      try {
+        const citiesData = await getCities();
+        setCities(citiesData);
+      } catch (error) {
+        console.error('Failed to load cities:', error);
+      } finally {
+        setCitiesLoading(false);
+      }
+    };
+    loadCities();
+  }, []);
+
+  // Load districts when city changes
+  useEffect(() => {
+    if (!filters.city) {
+      setDistricts([]);
+      return;
+    }
+
+    const loadDistricts = async () => {
+      setDistrictsLoading(true);
+      try {
+        const districtsData = await getDistrictsByCity(filters.city);
+        setDistricts(districtsData);
+      } catch (error) {
+        console.error('Failed to load districts:', error);
+        setDistricts([]);
+      } finally {
+        setDistrictsLoading(false);
+      }
+    };
+    loadDistricts();
+  }, [filters.city]);
+
   const handleChange = (field: keyof FiltersState, value: string | number) => {
-    onFiltersChange({
-      ...filters,
-      [field]: value,
-    });
+    if (field === 'city') {
+      // Reset district when city changes
+      onFiltersChange({
+        ...filters,
+        city: value as string,
+        district: '',
+      });
+    } else {
+      onFiltersChange({
+        ...filters,
+        [field]: value,
+      });
+    }
   };
 
   // Сброс всех фильтров
@@ -68,10 +106,14 @@ export const HorizontalFilters: React.FC<HorizontalFiltersProps> = ({
             value={filters.city}
             onChange={(e) => handleChange('city', e.target.value)}
             className="filter-select"
+            disabled={citiesLoading}
           >
-            {CITIES.map(city => (
-              <option key={city.value} value={city.value}>
-                {city.label}
+            <option value="">
+              {citiesLoading ? 'Загрузка городов...' : 'Все города'}
+            </option>
+            {cities.map(city => (
+              <option key={city.id} value={city.name}>
+                {city.name}
               </option>
             ))}
           </select>
@@ -84,10 +126,14 @@ export const HorizontalFilters: React.FC<HorizontalFiltersProps> = ({
             value={filters.district}
             onChange={(e) => handleChange('district', e.target.value)}
             className="filter-select"
+            disabled={!filters.city || districtsLoading}
           >
-            {DISTRICTS.map(district => (
-              <option key={district.value} value={district.value}>
-                {district.label}
+            <option value="">
+              {districtsLoading ? 'Загрузка районов...' : (filters.city ? 'Все районы' : 'Выберите город')}
+            </option>
+            {districts.map(district => (
+              <option key={district.id} value={district.name}>
+                {district.name}
               </option>
             ))}
           </select>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wrench, Plus, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Wrench, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './MaintenanceWidget.css';
 
@@ -55,23 +55,8 @@ export const MaintenanceWidget: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'pending': return <Clock size={16} className="status-pending" />;
-      case 'in_progress': return <AlertTriangle size={16} className="status-progress" />;
-      case 'completed': return <CheckCircle size={16} className="status-completed" />;
-      default: return null;
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'pending': return 'Ожидает';
-      case 'in_progress': return 'В работе';
-      case 'completed': return 'Выполнено';
-      default: return status;
-    }
-  };
+  const getStatusIcon = (status: string) => null;
+  const getStatusLabel = (status: string) => status;
 
   return (
     <div className="maintenance-widget">

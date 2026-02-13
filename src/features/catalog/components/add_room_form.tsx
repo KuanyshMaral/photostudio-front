@@ -1,8 +1,9 @@
 // src/components/AddRoomForm.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { Room, RoomType } from '../types';
+import type { Room, RoomType } from '../../../types/types';
+import { getRoomTypes, getAmenities, type RoomTypeRef, type Amenity } from '../../../api/referencesApi';
 
 interface AddRoomFormProps {
   studioId: number;
@@ -34,29 +35,41 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [newAmenity, setNewAmenity] = useState('');
 
+  // Reference data from API
+  const [roomTypes, setRoomTypes] = useState<RoomTypeRef[]>([]);
+  const [amenities, setAmenities] = useState<Amenity[]>([]);
+  const [refsLoading, setRefsLoading] = useState(true);
+
   const [formData, setFormData] = useState<FormData>({
     name: initialData?.name || '',
     description: initialData?.description || '',
     area_sqm: initialData?.area_sqm?.toString() || '',
     capacity: initialData?.capacity?.toString() || '',
-    room_type: initialData?.room_type || '',
+    room_type: initialData?.room_type as RoomType || '',
     price_per_hour_min: initialData?.price_per_hour_min?.toString() || '',
     price_per_hour_max: initialData?.price_per_hour_max?.toString() || '',
     amenities: initialData?.amenities || []
   });
 
-  const roomTypes: RoomType[] = ['Fashion', 'Portrait', 'Creative', 'Commercial'];
-
-  const commonAmenities = [
-    'Wi-Fi',
-    'Кондиционер',
-    'Гримерная',
-    'Паркинг',
-    'Кухня',
-    'Backdrop система',
-    'Мягкая зона',
-    'Душ'
-  ];
+  // Load room types and amenities on mount
+  useEffect(() => {
+    const loadReferences = async () => {
+      setRefsLoading(true);
+      try {
+        const [types, amen] = await Promise.all([
+          getRoomTypes(),
+          getAmenities()
+        ]);
+        setRoomTypes(types);
+        setAmenities(amen);
+      } catch (error) {
+        console.error('Failed to load references:', error);
+      } finally {
+        setRefsLoading(false);
+      }
+    };
+    loadReferences();
+  }, []);
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -172,7 +185,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 h-24"
-              placeholder="Краткое описание зала..."
+              placeholder=""
             />
           </div>
 
@@ -187,10 +200,13 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
               className={`w-full border rounded-lg px-3 py-2 ${
                 errors.room_type ? 'border-red-500' : 'border-gray-300'
               }`}
+              disabled={refsLoading}
             >
-              <option value="">Выберите тип</option>
+              <option value="">
+                {refsLoading ? 'Загрузка типов...' : 'Выберите тип'}
+              </option>
               {roomTypes.map(type => (
-                <option key={type} value={type}>{type}</option>
+                <option key={type.id} value={type.name}>{type.name}</option>
               ))}
             </select>
             {errors.room_type && <p className="text-red-500 text-sm mt-1">{errors.room_type}</p>}
@@ -209,7 +225,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
                 className={`w-full border rounded-lg px-3 py-2 ${
                   errors.area_sqm ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="60"
+                placeholder=""
                 min="1"
               />
               {errors.area_sqm && <p className="text-red-500 text-sm mt-1">{errors.area_sqm}</p>}
@@ -226,7 +242,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
                 className={`w-full border rounded-lg px-3 py-2 ${
                   errors.capacity ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="10"
+                placeholder=""
                 min="1"
               />
               {errors.capacity && <p className="text-red-500 text-sm mt-1">{errors.capacity}</p>}
@@ -246,7 +262,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
                 className={`w-full border rounded-lg px-3 py-2 ${
                   errors.price_per_hour_min ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="8000"
+                placeholder=""
                 min="0"
               />
               {errors.price_per_hour_min && (
@@ -263,7 +279,7 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
                 className={`w-full border rounded-lg px-3 py-2 ${
                   errors.price_per_hour_max ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="12000"
+                placeholder=""
                 min="0"
               />
               {errors.price_per_hour_max && (
@@ -276,28 +292,34 @@ const AddRoomForm: React.FC<AddRoomFormProps> = ({
           <div>
             <label className="block text-sm font-medium mb-2">Удобства</label>
             
-            {/* Common Amenities */}
+            {/* Common Amenities from API */}
             <div className="flex flex-wrap gap-2 mb-3">
-              {commonAmenities.map(amenity => (
-                <button
-                  key={amenity}
-                  type="button"
-                  onClick={() => {
-                    if (formData.amenities.includes(amenity)) {
-                      removeAmenity(amenity);
-                    } else {
-                      addAmenity(amenity);
-                    }
-                  }}
-                  className={`px-3 py-1 rounded-full text-sm transition ${
-                    formData.amenities.includes(amenity)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {amenity}
-                </button>
-              ))}
+              {refsLoading ? (
+                <p className="text-gray-500 text-sm">Загрузка удобств...</p>
+              ) : amenities.length === 0 ? (
+                <p className="text-gray-500 text-sm">Нет доступных удобств</p>
+              ) : (
+                amenities.map(amenity => (
+                  <button
+                    key={amenity.id}
+                    type="button"
+                    onClick={() => {
+                      if (formData.amenities.includes(amenity.name)) {
+                        removeAmenity(amenity.name);
+                      } else {
+                        addAmenity(amenity.name);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-full text-sm transition ${
+                      formData.amenities.includes(amenity.name)
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {amenity.name}
+                  </button>
+                ))
+              )}
             </div>
 
             {/* Custom Amenity */}

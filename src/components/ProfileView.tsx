@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { User, Mail, Phone, Building, FileText, MapPin, Edit, Calendar, Clock, CheckCircle, XCircle, AlertCircle, Upload, X, File, Image } from 'lucide-react';
+import { User, Mail, Phone, Building, FileText, MapPin, Edit, Calendar, Clock, Upload, X, File, Image } from 'lucide-react';
 import { getUserBookings, type Booking } from '../api/myBookingsApi';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
@@ -24,35 +24,9 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
     enabled: !!token,
   });
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'confirmed': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'completed': return <CheckCircle className="w-4 h-4 text-blue-500" />;
-      case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'pending': return <AlertCircle className="w-4 h-4 text-yellow-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'confirmed': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: 'Ожидает',
-      confirmed: 'Подтверждено',
-      completed: 'Завершено',
-      cancelled: 'Отменено'
-    };
-    return labels[status] || status;
-  };
+  const getStatusIcon = (status: string) => null;
+  const getStatusColor = (status: string) => '';
+  const getStatusLabel = (status: string) => status;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('ru-RU', {
@@ -108,9 +82,10 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes: string[] = [];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    const unit = sizes[i] || 'Bytes';
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + unit;
   };
 
   return (
@@ -372,8 +347,6 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
                       className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
                       onClick={() => {
                         // TODO: Implement actual upload logic
-                        console.log('Uploading files:', uploadedFiles);
-                        alert('Files uploaded successfully! (This is a demo - actual upload not implemented)');
                         setUploadedFiles([]);
                       }}
                     >

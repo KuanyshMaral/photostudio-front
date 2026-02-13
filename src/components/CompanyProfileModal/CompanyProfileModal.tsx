@@ -346,8 +346,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                     <button
                       className="company-modal__add-service"
                       onClick={() => {
-                        const newServices = [...(profile.services || []), ''];
-                        updateField('services', newServices);
+                        // Adding services requires backend support — no local mock add
                       }}
                     >
                       <Plus size={18} />

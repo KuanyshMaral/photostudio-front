@@ -18,6 +18,22 @@ export interface PendingStudio {
     created_at: string;
 }
 
+export interface PendingBooking {
+    id: number;
+    studio_name: string;
+    room_name: string;
+    user_name: string;
+    client_name: string;
+    client_email: string;
+    user_email: string;
+    start_time: string;
+    end_time: string;
+    date: string;
+    status: string;
+    total_price: number;
+    created_at: string;
+}
+
 export const getStatistics = async (token: string): Promise<Statistics> => {
     const response = await fetch(`${API_BASE}/admin/statistics`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -58,4 +74,36 @@ export const rejectStudio = async (token: string, studioId: number, reason: stri
         body: JSON.stringify({ reason })
     });
     if (!response.ok) throw new Error('Failed to reject studio');
+};
+
+export const getPendingBookings = async (token: string): Promise<PendingBooking[]> => {
+    const response = await fetch(`${API_BASE}/admin/bookings/pending`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch pending bookings');
+    const json = await response.json();
+    return json.data?.bookings || [];
+};
+
+export const approveBooking = async (token: string, bookingId: number): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/bookings/${bookingId}/approve`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) throw new Error('Failed to approve booking');
+};
+
+export const rejectBooking = async (token: string, bookingId: number, reason: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/bookings/${bookingId}/reject`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason })
+    });
+    if (!response.ok) throw new Error('Failed to reject booking');
 };

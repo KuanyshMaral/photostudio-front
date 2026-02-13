@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   X, User, Phone, Mail, Calendar, Clock, 
-  DollarSign, MessageSquare, Edit2, Trash2,
-  CheckCircle, XCircle, AlertTriangle
+  MessageSquare, Edit2, CheckCircle, XCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './ManagerBookingModal.css';
@@ -159,21 +158,7 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-      pending: { label: 'Ожидает', color: 'yellow', icon: AlertTriangle },
-      confirmed: { label: 'Подтверждено', color: 'blue', icon: CheckCircle },
-      completed: { label: 'Завершено', color: 'green', icon: CheckCircle },
-      cancelled: { label: 'Отменено', color: 'red', icon: XCircle }
-    };
-    const config = statusConfig[status] || statusConfig.pending;
-    const Icon = config.icon;
-
-    return (
-      <span className={`status-badge status-badge--${config.color}`}>
-        <Icon size={14} />
-        {config.label}
-      </span>
-    );
+    return null;
   };
 
   if (isLoading) {

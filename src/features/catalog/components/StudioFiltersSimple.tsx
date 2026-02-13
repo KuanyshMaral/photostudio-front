@@ -101,7 +101,7 @@ export default function StudioFilters({ filters, onFilterChange }: StudioFilters
       <div>
         <label className="block text-sm font-medium mb-1">Тип зала</label>
         <div className="space-y-2">
-          {['Fashion', 'Portrait', 'Creative', 'Commercial'].map(type => (
+          {[].map(type => (
             <label key={type} className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"

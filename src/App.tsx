@@ -5,8 +5,6 @@ import { Toaster } from 'react-hot-toast';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
-import ProfilePage from "./features/auth/ProfilePage.tsx";
-import Dashboard from "./features/auth/Dashboard.tsx";
 import ProfileDashboard from "./features/auth/ProfileDashboard";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
@@ -26,10 +24,8 @@ import StudioCatalog from "./features/catalog/StudioCatalog.tsx";
 import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
 
 // Admin components
-import AdminDashboard from "./features/admin/AdminDashboard";
 import UserManagement from "./features/admin/UserManagement";
 import StudioManagement from "./features/admin/StudioManagement";
-import Analytics from "./features/admin/Analytics";
 import { AdminLayout } from './features/admin/AdminLayout';
 import { AdminDashboard as NewAdminDashboard } from './features/admin/AdminDashboard';
 import { PlatformAnalytics } from './features/admin/PlatformAnalytics';
