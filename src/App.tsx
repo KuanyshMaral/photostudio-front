@@ -6,9 +6,10 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
 import ProfileDashboard from "./features/auth/ProfileDashboard";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import Dashboard from "./features/auth/Dashboard";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
+import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 // Booking components (from Kiryu project)
 import BookingForm from "./features/booking/BookingForm.tsx";
@@ -70,8 +71,14 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Dashboard redirects */}
-          <Route path="/dashboard" element={<Navigate to="/studios" replace />} />
+          {/* Client Dashboard */}
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </ProtectedRoute>
+          } />
           <Route path="/studios/:id" element={
             <ProtectedRoute>
               <Layout>

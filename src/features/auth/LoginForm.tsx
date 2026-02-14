@@ -27,16 +27,20 @@ export default function LoginForm() {
     
     try {
       const response = await login(data);
+      console.log('Login response:', response); // Отладка
       authLogin(response.token, response.user);
       toast.success('Вы успешно вошли!');
       
       // Redirect based on user role
-      if (response.user?.role === 'admin') {
+      const userRole = response.user?.role;
+      console.log('User role:', userRole); // Отладка
+      
+      if (userRole === 'admin') {
         navigate('/admin');
-      } else if (response.user?.role === 'studio_owner') {
+      } else if (userRole === 'studio_owner') {
         navigate('/owner');
       } else {
-        navigate('/studios');
+        navigate('/dashboard');
       }
     } catch (error: any) {
       // Показываем ошибку от API

@@ -21,19 +21,28 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
+  const [token, setToken] = useState<string | null>(() => {
+    const savedToken = localStorage.getItem("token");
+    console.log('AuthProvider init - token from localStorage:', !!savedToken);
+    return savedToken;
+  });
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
+    const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+    console.log('AuthProvider init - user from localStorage:', parsedUser);
+    return parsedUser;
   });
 
   const login = (token: string, user?: User) => {
+    console.log('AuthContext.login - token:', !!token, 'user:', user);
     setToken(token);
     if (user) {
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
+      console.log('User saved to localStorage and state');
     }
     localStorage.setItem("token", token);
+    console.log('Token saved to localStorage');
   };
 
   const logout = () => {

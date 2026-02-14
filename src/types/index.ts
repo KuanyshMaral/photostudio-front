@@ -112,6 +112,8 @@ export interface StudioFilterParams {
   min_price?: number;
   max_price?: number;
   search?: string;
+  sort_by?: string;
+  sort_order?: string;
   page?: number;
   limit?: number;
 }
