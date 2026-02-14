@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudios } from '../api/studios';
 import { StudioCard } from '../components/StudioCard';
 import { StudioFilters } from '../components/StudioFilters';
-import { StudioFilterParams } from '../../../types';
+import type { StudioFilterParams } from '../../../types';
 
 export const StudioList: React.FC = () => {
     const [filters, setFilters] = useState<StudioFilterParams>({
@@ -29,7 +29,7 @@ export const StudioList: React.FC = () => {
                     </aside>
                     <main className="md:col-span-3">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {data?.data.map(studio => (
+                            {data?.data.map((studio: any) => (
                                 <StudioCard key={studio.id} studio={studio} />
                             ))}
                         </div>

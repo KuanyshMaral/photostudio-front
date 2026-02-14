@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Star, Filter, RotateCcw } from 'lucide-react';
 import { StudioFilters } from './StudioFilters';
 import type { StudioFilterParams } from '../../../types';
+import { getCities, getRoomTypes, type City, type RoomTypeRef } from '../../../api/referencesApi';
 
 interface LeftPanelProps {
   filters: StudioFilterParams;
@@ -12,6 +13,30 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   filters, 
   onFilterChange
 }) => {
+  const [cities, setCities] = useState<City[]>([]);
+  const [roomTypes, setRoomTypes] = useState<RoomTypeRef[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadReferences = async () => {
+      setLoading(true);
+      try {
+        const [citiesData, typesData] = await Promise.all([
+          getCities(),
+          getRoomTypes()
+        ]);
+        // Take first 4 cities for "popular"
+        setCities(citiesData.slice(0, 4));
+        setRoomTypes(typesData.slice(0, 4));
+      } catch (error) {
+        console.error('Failed to load references:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReferences();
+  }, []);
+
   const handleResetAll = () => {
     onFilterChange({ 
       city: '', 
@@ -50,19 +75,25 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="font-semibold text-gray-900 mb-4">Популярные города</h3>
         <div className="space-y-2">
-          {['Алматы', 'Астана', 'Шымкент', 'Караганда'].map((city) => (
-            <button
-              key={city}
-              onClick={() => onFilterChange({ ...filters, city })}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm transition ${
-                filters.city === city 
-                  ? 'bg-blue-100 text-blue-700 font-medium' 
-                  : 'hover:bg-gray-100 text-gray-700'
-              }`}
-            >
-              {city}
-            </button>
-          ))}
+          {loading ? (
+            <p className="text-gray-500 text-sm">Загрузка городов...</p>
+          ) : cities.length === 0 ? (
+            <p className="text-gray-500 text-sm">Нет доступных городов</p>
+          ) : (
+            cities.map((city) => (
+              <button
+                key={city.id}
+                onClick={() => onFilterChange({ ...filters, city: city.name })}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm transition ${
+                  filters.city === city.name 
+                    ? 'bg-blue-100 text-blue-700 font-medium' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {city.name}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -70,24 +101,25 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="font-semibold text-gray-900 mb-4">Типы залов</h3>
         <div className="space-y-2">
-          {[
-            { value: 'Fashion', label: 'Фэшн студия' },
-            { value: 'Portrait', label: 'Портретная' },
-            { value: 'Creative', label: 'Креативная' },
-            { value: 'Commercial', label: 'Коммерческая' }
-          ].map((type) => (
-            <button
-              key={type.value}
-              onClick={() => onFilterChange({ ...filters, room_type: type.value })}
-              className={`w-full text-left px-3 py-2 rounded-md text-sm transition ${
-                filters.room_type === type.value 
-                  ? 'bg-blue-100 text-blue-700 font-medium' 
-                  : 'hover:bg-gray-100 text-gray-700'
-              }`}
-            >
-              {type.label}
-            </button>
-          ))}
+          {loading ? (
+            <p className="text-gray-500 text-sm">Загрузка типов...</p>
+          ) : roomTypes.length === 0 ? (
+            <p className="text-gray-500 text-sm">Нет доступных типов</p>
+          ) : (
+            roomTypes.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => onFilterChange({ ...filters, room_type: type.name })}
+                className={`w-full text-left px-3 py-2 rounded-md text-sm transition ${
+                  filters.room_type === type.name 
+                    ? 'bg-blue-100 text-blue-700 font-medium' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                }`}
+              >
+                {type.name}
+              </button>
+            ))
+          )}
         </div>
       </div>
 
@@ -96,11 +128,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="font-semibold text-gray-900 mb-4">Популярные студии</h3>
         <div className="space-y-3">
-          {[
-            { name: 'Photo Pro Studio', rating: 4.8, reviews: 124 },
-            { name: 'Creative Space', rating: 4.6, reviews: 89 },
-            { name: 'Light House', rating: 4.9, reviews: 156 }
-          ].map((studio, index) => (
+          {[].map((studio: any, index: number) => (
             <div key={index} className="border-b border-gray-100 pb-3 last:border-0">
               <div className="flex items-start justify-between">
                 <div>

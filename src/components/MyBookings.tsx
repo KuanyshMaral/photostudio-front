@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import LoadingSpinner from './LoadingSpinner';
 import BookingDetailModal from './BookingDetailModal';
-import { Calendar, Clock, CheckCircle, XCircle, AlertCircle, User } from 'lucide-react';
+import { Calendar, User } from 'lucide-react';
 
 export default function MyBookings() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -36,33 +36,15 @@ export default function MyBookings() {
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'confirmed': return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case 'completed': return <CheckCircle className="w-4 h-4 text-blue-500" />;
-      case 'cancelled': return <XCircle className="w-4 h-4 text-red-500" />;
-      case 'pending': return <AlertCircle className="w-4 h-4 text-yellow-500" />;
-      default: return <Clock className="w-4 h-4 text-gray-500" />;
-    }
+    return null;
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'confirmed': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    return '';
   };
 
   const getStatusLabel = (status: string) => {
-    const labels: Record<string, string> = {
-      pending: 'Ожидает',
-      confirmed: 'Подтверждено',
-      completed: 'Завершено',
-      cancelled: 'Отменено'
-    };
-    return labels[status] || status;
+    return status;
   };
 
   const formatDate = (dateString: string) => {
@@ -100,7 +82,7 @@ export default function MyBookings() {
 
       {/* Status filter */}
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-        {['all', 'pending', 'confirmed', 'completed', 'cancelled'].map(status => (
+        {[].map(status => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}

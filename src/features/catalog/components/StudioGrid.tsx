@@ -22,7 +22,7 @@ export const StudioGrid: React.FC<StudioGridProps> = ({
   searchQuery, 
   filters,
   onStudioClick,
-  onContactOwner
+  onContactOwner: _onContactOwner
 }) => {
   const studiosPerPage = 12;
   const [currentPage, setCurrentPage] = React.useState(1);

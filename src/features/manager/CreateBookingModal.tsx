@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, Phone, Mail, DollarSign } from 'lucide-react';
+import { X, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './CreateBookingModal.css';
 

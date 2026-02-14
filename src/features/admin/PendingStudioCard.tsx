@@ -91,7 +91,7 @@ export const PendingStudioCard: React.FC<PendingStudioCardProps> = ({ studio }) 
                 <div className="mb-6">
                     <p className="text-sm font-medium text-gray-700 mb-2">Документы:</p>
                     <div className="flex flex-wrap gap-2">
-                        {studio.documents.map((doc, index) => (
+                        {studio.documents.map((_doc, index) => (
                             <span key={index} className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm">
                                 Документ {index + 1}
                             </span>

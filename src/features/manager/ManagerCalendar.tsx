@@ -55,7 +55,6 @@ export const ManagerCalendar: React.FC<ManagerCalendarProps> = ({
   const [selectedBooking, setSelectedBooking] = useState<number | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedRange, setSelectedRange] = useState<{start: Date, end: Date} | null>(null);
-  const [currentView, setCurrentView] = useState<string>('timeGridWeek');
   const [dateRange, setDateRange] = useState<{start: string, end: string}>({
     start: '',
     end: ''
@@ -148,38 +147,11 @@ export const ManagerCalendar: React.FC<ManagerCalendarProps> = ({
 
   // Цвета по статусу
   const getEventColors = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return {
-          backgroundColor: '#fef3c7',
-          borderColor: '#f59e0b',
-          textColor: '#92400e'
-        };
-      case 'confirmed':
-        return {
-          backgroundColor: '#dbeafe',
-          borderColor: '#3b82f6',
-          textColor: '#1e40af'
-        };
-      case 'completed':
-        return {
-          backgroundColor: '#d1fae5',
-          borderColor: '#10b981',
-          textColor: '#065f46'
-        };
-      case 'cancelled':
-        return {
-          backgroundColor: '#fee2e2',
-          borderColor: '#ef4444',
-          textColor: '#991b1b'
-        };
-      default:
-        return {
-          backgroundColor: '#f3f4f6',
-          borderColor: '#9ca3af',
-          textColor: '#374151'
-        };
-    }
+    return {
+      backgroundColor: '',
+      borderColor: '',
+      textColor: ''
+    };
   };
 
   // Обработчик клика по событию
@@ -199,7 +171,6 @@ export const ManagerCalendar: React.FC<ManagerCalendarProps> = ({
 
   // Обработчик изменения вида/дат
   const handleDatesSet = (dateInfo: any) => {
-    setCurrentView(dateInfo.view.type);
     setDateRange({
       start: dateInfo.startStr.split('T')[0],
       end: dateInfo.endStr.split('T')[0]

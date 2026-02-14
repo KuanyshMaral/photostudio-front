@@ -35,21 +35,11 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     lg: 24,
   };
 
-  // Загружаем избранное из localStorage при монтировании
+  // Заглушка: состояние избранного приходит из props или API.
+  // Удалены локальные мок-реализации с localStorage.
   useEffect(() => {
-    if (token) {
-      const favorites = JSON.parse(localStorage.getItem(`favorites_${token}`) || '[]');
-      const isFav = favorites.includes(studioId);
-      setIsFavorite(isFav);
-    }
-  }, [studioId, token]);
-
-  // Сохраняем избранное в localStorage
-  const saveFavorites = useCallback((favorites: number[]) => {
-    if (token) {
-      localStorage.setItem(`favorites_${token}`, JSON.stringify(favorites));
-    }
-  }, [token]);
+    setIsFavorite(initialState);
+  }, [initialState]);
 
   const handleClick = useCallback(async (e: React.MouseEvent) => {
     // Предотвращаем всплытие (чтобы не открылась карточка студии)
@@ -75,36 +65,10 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     setIsLoading(true);
 
     try {
-      // Mock API call - сохраняем в localStorage
-      const favorites = JSON.parse(localStorage.getItem(`favorites_${token}`) || '[]');
-      
-      if (newState) {
-        // Добавляем в избранное
-        if (!favorites.includes(studioId)) {
-          favorites.push(studioId);
-        }
-      } else {
-        // Удаляем из избранного
-        const index = favorites.indexOf(studioId);
-        if (index > -1) {
-          favorites.splice(index, 1);
-        }
-      }
-      
-      saveFavorites(favorites);
-      
-      // Вызываем callback если есть
+      // No-op: backend integration required. Only trigger callback.
       onToggle?.(newState);
-      
-      console.log(`Studio ${studioId} ${newState ? 'added to' : 'removed from'} favorites (mock)`);
-      
-    } catch (error) {
-      // Откатываем при ошибке
-      setIsFavorite(!newState);
-      console.error('Failed to toggle favorite:', error);
     } finally {
       setIsLoading(false);
-      // Убираем анимацию через 300ms
       setTimeout(() => setIsAnimating(false), 300);
     }
   }, [studioId, isFavorite, isLoading, token, onToggle, saveFavorites]);

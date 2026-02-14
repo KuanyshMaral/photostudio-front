@@ -18,30 +18,26 @@ export default function StudioManagement() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data for now - replace with actual API call
-    const mockStudios: Studio[] = [
-      {
-        id: 1,
-        name: 'Photo Studio Pro',
-        email: 'studio@example.com',
-        address: '123 Main St, City',
-        status: 'verified',
-        created_at: '2024-01-01'
-      },
-      {
-        id: 2,
-        name: 'Creative Space',
-        email: 'creative@example.com',
-        address: '456 Oak Ave, Town',
-        status: 'pending',
-        created_at: '2024-01-02'
-      }
-    ];
+    // TODO: Replace with actual API call
+    // const fetchStudios = async () => {
+    //   try {
+    //     const response = await fetch('/api/v1/admin/studios', {
+    //       headers: { 'Authorization': `Bearer ${token}` }
+    //     });
+    //     const data = await response.json();
+    //     setStudios(data.data?.studios || []);
+    //   } catch (error) {
+    //     console.error('Failed to fetch studios:', error);
+    //     setStudios([]);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+    // fetchStudios();
     
-    setTimeout(() => {
-      setStudios(mockStudios);
-      setLoading(false);
-    }, 1000);
+    // For now, start with empty array
+    setStudios([]);
+    setLoading(false);
   }, [token]);
 
   const handleStatusChange = (studioId: number, newStatus: Studio['status']) => {

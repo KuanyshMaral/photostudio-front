@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { register as registerApi, registerStudio } from './auth.api';
+import { register as registerApi } from './auth.api';
 import type { RegisterRequest } from './auth.types';
 import { Loader2, Camera, User, Mail, Phone, Lock } from 'lucide-react';
 

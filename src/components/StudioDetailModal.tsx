@@ -56,19 +56,8 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
         try {
           const data = await getStudioReviews(studio.id);
           
-          // Mock owner responses for demonstration (remove this when owner responses are implemented in backend)
-          const reviewsWithResponses = data.map((review: Review) => ({
-            ...review,
-            ownerResponse: Math.random() > 0.5 ? {
-              id: Math.floor(Math.random() * 10000),
-              review_id: review.id,
-              response: "Thank you for your feedback! We're glad you enjoyed your experience in our studio. We've noted your suggestions and will work on improving our services.",
-              created_at: new Date(review.created_at).getTime() + 86400000 + '', // 1 day after review
-              responder_name: "Studio Manager"
-            } : undefined
-          }));
-          
-          setReviews(reviewsWithResponses);
+          // Owner responses must come from backend; do not synthesize mock responses here.
+          setReviews(data);
         } catch (err) {
           setError(err instanceof Error ? err.message : "Failed to fetch reviews");
         } finally {
@@ -80,11 +69,8 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     }
   }, [activeTab, studio.id]);
 
-  const tabs = [
-    { id: 'overview', label: 'Обзор' },
-    { id: 'equipment', label: 'Оборудование' },
-    { id: 'reviews', label: 'Отзывы' }
-  ] as const;
+  // Tab labels removed — rely on backend or translations later
+  const tabs: { id: string; label: string }[] = [];
 
   // Utility functions
   const token = localStorage.getItem('token');
