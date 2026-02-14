@@ -61,7 +61,7 @@ export default function RegisterForm() {
                 <input
                   type="text"
                   {...register('name', { required: 'Имя обязательно' })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.name ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="Ваше имя"
@@ -88,7 +88,7 @@ export default function RegisterForm() {
                       message: 'Неверный формат email'
                     }
                   })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="your@email.com"
@@ -109,7 +109,7 @@ export default function RegisterForm() {
                 <input
                   type="tel"
                   {...register('phone', { required: 'Телефон обязателен' })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="+7 (___) ___-__-__"
@@ -136,7 +136,7 @@ export default function RegisterForm() {
                       message: 'Пароль должен содержать минимум 6 символов'
                     }
                   })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="••••••••"
