@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { X, Camera, User } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { updateProfile } from './auth.api';
+import toast from 'react-hot-toast';
+import type { Profile } from './auth.types';
 import './EditProfileModal.css';
 
-interface UserProfile {
-  id: number;
-  email: string;
-  name: string;
-  phone?: string;
-  role: string;
-  avatar_url?: string;
-  created_at: string;
-}
-
 interface EditProfileModalProps {
-  profile: UserProfile;
+  profile: Profile;
   onClose: () => void;
   onSave: () => void;
 }
@@ -23,6 +17,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onClose,
   onSave,
 }) => {
+  const { token } = useAuth();
   const [formData, setFormData] = useState({
     name: profile.name,
     email: profile.email,
@@ -36,11 +31,23 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
     setIsLoading(true);
 
     try {
-      // TODO: Implement API call to update profile
-      console.log('Updating profile:', formData);
+      if (!token) {
+        toast.error('Токен авторизации отсутствует');
+        return;
+      }
+
+      // Обновляем только name и phone как в Swagger API
+      await updateProfile(token, {
+        name: formData.name,
+        phone: formData.phone,
+      });
+
+      toast.success('Профиль успешно обновлен!');
       onSave();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update profile:', error);
+      const message = error.response?.data?.error?.message || error.message || 'Ошибка обновления профиля';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }

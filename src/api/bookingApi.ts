@@ -1,62 +1,384 @@
 const API_BASE = '/api/v1';
 
+// Types for booking operations based on Swagger
 export type BookingData = {
-  room_id: string;
+  room_id: number;
   studio_id: number;
   user_id: number;
   start_time: string;
   end_time: string;
-  comment?: string;
+  notes?: string;
 };
 
+export interface CancelBookingRequest {
+  reason: string;
+}
+
+export interface UpdateDepositRequest {
+  deposit_amount: number;
+}
+
+export interface UpdatePaymentStatusRequest {
+  payment_status: 'unpaid' | 'paid' | 'refunded';
+}
+
+export interface UpdateBookingStatusRequest {
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+}
+
+// Create booking - POST /api/v1/bookings
 export const createBooking = async (data: BookingData, token: string) => {
-    const response = await fetch(`${API_BASE}/bookings`, {
+    console.log('Creating booking with data:', data);
+    
+    const response = await fetch('http://89.35.125.136:8090/api/v1/bookings', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-            room_id: Number(data.room_id),
+            room_id: data.room_id,
             studio_id: data.studio_id,
             user_id: data.user_id,
             start_time: data.start_time,
             end_time: data.end_time,
+            notes: data.notes,
         }),
     });
     
+    console.log('Create booking response status:', response.status);
+    
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || 'Booking failed');
+        console.error('Create booking error:', error);
+        throw new Error(error.error?.message || error.message || 'Booking failed');
     }
     
     const json = await response.json();
-    return json.data;
+    console.log('Create booking response:', json);
+    return json.data?.booking || json.data;
 };
 
-export const getMyBookings = async (token: string) => {
-    const response = await fetch(`${API_BASE}/users/me/bookings`, {
-        headers: { 'Authorization': `Bearer ${token}` },
-    });
+// Cancel booking - PATCH /api/v1/bookings/{id}/cancel
+export const cancelBooking = async (token: string, bookingId: number, data: CancelBookingRequest) => {
+    console.log('Cancelling booking:', bookingId, 'reason:', data.reason);
     
-    if (!response.ok) throw new Error('Failed to fetch bookings');
-    
-    const json = await response.json();
-    return json.data?.items || [];
-};
-
-export const updateBookingStatus = async (token: string, bookingId: number, status: string): Promise<void> => {
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/status`, {
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/cancel`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(data),
     });
+    
+    console.log('Cancel booking response status:', response.status);
     
     if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error?.message || 'Failed to update booking status');
+        console.error('Cancel booking error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to cancel booking');
     }
+    
+    const json = await response.json();
+    console.log('Cancel booking response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Complete booking - PATCH /api/v1/bookings/{id}/complete
+export const completeBooking = async (token: string, bookingId: number) => {
+    console.log('Completing booking:', bookingId);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/complete`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Complete booking response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Complete booking error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to complete booking');
+    }
+    
+    const json = await response.json();
+    console.log('Complete booking response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Confirm booking - PATCH /api/v1/bookings/{id}/confirm
+export const confirmBooking = async (token: string, bookingId: number) => {
+    console.log('Confirming booking:', bookingId);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/confirm`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Confirm booking response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Confirm booking error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to confirm booking');
+    }
+    
+    const json = await response.json();
+    console.log('Confirm booking response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Update deposit - PATCH /api/v1/bookings/{id}/deposit
+export const updateBookingDeposit = async (token: string, bookingId: number, data: UpdateDepositRequest) => {
+    console.log('Updating deposit for booking:', bookingId, 'amount:', data.deposit_amount);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/deposit`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    
+    console.log('Update deposit response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Update deposit error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to update deposit');
+    }
+    
+    const json = await response.json();
+    console.log('Update deposit response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Mark as paid - PATCH /api/v1/bookings/{id}/mark-paid
+export const markBookingAsPaid = async (token: string, bookingId: number) => {
+    console.log('Marking booking as paid:', bookingId);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/mark-paid`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Mark paid response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Mark paid error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to mark as paid');
+    }
+    
+    const json = await response.json();
+    console.log('Mark paid response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Update payment status - PATCH /api/v1/bookings/{id}/payment-status
+export const updatePaymentStatus = async (token: string, bookingId: number, data: UpdatePaymentStatusRequest) => {
+    console.log('Updating payment status for booking:', bookingId, 'status:', data.payment_status);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/payment-status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    
+    console.log('Update payment status response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Update payment status error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to update payment status');
+    }
+    
+    const json = await response.json();
+    console.log('Update payment status response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Update booking status - PATCH /api/v1/bookings/{id}/status
+export const updateBookingStatus = async (token: string, bookingId: number, data: UpdateBookingStatusRequest) => {
+    console.log('Updating booking status:', bookingId, 'status:', data.status);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(data),
+    });
+    
+    console.log('Update booking status response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Update booking status error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to update booking status');
+    }
+    
+    const json = await response.json();
+    console.log('Update booking status response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Get booking by ID - GET /api/v1/bookings/{id}
+export const getBookingById = async (token: string, bookingId: number) => {
+    console.log('Getting booking by ID:', bookingId);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get booking response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get booking error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to get booking');
+    }
+    
+    const json = await response.json();
+    console.log('Get booking response:', json);
+    return json.data?.booking || json.data;
+};
+
+// Get user bookings - GET /api/v1/bookings
+export const getMyBookings = async (token: string, status?: string) => {
+    console.log('Getting user bookings, status:', status);
+    
+    const url = status 
+        ? `http://89.35.125.136:8090/api/v1/bookings?status=${status}`
+        : `http://89.35.125.136:8090/api/v1/bookings`;
+    
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get user bookings response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get user bookings error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to fetch bookings');
+    }
+    
+    const json = await response.json();
+    console.log('Get user bookings response:', json);
+    return json.data?.bookings || json.bookings || [];
+};
+
+// Get room availability - GET /api/v1/rooms/{id}/availability
+export const getRoomAvailability = async (token: string, roomId: number, date: string) => {
+    console.log('Getting room availability:', roomId, 'date:', date);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/rooms/${roomId}/availability?date=${date}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get room availability response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get room availability error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to get room availability');
+    }
+    
+    const json = await response.json();
+    console.log('Get room availability response:', json);
+    return json.data?.availability || json;
+};
+
+// Get room busy slots - GET /api/v1/rooms/{id}/busy-slots
+export const getRoomBusySlots = async (token: string, roomId: number, date: string) => {
+    console.log('Getting room busy slots:', roomId, 'date:', date);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/rooms/${roomId}/busy-slots?date=${date}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get room busy slots response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get room busy slots error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to get room busy slots');
+    }
+    
+    const json = await response.json();
+    console.log('Get room busy slots response:', json);
+    return json.data || json;
+};
+
+// Get studio bookings - GET /api/v1/studios/{id}/bookings
+export const getStudioBookings = async (token: string, studioId: number) => {
+    console.log('Getting studio bookings:', studioId);
+    
+    const response = await fetch(`http://89.35.125.136:8090/api/v1/studios/${studioId}/bookings`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get studio bookings response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get studio bookings error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to get studio bookings');
+    }
+    
+    const json = await response.json();
+    console.log('Get studio bookings response:', json);
+    return json.data?.bookings || json.bookings || [];
+};
+
+// Get user bookings with pagination - GET /api/v1/users/me/bookings
+export const getUserBookings = async (token: string, limit?: number, offset?: number) => {
+    console.log('Getting user bookings with pagination, limit:', limit, 'offset:', offset);
+    
+    const params = new URLSearchParams();
+    if (limit) params.append('limit', limit.toString());
+    if (offset) params.append('offset', offset.toString());
+    
+    const url = `http://89.35.125.136:8090/api/v1/users/me/bookings${params.toString() ? `?${params.toString()}` : ''}`;
+    
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+    
+    console.log('Get user bookings with pagination response status:', response.status);
+    
+    if (!response.ok) {
+        const error = await response.json();
+        console.error('Get user bookings with pagination error:', error);
+        throw new Error(error.error?.message || error.message || 'Failed to get user bookings');
+    }
+    
+    const json = await response.json();
+    console.log('Get user bookings with pagination response:', json);
+    return json.data || json;
 };
