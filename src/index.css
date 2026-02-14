@@ -46,7 +46,7 @@ body {
 
 /* Modern Input Styles */
 .modern-input {
-  @apply w-full px-4 py-3 rounded-xl border border-gray-200;
+  @apply w-full py-3 rounded-xl border border-gray-200;
   @apply focus:border-primary-500 focus:ring-2 focus:ring-primary-200;
   @apply transition-all duration-200 bg-white;
 }
