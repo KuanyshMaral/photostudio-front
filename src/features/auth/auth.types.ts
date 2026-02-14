@@ -17,8 +17,9 @@ export type RegisterRequest = {
 };
 
 export type RegisterResponse = {
-  message: string;
-  // Assuming success response has a message
+  token: string;
+  user: Profile;
+  message?: string;
 };
 
 export type StudioRegisterRequest = {
@@ -44,6 +45,21 @@ export type Profile = {
   contactPerson?: string;
   studio_status?: string;
   avatar?: string;
+  avatar_url?: string;
+  created_at?: string;
+  stats?: {
+    total_bookings: number;
+    upcoming_bookings: number;
+    completed_bookings: number;
+    cancelled_bookings: number;
+  };
+  recent_bookings?: Array<{
+    id: number;
+    studio_name: string;
+    room_name: string;
+    date: string;
+    status: 'completed' | 'cancelled' | 'pending' | 'confirmed';
+  }>;
 };
 
 export type ApiError = {

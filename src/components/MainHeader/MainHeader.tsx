@@ -19,7 +19,7 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
       if (!token) return;
       
       try {
-        const response = await fetch('/api/v1/notifications/unread-count', {
+        const response = await fetch('http://89.35.125.136:8090/api/v1/notifications/unread-count', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {

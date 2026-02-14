@@ -4,38 +4,13 @@ import { useAuth } from '../../context/AuthContext';
 import { StatCard } from '../../components/StatCard';
 import { RecentActivityItem } from '../../components/RecentActivityItem';
 import { EditProfileModal } from './EditProfileModal';
+import { getProfile } from './auth.api';
+import type { Profile } from './auth.types';
 import './ProfileDashboard.css';
-
-interface UserStats {
-  total_bookings: number;
-  upcoming_bookings: number;
-  completed_bookings: number;
-  cancelled_bookings: number;
-}
-
-interface RecentBooking {
-  id: number;
-  studio_name: string;
-  room_name: string;
-  date: string;
-  status: 'completed' | 'cancelled' | 'pending' | 'confirmed';
-}
-
-interface UserProfile {
-  id: number;
-  email: string;
-  name: string;
-  phone?: string;
-  role: string;
-  avatar_url?: string;
-  created_at: string;
-  stats?: UserStats;
-  recent_bookings?: RecentBooking[];
-}
 
 export const ProfileDashboard: React.FC = () => {
   const { token, refreshUser } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -45,14 +20,8 @@ export const ProfileDashboard: React.FC = () => {
       if (!token) return;
 
       try {
-        const response = await fetch('/api/v1/users/me?include_stats=true', {
-          headers: { 'Authorization': `Bearer ${token}` },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setProfile(data);
-        }
+        const profileData = await getProfile(token);
+        setProfile(profileData);
       } catch (error) {
         console.error('Failed to fetch profile:', error);
       } finally {

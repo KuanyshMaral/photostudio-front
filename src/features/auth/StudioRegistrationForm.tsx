@@ -5,7 +5,7 @@ import StepIndicator from '../../components/StepIndicator';
 import Step1PersonalData from '../../components/steps/Step1PersonalData';
 import Step2CompanyData from '../../components/steps/Step2CompanyData';
 import Step3Documents from '../../components/steps/Step3Documents';
-import { registerStudioOwner } from './auth.api';
+import { registerStudioOwner, uploadVerificationDocs } from './auth.api';
 
 type Step = 1 | 2 | 3;
 
@@ -49,24 +49,48 @@ export default function StudioRegistrationForm() {
     setIsLoading(true);
     
     try {
-      // Отправляем все данные за один раз как ожидает бэкенд
-      await registerStudioOwner({
-        name: formData.name || formData.contactPerson || '',
-        email: formData.email!,
-        phone: formData.phone!,
-        password: formData.password!,
-        company_name: formData.companyName!,
-        bin: formData.bin!,
-        legal_address: formData.address!,
-        contact_person: formData.contactPerson!
-      });
-
       // Загружаем документы если есть
       if (formData.documents?.length) {
-        // Note: We need token for authentication, but we don't have it here
-        // This would need to be passed from AuthContext or handled differently
-        console.log('Documents need to be uploaded with authentication token');
-        // await uploadVerificationDocs(response.user.token, formData.documents);
+        try {
+          // Получаем токен из ответа регистрации
+          const registrationResponse = await registerStudioOwner({
+            name: formData.name || formData.contactPerson || '',
+            email: formData.email!,
+            phone: formData.phone!,
+            password: formData.password!,
+            company_name: formData.companyName!,
+            bin: formData.bin!,
+            legal_address: formData.address!,
+            contact_person: formData.contactPerson!,
+            contact_position: 'Owner'
+          });
+
+          // Если регистрация вернула токен, загружаем документы
+          if (registrationResponse.token) {
+            console.log('Uploading verification documents after registration...');
+            await uploadVerificationDocs(registrationResponse.token, formData.documents);
+            toast.success('Документы успешно загружены!');
+          } else {
+            console.log('No token received from registration, skipping document upload');
+          }
+        } catch (uploadError: any) {
+          console.error('Document upload error:', uploadError);
+          toast.error('Ошибка загрузки документов: ' + uploadError.message);
+          // Не прерываем процесс, если документы не загрузились
+        }
+      } else {
+        // Просто регистрируем без документов
+        await registerStudioOwner({
+          name: formData.name || formData.contactPerson || '',
+          email: formData.email!,
+          phone: formData.phone!,
+          password: formData.password!,
+          company_name: formData.companyName!,
+          bin: formData.bin!,
+          legal_address: formData.address!,
+          contact_person: formData.contactPerson!,
+          contact_position: 'Owner'
+        });
       }
 
       toast.success('Заявка отправлена! Ожидайте верификации.');
