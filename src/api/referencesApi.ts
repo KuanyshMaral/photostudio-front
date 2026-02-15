@@ -3,7 +3,7 @@
  * Все данные приходят с бэкенда, без хардкодов
  */
 
-const API_BASE = 'http://89.35.125.136:8090/api/v1';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
 
 // ============ TYPES ============
 

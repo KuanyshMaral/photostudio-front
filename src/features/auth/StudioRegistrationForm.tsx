@@ -54,15 +54,14 @@ export default function StudioRegistrationForm() {
         try {
           // Получаем токен из ответа регистрации
           const registrationResponse = await registerStudioOwner({
-            name: formData.name || formData.contactPerson || '',
             email: formData.email!,
-            phone: formData.phone!,
             password: formData.password!,
-            company_name: formData.companyName!,
+            phone: formData.phone!,
+            companyName: formData.companyName!,
             bin: formData.bin!,
-            legal_address: formData.address!,
-            contact_person: formData.contactPerson!,
-            contact_position: 'Owner'
+            address: formData.address!,
+            contactPerson: formData.contactPerson!,
+            documents: formData.documents || []
           });
 
           // Если регистрация вернула токен, загружаем документы
@@ -81,15 +80,14 @@ export default function StudioRegistrationForm() {
       } else {
         // Просто регистрируем без документов
         await registerStudioOwner({
-          name: formData.name || formData.contactPerson || '',
           email: formData.email!,
-          phone: formData.phone!,
           password: formData.password!,
-          company_name: formData.companyName!,
+          phone: formData.phone!,
+          companyName: formData.companyName!,
           bin: formData.bin!,
-          legal_address: formData.address!,
-          contact_person: formData.contactPerson!,
-          contact_position: 'Owner'
+          address: formData.address!,
+          contactPerson: formData.contactPerson!,
+          documents: []
         });
       }
 

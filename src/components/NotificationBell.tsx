@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getNotifications, markAsRead, markAllAsRead, type Notification } from '../api/notificationApi';
+import { getNotifications, markAsRead, markAllAsRead, type Notification, type NotificationListResponse } from '../api/notificationApi';
 import './NotificationBell.css';
 
 export default function NotificationBell() {
@@ -13,9 +13,11 @@ export default function NotificationBell() {
     const fetchNotifications = async () => {
         if (!token) return;
         try {
-            const data = await getNotifications(token);
+            const data: NotificationListResponse = await getNotifications(token);
             setNotifications(data.notifications);
-            setUnreadCount(data.unread_count);
+            // Calculate unread count from notifications since unread-count endpoint isn't available
+            const unread = data.notifications.filter(n => !n.is_read).length;
+            setUnreadCount(unread);
         } catch (error) {
             console.error('Failed to fetch notifications');
         }
@@ -98,7 +100,7 @@ export default function NotificationBell() {
                                     onClick={() => !notif.is_read && handleMarkAsRead(notif.id)}
                                 >
                                     <div className="notif-title">{notif.title}</div>
-                                    <div className="notif-message">{notif.message}</div>
+                                    <div className="notif-message">{notif.body || ''}</div>
                                     <div className="notif-time">{formatTime(notif.created_at)}</div>
                                 </div>
                             ))

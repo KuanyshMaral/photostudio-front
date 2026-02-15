@@ -1,17 +1,25 @@
-const API_BASE = '/api/v1';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
 
 export interface Notification {
     id: number;
+    user_id: number;
     type: string;
     title: string;
-    message: string;
+    body?: string;
+    data?: any;
     is_read: boolean;
-    data: any;
+    read_at?: string;
     created_at: string;
 }
 
-export const getNotifications = async (token: string): Promise<{ notifications: Notification[]; unread_count: number }> => {
-    const response = await fetch(`${API_BASE}/notifications?limit=20`, {
+export interface NotificationListResponse {
+    notifications: Notification[];
+    unread_count: number;
+    total: number;
+}
+
+export const getNotifications = async (token: string, limit: number = 20, offset: number = 0): Promise<NotificationListResponse> => {
+    const response = await fetch(`${API_BASE}/notifications?limit=${limit}&offset=${offset}`, {
         headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to fetch notifications');

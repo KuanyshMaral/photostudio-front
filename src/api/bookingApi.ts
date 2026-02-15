@@ -1,4 +1,4 @@
-const API_BASE = '/api/v1';
+const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
 
 // Types for booking operations based on Swagger
 export type BookingData = {
@@ -30,7 +30,7 @@ export interface UpdateBookingStatusRequest {
 export const createBooking = async (data: BookingData, token: string) => {
     console.log('Creating booking with data:', data);
     
-    const response = await fetch('http://89.35.125.136:8090/api/v1/bookings', {
+    const response = await fetch(`${API_BASE}/bookings`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export const createBooking = async (data: BookingData, token: string) => {
 export const cancelBooking = async (token: string, bookingId: number, data: CancelBookingRequest) => {
     console.log('Cancelling booking:', bookingId, 'reason:', data.reason);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/cancel`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/cancel`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export const cancelBooking = async (token: string, bookingId: number, data: Canc
 export const completeBooking = async (token: string, bookingId: number) => {
     console.log('Completing booking:', bookingId);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/complete`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/complete`, {
         method: 'PATCH',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -113,7 +113,7 @@ export const completeBooking = async (token: string, bookingId: number) => {
 export const confirmBooking = async (token: string, bookingId: number) => {
     console.log('Confirming booking:', bookingId);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/confirm`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/confirm`, {
         method: 'PATCH',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -137,7 +137,7 @@ export const confirmBooking = async (token: string, bookingId: number) => {
 export const updateBookingDeposit = async (token: string, bookingId: number, data: UpdateDepositRequest) => {
     console.log('Updating deposit for booking:', bookingId, 'amount:', data.deposit_amount);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/deposit`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/deposit`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export const updateBookingDeposit = async (token: string, bookingId: number, dat
 export const markBookingAsPaid = async (token: string, bookingId: number) => {
     console.log('Marking booking as paid:', bookingId);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/mark-paid`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/mark-paid`, {
         method: 'PATCH',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -187,7 +187,7 @@ export const markBookingAsPaid = async (token: string, bookingId: number) => {
 export const updatePaymentStatus = async (token: string, bookingId: number, data: UpdatePaymentStatusRequest) => {
     console.log('Updating payment status for booking:', bookingId, 'status:', data.payment_status);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/payment-status`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/payment-status`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ export const updatePaymentStatus = async (token: string, bookingId: number, data
 export const updateBookingStatus = async (token: string, bookingId: number, data: UpdateBookingStatusRequest) => {
     console.log('Updating booking status:', bookingId, 'status:', data.status);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}/status`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ export const updateBookingStatus = async (token: string, bookingId: number, data
 export const getBookingById = async (token: string, bookingId: number) => {
     console.log('Getting booking by ID:', bookingId);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/bookings/${bookingId}`, {
+    const response = await fetch(`${API_BASE}/bookings/${bookingId}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -258,13 +258,13 @@ export const getBookingById = async (token: string, bookingId: number) => {
     return json.data?.booking || json.data;
 };
 
-// Get user bookings - GET /api/v1/bookings
+// Get user bookings - GET /api/v1/users/me/bookings
 export const getMyBookings = async (token: string, status?: string) => {
     console.log('Getting user bookings, status:', status);
     
     const url = status 
-        ? `http://89.35.125.136:8090/api/v1/bookings?status=${status}`
-        : `http://89.35.125.136:8090/api/v1/bookings`;
+        ? `${API_BASE}/users/me/bookings?status=${status}`
+        : `${API_BASE}/users/me/bookings`;
     
     const response = await fetch(url, {
         headers: {
@@ -289,7 +289,7 @@ export const getMyBookings = async (token: string, status?: string) => {
 export const getRoomAvailability = async (token: string, roomId: number, date: string) => {
     console.log('Getting room availability:', roomId, 'date:', date);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/rooms/${roomId}/availability?date=${date}`, {
+    const response = await fetch(`${API_BASE}/rooms/${roomId}/availability?date=${date}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -312,7 +312,7 @@ export const getRoomAvailability = async (token: string, roomId: number, date: s
 export const getRoomBusySlots = async (token: string, roomId: number, date: string) => {
     console.log('Getting room busy slots:', roomId, 'date:', date);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/rooms/${roomId}/busy-slots?date=${date}`, {
+    const response = await fetch(`${API_BASE}/rooms/${roomId}/busy-slots?date=${date}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -335,7 +335,7 @@ export const getRoomBusySlots = async (token: string, roomId: number, date: stri
 export const getStudioBookings = async (token: string, studioId: number) => {
     console.log('Getting studio bookings:', studioId);
     
-    const response = await fetch(`http://89.35.125.136:8090/api/v1/studios/${studioId}/bookings`, {
+    const response = await fetch(`${API_BASE}/studios/${studioId}/bookings`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -362,7 +362,7 @@ export const getUserBookings = async (token: string, limit?: number, offset?: nu
     if (limit) params.append('limit', limit.toString());
     if (offset) params.append('offset', offset.toString());
     
-    const url = `http://89.35.125.136:8090/api/v1/users/me/bookings${params.toString() ? `?${params.toString()}` : ''}`;
+    const url = `${API_BASE}/users/me/bookings${params.toString() ? `?${params.toString()}` : ''}`;
     
     const response = await fetch(url, {
         headers: {

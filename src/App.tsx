@@ -26,6 +26,7 @@ import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
 
 // Admin components
 import UserManagement from "./features/admin/UserManagement";
+import { AdminManagement } from "./features/admin/AdminManagement";
 import StudioManagement from "./features/admin/StudioManagement";
 import { AdminLayout } from './features/admin/AdminLayout';
 import { AdminDashboard as NewAdminDashboard } from './features/admin/AdminDashboard';
@@ -33,6 +34,7 @@ import { PlatformAnalytics } from './features/admin/PlatformAnalytics';
 import { AdManager } from './features/admin/AdManager';
 import { ReviewModerator } from './features/admin/ReviewModerator';
 import { StudioVIPManager } from './features/admin/StudioVIPManager';
+import { AdminLogin } from './features/admin/AdminLogin';
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -158,6 +160,9 @@ function App() {
             </ProtectedRoute>
           } />
           
+          
+          {/* Admin Login */}
+          <Route path="/admin/login" element={<AdminLogin />} />
           
           {/* Admin routes */}
           <Route path="/admin" element={

@@ -16,6 +16,10 @@ type AuthContextType = {
   login: (token: string, user?: User) => void;
   logout: () => void;
   refreshUser?: () => void;
+  // Admin functions
+  promoteToAdmin: (userId: number) => Promise<void>;
+  demoteFromAdmin: (userId: number) => Promise<void>;
+  isAdmin: (userId: number) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -52,11 +56,57 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("user");
   };
 
+  const promoteToAdmin = async (userId: number): Promise<void> => {
+    // This would be implemented with API call
+    console.log('Promoting user to admin:', userId);
+  };
+
+  const demoteFromAdmin = async (userId: number): Promise<void> => {
+    // This would be implemented with API call
+    console.log('Demoting user from admin:', userId);
+  };
+
+  const isAdmin = async (userId: number): Promise<boolean> => {
+    // Check if user has admin role
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/${userId}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        return false;
+      }
+
+      const userData = await response.json();
+      return userData.user?.role === 'admin';
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      return false;
+    }
+  };
+
   const refreshUser = async () => {
     if (!token) return;
     
     try {
-      const response = await fetch('/api/v1/users/me', {
+      const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+      console.log('refreshUser - currentUser from localStorage:', currentUser);
+      const isAdmin = currentUser?.role === 'admin';
+      console.log('refreshUser - isAdmin:', isAdmin);
+      
+      if (isAdmin) {
+        console.log('refreshUser - skipping refresh for admin user (already have user data)');
+        return; // Admin users don't need to refresh
+      }
+      
+      const endpoint = '/api/v1/users/me';
+      const fullUrl = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      console.log('refreshUser - calling endpoint:', fullUrl);
+      
+      const response = await fetch(fullUrl, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
 
@@ -71,7 +121,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, refreshUser }}>
+    <AuthContext.Provider value={{ token, user, login, logout, refreshUser, promoteToAdmin, demoteFromAdmin, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

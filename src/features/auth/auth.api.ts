@@ -120,7 +120,8 @@ export async function getProfile(token: string): Promise<Profile> {
   console.log('Token length:', token?.length);
   console.log('Authorization header:', `Bearer ${token}`);
   
-  const response = await fetch('http://89.35.125.136:8090/api/v1/users/me?include_stats=true', {
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  const response = await fetch(`${API_BASE}/users/me?include_stats=true`, {
     headers: { 'Authorization': `Bearer ${token}` },
   });
   
@@ -131,11 +132,12 @@ export async function getProfile(token: string): Promise<Profile> {
   
   const json = await response.json();
   console.log('getProfile response data:', json);
-  return json.data.user;
+  return json.user; // Direct access, not json.data.user
 }
 
 export async function updateProfile(token: string, data: Partial<Pick<Profile, 'name' | 'phone'>>): Promise<Profile> {
-  const response = await fetch('http://89.35.125.136:8090/api/v1/users/me', {
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  const response = await fetch(`${API_BASE}/users/me`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -153,12 +155,22 @@ export async function updateProfile(token: string, data: Partial<Pick<Profile, '
   return json.data.user;
 }
 
-export async function uploadFiles(token: string, files: File[]): Promise<{ message: string }> {
+export async function uploadFiles(token: string, files: File[], contactInfo?: { contactName: string; contactEmail: string; contactPhone: string }): Promise<{ message: string }> {
   const formData = new FormData();
+  
+  // Append files with the correct field name
   files.forEach((file, index) => {
-    formData.append(`files[${index}]`, file);
+    formData.append('documents', file);
   });
+  
+  // Add required contact information if provided
+  if (contactInfo) {
+    formData.append('contact_name', contactInfo.contactName);
+    formData.append('contact_email', contactInfo.contactEmail);
+    formData.append('contact_phone', contactInfo.contactPhone);
+  }
 
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
   const response = await fetch(`${API_BASE}/upload`, {
     method: 'POST',
     headers: {
@@ -176,25 +188,47 @@ export async function uploadFiles(token: string, files: File[]): Promise<{ messa
 }
 
 // Additional API functions for studio registration workflow
-export async function registerStudioOwner(data: {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  company_name: string;
-  bin: string;
-  legal_address?: string;
-  contact_person?: string;
-  contact_position?: string;
-}): Promise<{ user: { id: number }; token?: string }> {
+export async function registerStudioOwner(data: StudioRegisterRequest): Promise<{ user: { id: number }; token?: string }> {
   console.log('Registering studio owner with data:', JSON.stringify(data, null, 2));
-  console.log('Full URL:', 'http://89.35.125.136:8090/api/v1/auth/register/studio');
-  const response = await fetch('http://89.35.125.136:8090/api/v1/auth/register/studio', {
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  console.log('Full URL:', `${API_BASE}/leads/submit`);
+  
+  // Transform data to match backend SubmitLeadRequest format
+  const leadData = {
+    contact_name: data.contactPerson || '',
+    contact_email: data.email || '',
+    contact_phone: data.phone || '',
+    contact_position: '', // Optional field
+    company_name: data.companyName || '',
+    bin: data.bin || '',
+    legal_address: data.address || '',
+    website: '', // Optional field
+    use_case: '', // Optional field
+    how_found_us: '', // Optional field
+  };
+  
+  console.log('Transformed lead data:', JSON.stringify(leadData, null, 2));
+  
+  // Validate required fields before sending
+  if (!leadData.contact_name.trim()) {
+    throw new Error('Contact person name is required');
+  }
+  if (!leadData.contact_email.trim()) {
+    throw new Error('Contact email is required');
+  }
+  if (!leadData.contact_phone.trim()) {
+    throw new Error('Contact phone is required');
+  }
+  if (!leadData.company_name.trim()) {
+    throw new Error('Company name is required');
+  }
+  
+  const response = await fetch(`${API_BASE}/leads/submit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(leadData),
   });
 
   console.log('Studio registration response status:', response.status);
@@ -202,19 +236,30 @@ export async function registerStudioOwner(data: {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     console.error('Error response from server:', errorData);
+    
+    // Handle lead submission response
+    if (errorData.data && errorData.data.status === 'new') {
+      // Lead submitted successfully, but requires admin approval
+      throw new Error('Ваша заявка отправлена на модерацию. Мы свяжемся с вами в ближайшее время.');
+    }
+    
     const errorMessage = errorData.error?.message || errorData.message || 'Registration failed';
     const error = new Error(errorMessage) as any;
     error.response = { data: errorData };
     throw error;
   }
-
-  const json = await response.json();
-  console.log('Studio registration response data:', json);
-  // Согласно Swagger, при успешной регистрации должен возвращаться JWT токен
-  return { 
-    user: json.data?.user || json.user, 
-    token: json.data?.token || json.token || json.access_token
-  };
+  
+  const responseData = await response.json();
+  console.log('Studio registration response:', responseData);
+  
+  // Lead submission doesn't return token/user directly
+  // It returns a lead object that needs admin approval
+  if (responseData.data && responseData.data.status === 'new') {
+    return { user: { id: 0 }, token: undefined }; // No immediate token for lead submission
+  }
+  
+  // Fallback for other cases
+  return { user: { id: 0 }, token: undefined };
 }
 
 export async function createStudioOwner(data: { userId: number; bin: string; companyName: string; address: string; contactPerson: string }): Promise<{ message: string }> {
@@ -301,7 +346,8 @@ export async function uploadVerificationDocs(token: string, documents: File[]): 
     console.log(key, value);
   }
 
-  const response = await fetch('http://89.35.125.136:8090/api/v1/users/verification/documents', {
+  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  const response = await fetch(`${API_BASE}/users/verification/documents`, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,

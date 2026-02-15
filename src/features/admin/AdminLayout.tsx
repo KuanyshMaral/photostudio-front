@@ -18,12 +18,13 @@ export const AdminLayout: React.FC = () => {
 
   const navItems = [
     { path: '/admin/dashboard', label: 'Дашборд', icon: LayoutDashboard },
-    { path: '/admin/studios', label: 'Студии', icon: Building2 },
     { path: '/admin/users', label: 'Пользователи', icon: Users },
     { path: '/admin/analytics', label: 'Аналитика', icon: BarChart3 },
+    { path: '/admin/studios', label: 'Студии', icon: Building2 },
     { path: '/admin/ads', label: 'Реклама', icon: Megaphone },
     { path: '/admin/reviews', label: 'Отзывы', icon: MessageSquare },
     { path: '/admin/settings', label: 'Настройки', icon: Settings },
+    { path: '/admin/user-management', label: 'Управление ролями', icon: Shield },
   ];
 
   return (
