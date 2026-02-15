@@ -82,7 +82,7 @@ export default function LoginForm() {
                       message: 'Некорректный email'
                     }
                   })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="your@email.com"
@@ -109,7 +109,7 @@ export default function LoginForm() {
                       message: 'Минимум 6 символов'
                     }
                   })}
-                  className={`modern-input pl-12 ${
+                  className={`modern-input pl-12 pr-4 ${
                     errors.password ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : ''
                   }`}
                   placeholder="••••••••"
