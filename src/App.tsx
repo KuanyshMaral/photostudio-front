@@ -26,7 +26,6 @@ import { StudioDetail } from "./features/catalog/pages/StudioDetail.tsx";
 
 // Admin components
 import UserManagement from "./features/admin/UserManagement";
-import { AdminManagement } from "./features/admin/AdminManagement";
 import StudioManagement from "./features/admin/StudioManagement";
 import { AdminLayout } from './features/admin/AdminLayout';
 import { AdminDashboard as NewAdminDashboard } from './features/admin/AdminDashboard';
@@ -35,6 +34,7 @@ import { AdManager } from './features/admin/AdManager';
 import { ReviewModerator } from './features/admin/ReviewModerator';
 import { StudioVIPManager } from './features/admin/StudioVIPManager';
 import { AdminLogin } from './features/admin/AdminLogin';
+import LeadManagement from './features/admin/LeadManagement';
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -175,6 +175,7 @@ function App() {
             <Route path="analytics" element={<PlatformAnalytics />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="studios" element={<StudioManagement />} />
+            <Route path="leads" element={<LeadManagement />} />
             <Route path="ads" element={<AdManager />} />
             <Route path="reviews" element={<ReviewModerator />} />
             <Route path="studios/vip" element={<StudioVIPManager />} />

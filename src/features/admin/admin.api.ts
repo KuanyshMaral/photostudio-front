@@ -107,3 +107,201 @@ export const rejectBooking = async (token: string, bookingId: number, reason: st
     });
     if (!response.ok) throw new Error('Failed to reject booking');
 };
+
+// Lead Management APIs
+export interface OwnerLead {
+    id: number;
+    contact_name: string;
+    contact_email: string;
+    contact_phone: string;
+    contact_position?: string;
+    company_name: string;
+    bin?: string;
+    legal_address?: string;
+    website?: string;
+    use_case?: string;
+    how_found_us?: string;
+    status: 'new' | 'contacted' | 'qualified' | 'converted' | 'rejected' | 'lost';
+    priority: number;
+    assigned_to?: string;
+    notes?: string;
+    last_contacted_at?: string;
+    next_follow_up_at?: string;
+    follow_up_count: number;
+    converted_at?: string;
+    converted_user_id?: number;
+    rejection_reason?: string;
+    source?: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    referrer_url?: string;
+    ip_address?: string;
+    user_agent?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface LeadStats {
+    new: number;
+    contacted: number;
+    qualified: number;
+    converted: number;
+    rejected: number;
+    lost: number;
+}
+
+export interface LeadListResponse {
+    leads: OwnerLead[];
+    total: number;
+}
+
+export const getLeads = async (token: string, status?: string, limit = 50, offset = 0): Promise<LeadListResponse> => {
+    const params = new URLSearchParams({
+        limit: limit.toString(),
+        offset: offset.toString(),
+    });
+    
+    if (status) {
+        params.append('status', status);
+    }
+
+    const response = await fetch(`${API_BASE}/admin/leads?${params}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch leads');
+    const json = await response.json();
+    return json.data;
+};
+
+export const getLeadById = async (token: string, leadId: number): Promise<OwnerLead> => {
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch lead');
+    const json = await response.json();
+    return json.data;
+};
+
+export const getLeadStats = async (token: string): Promise<LeadStats> => {
+    const response = await fetch(`${API_BASE}/admin/leads/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch lead stats');
+    const json = await response.json();
+    return json.data;
+};
+
+export const updateLeadStatus = async (token: string, leadId: number, status: string, notes?: string, reason?: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status, notes, reason })
+    });
+    if (!response.ok) throw new Error('Failed to update lead status');
+};
+
+export const assignLead = async (token: string, leadId: number, adminId: string, priority = 0): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}/assign`, {
+        method: 'PATCH',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ admin_id: adminId, priority })
+    });
+    if (!response.ok) throw new Error('Failed to assign lead');
+};
+
+export const markLeadContacted = async (token: string, leadId: number): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}/contacted`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    if (!response.ok) throw new Error('Failed to mark lead as contacted');
+};
+
+export const rejectLead = async (token: string, leadId: number, reason: string): Promise<void> => {
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}/reject`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason })
+    });
+    if (!response.ok) throw new Error('Failed to reject lead');
+};
+
+export const convertLead = async (token: string, leadId: number, legalName: string, legalAddress: string, password: string, bin?: string): Promise<{ message: string; user_id: number; email: string }> => {
+    // Ensure all values are strings and handle object types
+    const cleanLegalName = typeof legalName === 'string' ? legalName : String(legalName);
+    const cleanLegalAddress = typeof legalAddress === 'string' ? legalAddress : String(legalAddress);
+    const cleanPassword = typeof password === 'string' ? password : String(password);
+    const cleanBin = typeof bin === 'string' ? bin : '000000000000';
+    
+    const requestBody = {
+        legal_name: cleanLegalName,
+        legal_address: cleanLegalAddress,
+        password: cleanPassword,
+        org_type: 'ip', // Default to individual entrepreneur
+        bin: cleanBin.trim() || '000000000000' // Ensure BIN is always provided
+    };
+    
+    console.log('Convert lead request body:', JSON.stringify(requestBody, null, 2));
+    
+    const response = await fetch(`${API_BASE}/admin/leads/${leadId}/convert`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    });
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.log('Error response:', errorData);
+        let errorMessage = 'Failed to convert lead';
+        
+        // Handle validation errors which might be objects
+        if (errorData.error?.message) {
+            errorMessage = errorData.error.message;
+        } else if (errorData.message) {
+            errorMessage = errorData.message;
+        } else if (typeof errorData.error === 'string') {
+            errorMessage = errorData.error;
+        } else if (errorData.error && typeof errorData.error === 'object') {
+            // Handle validation object with String/Valid structure
+            const validationErrors = Object.entries(errorData.error)
+                .filter(([_, value]) => typeof value === 'string')
+                .map(([_, value]) => value)
+                .join(', ');
+            if (validationErrors) {
+                errorMessage = validationErrors;
+            }
+        } else if (errorData.data && typeof errorData.data === 'object') {
+            // Handle errors in data field
+            const validationErrors = Object.entries(errorData.data)
+                .filter(([_, value]) => typeof value === 'string')
+                .map(([_, value]) => value)
+                .join(', ');
+            if (validationErrors) {
+                errorMessage = validationErrors;
+            }
+        }
+        
+        throw new Error(errorMessage);
+    }
+    const json = await response.json();
+    return json.data;
+};

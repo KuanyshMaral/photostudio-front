@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Building2, Users, BarChart3, 
-  Megaphone, MessageSquare, Settings, LogOut, Shield
+  Megaphone, MessageSquare, Settings, LogOut, Shield, UserPlus
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './AdminLayout.css';
@@ -21,6 +21,7 @@ export const AdminLayout: React.FC = () => {
     { path: '/admin/users', label: 'Пользователи', icon: Users },
     { path: '/admin/analytics', label: 'Аналитика', icon: BarChart3 },
     { path: '/admin/studios', label: 'Студии', icon: Building2 },
+    { path: '/admin/leads', label: 'Лиды', icon: UserPlus },
     { path: '/admin/ads', label: 'Реклама', icon: Megaphone },
     { path: '/admin/reviews', label: 'Отзывы', icon: MessageSquare },
     { path: '/admin/settings', label: 'Настройки', icon: Settings },

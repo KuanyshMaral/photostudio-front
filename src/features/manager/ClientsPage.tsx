@@ -38,49 +38,34 @@ export const ClientsPage: React.FC = () => {
 
       console.log('Fetching clients with params:', params.toString());
 
-      // Пробуем самый простой эндпоинт - всех пользователей
-      const response = await fetch(`/api/v1/users?${params}`, {
+      // Используем правильный эндпоинт для владельцев студий
+      const response = await fetch(`/api/v1/manager/clients?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      console.log(`/api/v1/users?${params} response:`, response.status);
+      console.log(`/api/v1/manager/clients?${params} response:`, response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('All users data:', data);
+        console.log('Clients data:', data);
         
-        // Извлекаем всех пользователей и фильтруем клиентов
-        const allUsers = data.data?.users || data.users || data || [];
-        console.log('All users:', allUsers);
-        
-        // Фильтруем клиентов и применяем поиск если нужно
-        let clientsData = allUsers
-          .filter((user: any) => user.role === 'client');
+        // Данные уже в правильном формате от API
+        const clientsData = data.data?.clients || data.clients || [];
+        console.log('Clients from API:', clientsData);
         
         // Если есть поиск, дополнительно фильтруем по имени/email/телефону
+        let filteredClients = clientsData;
         if (search) {
           const searchLower = search.toLowerCase();
-          clientsData = clientsData.filter((user: any) => 
-            user.name.toLowerCase().includes(searchLower) ||
-            user.email.toLowerCase().includes(searchLower) ||
-            (user.phone && user.phone.toLowerCase().includes(searchLower))
+          filteredClients = clientsData.filter((client: any) => 
+            client.name.toLowerCase().includes(searchLower) ||
+            client.email.toLowerCase().includes(searchLower) ||
+            (client.phone && client.phone.toLowerCase().includes(searchLower))
           );
         }
         
-        // Преобразуем в нужный формат
-        clientsData = clientsData.map((user: any) => ({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone || '',
-          total_bookings: 0,
-          total_spent: 0,
-          last_booking_at: undefined
-        }));
-        
-        console.log('Filtered clients:', clientsData);
-        setClients(clientsData);
-        setTotal(clientsData.length);
+        setClients(filteredClients);
+        setTotal(data.total || filteredClients.length);
       } else {
         console.log('Failed to load users, trying empty clients array');
         setClients([]);
