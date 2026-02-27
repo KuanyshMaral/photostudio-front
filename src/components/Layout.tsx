@@ -23,14 +23,18 @@ export default function Layout({ children }: LayoutProps) {
   const getSidebarItems = () => {
     const role = user?.role;
 
-    // Для владельца студии — CRM-ориентированное меню
+    // Для владельца студии — все вкладки в основной панели
     if (role === 'studio_owner') {
       return [
+        { id: "studios", label: "Студии", icon: Building2 },
         { id: "manager/bookings", label: "Бронирования", icon: Calendar },
         { id: "manager/clients", label: "Клиенты", icon: Users },
-        { id: "studio-management", label: "Мои студии", icon: Building2 },
         { id: "messages", label: "Сообщения", icon: MessageSquare },
-        { id: "company/profile", label: "Профиль компании", icon: Settings },
+        { id: "owner/profile", label: "Профиль компании", icon: Settings },
+        { id: "owner/analytics", label: "Аналитика", icon: BarChart2 },
+        { id: "owner/maintenance", label: "Обслуживание", icon: Settings },
+        { id: "owner/procurement", label: "Закупки", icon: Settings },
+        { id: "owner/pin", label: "PIN-код", icon: Settings }
       ];
     }
 
@@ -86,7 +90,6 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             </div>
           )}
-          
           <nav className="space-y-2">
             {sidebarItems.map((item) => {
               const Icon = item.icon;
@@ -96,7 +99,13 @@ export default function Layout({ children }: LayoutProps) {
                 <button
                   key={item.id}
                   onClick={() => {
-                    navigate(`/${item.id}`);
+                    // Все owner вкладки ведут на /owner с нужным hash
+                    if (item.id.startsWith('owner/')) {
+                      const tab = item.id.replace('owner/', '');
+                      navigate(`/owner#${tab}`);
+                    } else {
+                      navigate(`/${item.id}`);
+                    }
                   }}
                   className={`w-full text-left px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-3 group ${
                     isActive
@@ -130,10 +139,8 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
+      <main className="flex-1 overflow-visible">
+        <div className="h-full">
           {children}
         </div>
       </main>
