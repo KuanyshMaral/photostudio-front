@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Shield, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { adminLogin } from './admin.api';
 
 export const AdminLogin: React.FC = () => {
   const { token, user, login } = useAuth();
@@ -11,9 +12,26 @@ export const AdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Debug: Check what's in localStorage
+  React.useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+    console.log('AdminLogin - localStorage token:', savedToken);
+    console.log('AdminLogin - localStorage user:', savedUser);
+    console.log('AdminLogin - current token:', token);
+    console.log('AdminLogin - current user:', user);
+  }, [token, user]);
+
   // Redirect if already logged in as admin
-  if (token && user?.role === 'admin') {
+  if (token && user && user.role === 'admin') {
+    console.log('AdminLogin: User already logged in as admin, redirecting to dashboard');
     return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  // If there's a token but user is not admin, redirect to regular login
+  if (token && (!user || user.role !== 'admin')) {
+    console.log('AdminLogin: User has token but not admin, redirecting to login');
+    return <Navigate to="/login" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,29 +40,19 @@ export const AdminLogin: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Check if user has admin role
-      const user = data.user || data.data?.user;
-      if (!user || user.role !== 'admin') {
-        throw new Error('Access denied. Admin privileges required.');
-      }
-
+      const response = await adminLogin({ email, password });
+      
+      // Convert admin user to match User interface expected by AuthContext
+      const userForAuth = {
+        id: parseInt(response.user.id), // Convert string ID to number
+        email: response.user.email,
+        name: response.user.name,
+        role: 'admin' as const,
+        avatar_url: response.user.avatar_url,
+      };
+      
       // Login with admin credentials
-      const token = data.token || data.data?.token || data.data?.tokens?.access_token;
-      login(token, user);
+      login(response.token, userForAuth);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

@@ -190,7 +190,7 @@ export async function uploadFiles(token: string, files: File[], contactInfo?: { 
 // Additional API functions for studio registration workflow
 export async function registerStudioOwner(data: StudioRegisterRequest): Promise<{ user: { id: number }; token?: string }> {
   console.log('Registering studio owner with data:', JSON.stringify(data, null, 2));
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  const API_BASE = '/api/v1';
   console.log('Full URL:', `${API_BASE}/leads/submit`);
   
   // Transform data to match backend SubmitLeadRequest format

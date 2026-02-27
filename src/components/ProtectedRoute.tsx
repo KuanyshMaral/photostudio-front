@@ -17,8 +17,13 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   }
 
   if (requiredRole && (!user || user.role !== requiredRole)) {
-    console.log('Role mismatch, redirecting to /dashboard');
-    return <Navigate to="/dashboard" replace />;
+    console.log('Role mismatch, redirecting to appropriate login');
+    // If admin access required, redirect to admin login
+    if (requiredRole === 'admin') {
+      return <Navigate to="/admin/login" replace />;
+    }
+    // For other roles, redirect to regular login
+    return <Navigate to="/login" replace />;
   }
 
   console.log('Access granted, rendering children');

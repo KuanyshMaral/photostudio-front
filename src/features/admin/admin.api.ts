@@ -1,5 +1,93 @@
 const API_BASE = '/api/v1';
 
+export interface AdminLoginRequest {
+    email: string;
+    password: string;
+}
+
+export interface AdminLoginResponse {
+    data: string; // JWT token
+    success: boolean;
+    error?: {
+        code: string;
+        details: string;
+        message: string;
+    };
+}
+
+export interface AdminUser {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+    avatar_url?: string;
+    is_active: boolean;
+    last_login_at?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AdminMeResponse {
+    data: AdminUser;
+    success: boolean;
+    error?: {
+        code: string;
+        details: string;
+        message: string;
+    };
+}
+
+// Admin authentication functions
+export const adminLogin = async (data: AdminLoginRequest): Promise<{ token: string; user: AdminUser }> => {
+    const response = await fetch(`${API_BASE}/admin/auth/login`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'accept': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || errorData.message || 'Admin login failed';
+        throw new Error(errorMessage);
+    }
+
+    const json = await response.json();
+    
+    // According to the API response, the structure is:
+    // {
+    //   "data": {
+    //     "access_token": "...",
+    //     "admin": { ... }
+    //   },
+    //   "success": true
+    // }
+    const token = json.data.access_token;
+    const user = json.data.admin;
+    
+    return { token, user };
+};
+
+export const getCurrentAdmin = async (token: string): Promise<AdminUser> => {
+    const response = await fetch(`${API_BASE}/admin/auth/me`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'accept': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || errorData.message || 'Failed to get admin info';
+        throw new Error(errorMessage);
+    }
+
+    const json = await response.json();
+    return json.data;
+};
+
 export interface Statistics {
     total_users: number;
     total_studios: number;
