@@ -26,6 +26,9 @@ export default function LeadManagement() {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [total, setTotal] = useState(0);
+  const [conversionPassword, setConversionPassword] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedLeadForConversion, setSelectedLeadForConversion] = useState<Lead | null>(null);
   const limit = 20;
 
   useEffect(() => {
@@ -126,23 +129,29 @@ export default function LeadManagement() {
   };
 
   const handleConvert = async (lead: Lead) => {
-    if (!token) {
-      console.error('No token available');
+    setSelectedLeadForConversion(lead);
+    setShowPasswordModal(true);
+    setConversionPassword('');
+  };
+
+  const handleConvertWithPassword = async () => {
+    if (!token || !selectedLeadForConversion) {
+      console.error('No token or lead available');
       return;
     }
     
     try {
       // Ensure bin is a string, extract from object if needed
       let binValue = '';
-      if (lead.bin) {
-        if (typeof lead.bin === 'string') {
-          binValue = lead.bin;
-        } else if (typeof lead.bin === 'object' && lead.bin !== null && 'String' in lead.bin) {
+      if (selectedLeadForConversion.bin) {
+        if (typeof selectedLeadForConversion.bin === 'string') {
+          binValue = selectedLeadForConversion.bin;
+        } else if (typeof selectedLeadForConversion.bin === 'object' && selectedLeadForConversion.bin !== null && 'String' in selectedLeadForConversion.bin) {
           // Handle protobuf-like object structure
-          binValue = (lead.bin as any).String;
+          binValue = (selectedLeadForConversion.bin as any).String;
         } else {
           // Extract string value from object or convert to string
-          const objStr = JSON.stringify(lead.bin);
+          const objStr = JSON.stringify(selectedLeadForConversion.bin);
           if (objStr === '{}') {
             binValue = ''; // Empty object becomes empty string
           } else if (objStr.startsWith('"') && objStr.endsWith('"')) {
@@ -155,10 +164,10 @@ export default function LeadManagement() {
       
       const conversionData = {
         bin: binValue,
-        legal_address: lead.legal_address || '',
-        legal_name: lead.company_name || '',
+        legal_address: selectedLeadForConversion.legal_address || '',
+        legal_name: selectedLeadForConversion.company_name || '',
         org_type: 'ip',
-        password: Math.random().toString(36).substring(2, 10), // Generate random password
+        password: conversionPassword, // Use password from admin input
       };
       
       // Validate required fields
@@ -174,8 +183,13 @@ export default function LeadManagement() {
       
       console.log('LeadManagement: Conversion data:', conversionData);
       
-      await convertLead(token, lead.id, conversionData);
+      await convertLead(token, selectedLeadForConversion.id, conversionData);
       alert('Лид успешно конвертирован в студию!');
+      
+      // Close modal and reset
+      setShowPasswordModal(false);
+      setSelectedLeadForConversion(null);
+      setConversionPassword('');
       
       // Refetch leads
       const data = await getAllLeads(
@@ -525,6 +539,59 @@ export default function LeadManagement() {
             <div className="modal-footer">
               <button onClick={() => setSelectedLead(null)} className="btn-secondary">
                 Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Password Modal for Conversion */}
+      {showPasswordModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Конвертация лида в студию</h3>
+            </div>
+            
+            <div className="modal-body">
+              <div className="detail-row">
+                <strong>Компания:</strong> {selectedLeadForConversion?.company_name}
+              </div>
+              <div className="detail-row">
+                <strong>Контакт:</strong> {selectedLeadForConversion?.contact_name}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="conversion-password">Пароль для новой студии:</label>
+                <input
+                  id="conversion-password"
+                  type="password"
+                  value={conversionPassword}
+                  onChange={(e) => setConversionPassword(e.target.value)}
+                  placeholder="Введите пароль (минимум 8 символов)"
+                  className="form-input"
+                />
+                <small>Пароль должен содержать минимум 8 символов</small>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button 
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setSelectedLeadForConversion(null);
+                  setConversionPassword('');
+                }} 
+                className="btn-secondary"
+              >
+                Отмена
+              </button>
+              <button 
+                onClick={handleConvertWithPassword}
+                className="btn-primary"
+                disabled={!conversionPassword || conversionPassword.length < 8}
+              >
+                Конвертировать
               </button>
             </div>
           </div>
