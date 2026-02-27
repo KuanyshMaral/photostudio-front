@@ -146,6 +146,11 @@ export default function LoginForm() {
                 Зарегистрироваться
               </Link>
             </p>
+            <p className="text-gray-600 text-sm mt-4">
+              <Link to="/admin/login" className="text-primary-600 hover:text-primary-700 font-medium transition-colors">
+                Вход для администраторов
+              </Link>
+            </p>
           </div>
         </div>
 

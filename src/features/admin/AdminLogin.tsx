@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Shield, Lock, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { adminLogin } from './admin.api';
 
 export const AdminLogin: React.FC = () => {
   const { token, user, login } = useAuth();
@@ -22,29 +23,19 @@ export const AdminLogin: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Check if user has admin role
-      const user = data.user || data.data?.user;
-      if (!user || user.role !== 'admin') {
-        throw new Error('Access denied. Admin privileges required.');
-      }
-
+      const response = await adminLogin({ email, password });
+      
+      // Convert admin user to match User interface expected by AuthContext
+      const userForAuth = {
+        id: parseInt(response.user.id), // Convert string ID to number
+        email: response.user.email,
+        name: response.user.name,
+        role: 'admin' as const,
+        avatar_url: response.user.avatar_url,
+      };
+      
       // Login with admin credentials
-      const token = data.token || data.data?.token || data.data?.tokens?.access_token;
-      login(token, user);
+      login(response.token, userForAuth);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

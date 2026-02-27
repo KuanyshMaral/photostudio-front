@@ -188,6 +188,11 @@ export const AuthLanding: React.FC = () => {
                 Войдите
               </Link>
             </p>
+            <p className="text-gray-500 mb-4">
+              <Link to="/admin/login" className="text-gray-600 hover:text-gray-700 font-medium transition-colors">
+                Вход для администраторов
+              </Link>
+            </p>
             <p className="text-gray-500 text-sm">
               © 2024 StudioBooking. Все права защищены.
             </p>
