@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Building, TrendingUp, Wrench, ShoppingCart, Lock } from 'lucide-react';
+import { Building, TrendingUp, Wrench, ShoppingCart, Lock, Camera } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 // Import components
@@ -9,13 +9,14 @@ import Analytics from './Analytics';
 import Maintenance from './Maintenance';
 import Procurement from './Procurement';
 import PinManagement from './PinManagement';
+import StudioManagement from './StudioManagement';
 
 import './OwnerDashboard.css';
 
 export default function OwnerDashboard() {
   const { token } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'pin'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'studios' | 'pin'>('profile');
 
   // Update active tab based on URL hash or query param
   useEffect(() => {
@@ -29,6 +30,8 @@ export default function OwnerDashboard() {
       setActiveTab('maintenance');
     } else if (hash.includes('procurement')) {
       setActiveTab('procurement');
+    } else if (hash.includes('studios')) {
+      setActiveTab('studios');
     } else if (hash.includes('pin')) {
       setActiveTab('pin');
     } else {
@@ -47,6 +50,7 @@ export default function OwnerDashboard() {
     { id: 'analytics', label: 'Аналитика', icon: TrendingUp },
     { id: 'maintenance', label: 'Обслуживание', icon: Wrench },
     { id: 'procurement', label: 'Закупки', icon: ShoppingCart },
+    { id: 'studios', label: 'Мои студии', icon: Camera },
     { id: 'pin', label: 'PIN-код', icon: Lock }
   ];
 
@@ -60,6 +64,8 @@ export default function OwnerDashboard() {
         return <Maintenance />;
       case 'procurement':
         return <Procurement />;
+      case 'studios':
+        return <StudioManagement />;
       case 'pin':
         return <PinManagement />;
       default:
