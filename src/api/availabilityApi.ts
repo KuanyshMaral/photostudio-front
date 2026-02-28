@@ -1,4 +1,5 @@
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_BASE = `${API_ORIGIN}/api/v1`;
 
 export interface TimeSlot {
   hour: number;
@@ -19,6 +20,27 @@ export interface AvailabilityResponse {
   available_slots: TimeSlot[];
 }
 
+const formatLocalDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
+const parseJsonSafely = async (response: Response) => {
+    const text = await response.text();
+
+    if (!text.trim()) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return null;
+    }
+};
+
 export const getRoomAvailability = async (roomId: number, date: string, token?: string): Promise<AvailabilityResponse> => {
     const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -33,12 +55,16 @@ export const getRoomAvailability = async (roomId: number, date: string, token?: 
     });
     
     if (!response.ok) throw new Error('Failed to fetch availability');
-    
-    const json = await response.json();
-    return json.data;
+
+    const json = await parseJsonSafely(response);
+    return json?.data || {
+        date,
+        booked_slots: [],
+        available_slots: []
+    };
 };
 
 export const getAvailability = async (roomId: number, date: Date, token?: string): Promise<AvailabilityResponse> => {
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = formatLocalDate(date);
     return getRoomAvailability(roomId, dateString, token);
 };

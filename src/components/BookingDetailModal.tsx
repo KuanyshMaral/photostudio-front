@@ -7,8 +7,17 @@ interface BookingDetailModalProps {
 }
 
 export default function BookingDetailModal({ booking, onClose }: BookingDetailModalProps) {
+  const parseDateSafe = (dateString?: string) => {
+    if (!dateString) return null;
+    const parsed = new Date(dateString);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  };
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('ru-RU', {
+    const parsed = parseDateSafe(dateString);
+    if (!parsed) return '—';
+
+    return parsed.toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -16,7 +25,10 @@ export default function BookingDetailModal({ booking, onClose }: BookingDetailMo
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('ru-RU', {
+    const parsed = parseDateSafe(dateString);
+    if (!parsed) return '—';
+
+    return parsed.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit'
     });
@@ -157,7 +169,7 @@ export default function BookingDetailModal({ booking, onClose }: BookingDetailMo
               <div>
                 <span className="font-medium">Создано:</span> {formatDate(booking.created_at)} {formatTime(booking.created_at)}
               </div>
-              {booking.updated_at && (
+              {parseDateSafe(booking.updated_at) && (
                 <div>
                   <span className="font-medium">Обновлено:</span> {formatDate(booking.updated_at)} {formatTime(booking.updated_at)}
                 </div>

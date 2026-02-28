@@ -106,7 +106,7 @@ const BookingForm: React.FC = () => {
     setMessage("");
     
     const data: BookingData = { 
-      room_id: selectedRoom!.id.toString(), 
+      room_id: selectedRoom!.id,
       studio_id: studio!.id,
       user_id: user.id,
       start_time: startTime!.toISOString(), 
@@ -115,8 +115,9 @@ const BookingForm: React.FC = () => {
 
     try {
       const result = await createBooking(data, token);
-      toast.success(`Бронирование создано! ID: ${result.id}`);
-      setMessage(`Booking created! ID: ${result.id}`);
+      const bookingId = result?.id;
+      toast.success(bookingId ? `Бронирование создано! ID: ${bookingId}` : 'Бронирование создано!');
+      setMessage(bookingId ? `Бронирование создано! ID: ${bookingId}` : 'Бронирование создано!');
       // Reset form on success
       setStartTime(null);
       setEndTime(null);

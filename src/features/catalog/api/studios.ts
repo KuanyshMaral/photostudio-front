@@ -2,6 +2,24 @@
 
 const API_BASE = '/api/v1';
 
+const parseJsonSafely = async (response: Response) => {
+    const text = await response.text();
+
+    if (!text.trim()) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return null;
+    }
+};
+
+const getErrorMessage = (payload: any, fallback: string) => {
+    return payload?.error?.message || payload?.message || fallback;
+};
+
 export const getStudios = async (params: StudioFilterParams) => {
     const searchParams = new URLSearchParams();
     if (params.city) searchParams.append('city', params.city);
@@ -15,15 +33,15 @@ export const getStudios = async (params: StudioFilterParams) => {
     const response = await fetch(`${API_BASE}/studios?${searchParams.toString()}`);
     
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `HTTP error ${response.status}`);
+        const errorData = await parseJsonSafely(response);
+        throw new Error(getErrorMessage(errorData, `HTTP error ${response.status}`));
     }
     
-    const json = await response.json();
+    const json = await parseJsonSafely(response);
     return { 
         success: true, 
-        data: json.data?.studios || [],
-        pagination: json.data?.pagination || { page: 1, limit: 20, total: 0, total_pages: 1 }
+        data: json?.data?.studios || [],
+        pagination: json?.data?.pagination || { page: 1, limit: 20, total: 0, total_pages: 1 }
     };
 };
 
@@ -34,12 +52,12 @@ export const getStudioById = async (id: number) => {
         if (response.status === 404) {
             throw new Error('Studio not found');
         }
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || 'Failed to load studio');
+        const errorData = await parseJsonSafely(response);
+        throw new Error(getErrorMessage(errorData, 'Failed to load studio'));
     }
     
-    const json = await response.json();
-    return json.data;
+    const json = await parseJsonSafely(response);
+    return json?.data || null;
 };
 
 export const getStudiosWithRooms = async (params: StudioFilterParams) => {
@@ -59,16 +77,16 @@ export const getStudiosWithRooms = async (params: StudioFilterParams) => {
     console.log('Studios API URL:', `${API_BASE}/studios?include_rooms=true&${searchParams.toString()}`);
     
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const errorData = await parseJsonSafely(response);
         console.error('Studios API error:', errorData);
-        throw new Error(errorData.error?.message || `Failed to fetch studios with rooms`);
+        throw new Error(getErrorMessage(errorData, 'Failed to fetch studios with rooms'));
     }
     
-    const json = await response.json();
+    const json = await parseJsonSafely(response);
     console.log('Studios API response:', json);
     return { 
         success: true, 
-        data: json.data?.studios || [],
-        pagination: json.data?.pagination || { page: 1, limit: 20, total: 0, total_pages: 1 }
+        data: json?.data?.studios || [],
+        pagination: json?.data?.pagination || { page: 1, limit: 20, total: 0, total_pages: 1 }
     };
 };

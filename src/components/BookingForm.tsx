@@ -52,7 +52,7 @@ export default function BookingForm({
       });
 
       const bookingData = {
-        room_id: roomId.toString(),
+        room_id: roomId,
         studio_id: studioId,
         user_id: user.id,
         start_time: startDateTime,
@@ -66,12 +66,9 @@ export default function BookingForm({
 
       toast.success('Бронирование создано!');
       onSuccess();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('Booking error details:', error);
-      console.log('Error response:', error.response);
-      console.log('Error data:', error.response?.data);
-      
-      const message = error.response?.data?.error?.message || error.message || 'Ошибка бронирования';
+      const message = error instanceof Error ? error.message : 'Ошибка бронирования';
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -181,14 +178,11 @@ function calculateHours(startTime: string, endTime: string): number {
 
 function combineDateAndTime(date: Date, time: string): string {
   const [hours, minutes] = time.split(':').map(Number);
-  // Create date at midnight local time
   const combined = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   combined.setHours(hours, minutes, 0, 0);
-  
-  // Return ISO string but preserve local hours by adjusting for timezone
-  const localOffset = combined.getTimezoneOffset() * 60000; // offset in milliseconds
-  const localTime = new Date(combined.getTime() - localOffset);
-  return localTime.toISOString();
+
+  // Send real UTC instant corresponding to selected local date/time
+  return combined.toISOString();
 }
 
 function formatDate(date: Date): string {
