@@ -27,7 +27,7 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
   // Use backend slots if present, otherwise fallback to default working window
   const allSlots = normalizedAvailableSlots.length > 0
     ? normalizedAvailableSlots.map((slot) => slot.time)
-    : generateTimeSlots('12:00', '22:00', 60);
+    : generateTimeSlots('10:00', '20:00', 60);
 
   console.log('Calendar state:', { data, isLoading, error, allSlots });
 
@@ -36,20 +36,6 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
     return normalizedBookedSlots.includes(slot);
   };
   
-  // Check if slot is actually available from backend (only if data exists)
-  const isSlotAvailable = (slot: string) => {
-    // If no data from backend, assume all slots are available
-    if (!data || !data.available_slots) return true;
-    if (normalizedAvailableSlots.length === 0) return true;
-
-    const match = normalizedAvailableSlots.find((availableSlot) => availableSlot.time === slot);
-
-    // If backend returned slots list but without explicit availability flags,
-    // treat listed slots as available.
-    if (!match) return false;
-    return match.available;
-  };
-
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h3 className="font-semibold text-lg mb-4">Выберите дату и время</h3>
@@ -72,7 +58,7 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
             Не удалось загрузить доступное время
           </div>
           <div className="text-yellow-600 text-sm mt-1">
-            Показаны слоты с 12:00. Время работы студии: 12:00 - 22:00
+            Показаны слоты с 10:00. Время работы студии: 10:00 - 20:00
           </div>
         </div>
       )}
@@ -89,14 +75,14 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
           {allSlots.map(slot => (
             <button
               key={slot}
-              disabled={isSlotBooked(slot) || !isSlotAvailable(slot)}
+              disabled={isSlotBooked(slot)}
               onClick={() => {
                 const end = addHour(slot);
                 onSlotSelect(new Date(selectedDate), slot, end);
               }}
               className={`
                 p-3 rounded-lg text-center font-medium transition
-                ${isSlotBooked(slot) || !isSlotAvailable(slot)
+                ${isSlotBooked(slot)
                   ? 'bg-red-100 text-red-400 cursor-not-allowed'
                   : 'bg-green-100 text-green-700 hover:bg-green-200 cursor-pointer'
                 }

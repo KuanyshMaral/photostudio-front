@@ -181,8 +181,20 @@ function combineDateAndTime(date: Date, time: string): string {
   const combined = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   combined.setHours(hours, minutes, 0, 0);
 
-  // Send real UTC instant corresponding to selected local date/time
-  return combined.toISOString();
+  // Backend expects RFC3339, keep local wall clock and include timezone offset.
+  const year = combined.getFullYear();
+  const month = String(combined.getMonth() + 1).padStart(2, '0');
+  const day = String(combined.getDate()).padStart(2, '0');
+  const hh = String(combined.getHours()).padStart(2, '0');
+  const mm = String(combined.getMinutes()).padStart(2, '0');
+  const ss = String(combined.getSeconds()).padStart(2, '0');
+
+  const offsetMinutes = -combined.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const offsetHours = String(Math.floor(Math.abs(offsetMinutes) / 60)).padStart(2, '0');
+  const offsetMins = String(Math.abs(offsetMinutes) % 60).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hh}:${mm}:${ss}${sign}${offsetHours}:${offsetMins}`;
 }
 
 function formatDate(date: Date): string {

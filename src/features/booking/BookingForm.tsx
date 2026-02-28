@@ -109,8 +109,8 @@ const BookingForm: React.FC = () => {
       room_id: selectedRoom!.id,
       studio_id: studio!.id,
       user_id: user.id,
-      start_time: startTime!.toISOString(), 
-      end_time: endTime!.toISOString() 
+      start_time: formatLocalDateTime(startTime!), 
+      end_time: formatLocalDateTime(endTime!) 
     };
 
     try {
@@ -288,3 +288,19 @@ const BookingForm: React.FC = () => {
 };
 
 export default BookingForm;
+
+function formatLocalDateTime(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const offsetMinutes = -date.getTimezoneOffset();
+  const sign = offsetMinutes >= 0 ? '+' : '-';
+  const offsetHours = String(Math.floor(Math.abs(offsetMinutes) / 60)).padStart(2, '0');
+  const offsetMins = String(Math.abs(offsetMinutes) % 60).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${offsetHours}:${offsetMins}`;
+}
