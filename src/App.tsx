@@ -35,6 +35,7 @@ import { ReviewModerator } from './features/admin/ReviewModerator';
 import { StudioVIPManager } from './features/admin/StudioVIPManager';
 import { AdminLogin } from './features/admin/AdminLogin';
 import LeadManagement from './features/admin/LeadManagement';
+import OwnerVerification from './features/admin/OwnerVerification';
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
@@ -175,6 +176,7 @@ function App() {
             <Route path="analytics" element={<PlatformAnalytics />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="studios" element={<StudioManagement />} />
+            <Route path="verification" element={<OwnerVerification />} />
             <Route path="leads" element={<LeadManagement />} />
             <Route path="ads" element={<AdManager />} />
             <Route path="reviews" element={<ReviewModerator />} />

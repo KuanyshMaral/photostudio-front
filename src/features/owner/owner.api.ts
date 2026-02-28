@@ -95,6 +95,50 @@ export interface PinRequest {
   pin: string;
 }
 
+// Studio Types
+export interface Studio {
+  id: number;
+  owner_id: number;
+  name: string;
+  description: string;
+  address: string;
+  city: string;
+  district?: string;
+  phone: string;
+  email?: string;
+  website?: string;
+  rating?: number;
+  total_reviews?: number;
+  working_hours?: Record<string, { open: string; close: string }>;
+  price_per_hour?: number;
+  images?: string[];
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface StudioListResponse {
+  data?: {
+    count?: number;
+    items?: Studio[];
+  };
+  success?: boolean;
+  // API might return array directly or wrapped in data
+}
+
+export interface StudioCreateRequest {
+  name: string;
+  description: string;
+  address: string;
+  city: string;
+  district?: string;
+  phone: string;
+  email?: string;
+  website?: string;
+  working_hours: Record<string, { open: string; close: string }>;
+}
+
+export interface StudioUpdateRequest extends Partial<StudioCreateRequest> {}
+
 // Company Profile API
 export const getCompanyProfile = async (token: string): Promise<CompanyProfileResponse> => {
   const response = await fetch(`${API_BASE}/company/profile`, {
@@ -342,5 +386,74 @@ export const deleteProcurementRecord = async (token: string, id: number): Promis
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.error?.message || 'Failed to delete procurement record');
+  }
+};
+
+// Studio API
+export const getMyStudios = async (token: string): Promise<StudioListResponse> => {
+  const response = await fetch(`${API_BASE}/studios/my`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || 'Failed to fetch studios');
+  }
+
+  return response.json();
+};
+
+export const createStudio = async (token: string, studioData: StudioCreateRequest): Promise<Studio> => {
+  const response = await fetch(`${API_BASE}/studios`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studioData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || 'Failed to create studio');
+  }
+
+  return response.json();
+};
+
+export const updateStudio = async (token: string, id: number, studioData: StudioUpdateRequest): Promise<Studio> => {
+  const response = await fetch(`${API_BASE}/studios/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(studioData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || 'Failed to update studio');
+  }
+
+  return response.json();
+};
+
+export const deleteStudio = async (token: string, id: number): Promise<void> => {
+  const response = await fetch(`${API_BASE}/studios/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || 'Failed to delete studio');
   }
 };

@@ -27,6 +27,7 @@ export default function Layout({ children }: LayoutProps) {
     if (role === 'studio_owner') {
       return [
         { id: "studios", label: "Студии", icon: Building2 },
+        { id: "owner/studios", label: "Мои студии", icon: Building2 },
         { id: "manager/bookings", label: "Бронирования", icon: Calendar },
         { id: "manager/clients", label: "Клиенты", icon: Users },
         { id: "messages", label: "Сообщения", icon: MessageSquare },

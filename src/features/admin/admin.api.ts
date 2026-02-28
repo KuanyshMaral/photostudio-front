@@ -393,3 +393,102 @@ export const convertLead = async (token: string, leadId: number, legalName: stri
     const json = await response.json();
     return json.data;
 };
+
+// Owner verification types
+export interface OwnerProfile {
+  user_id: number;
+  studio_id: number; // Original studio ID for API calls
+  company_name?: string;
+  contact_person?: string;
+  phone?: string;
+  email?: string;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  studio_status?: 'active' | 'inactive';
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OwnerProfilesResponse {
+  data: OwnerProfile[];
+  success: boolean;
+}
+
+// Owner verification API functions
+export const getOwnerProfiles = async (token: string): Promise<OwnerProfilesResponse> => {
+  const response = await fetch(`${API_BASE}/admin/studios/pending`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error?.message || 'Failed to fetch owner profiles');
+  }
+
+  const json = await response.json();
+  // Convert pending studios to owner profiles format
+  const studios = json.data?.pending_studios || [];
+  const ownerProfiles: OwnerProfile[] = studios.map((studio: any) => ({
+    user_id: studio.id, // Use studio.id as user_id for API calls
+    studio_id: studio.id, // Keep original studio_id for reference
+    company_name: studio.company_name,
+    contact_person: '', // Not available in API response
+    phone: '', // Not available in API response
+    email: '', // Not available in API response
+    verification_status: 'pending', // All pending studios are pending verification
+    studio_status: 'inactive',
+    created_at: studio.created_at,
+    updated_at: studio.created_at
+  }));
+
+  return {
+    data: ownerProfiles,
+    success: true
+  };
+};
+
+export const updateOwnerVerification = async (token: string, studioId: number, verificationStatus: 'pending' | 'verified' | 'rejected'): Promise<OwnerProfile> => {
+  if (verificationStatus === 'verified') {
+    // Use existing verifyStudio function
+    await verifyStudio(token, studioId, 'Verified through admin panel');
+    
+    // Return mock updated profile
+    return {
+      user_id: studioId,
+      studio_id: studioId,
+      verification_status: 'verified',
+      studio_status: 'active'
+    } as OwnerProfile;
+  } else if (verificationStatus === 'rejected') {
+    // Use existing rejectStudio function
+    await rejectStudio(token, studioId, 'Rejected through admin panel');
+    
+    // Return mock updated profile
+    return {
+      user_id: studioId,
+      studio_id: studioId,
+      verification_status: 'rejected',
+      studio_status: 'inactive'
+    } as OwnerProfile;
+  } else {
+    // For 'pending', just return mock profile
+    return {
+      user_id: studioId,
+      studio_id: studioId,
+      verification_status: 'pending',
+      studio_status: 'inactive'
+    } as OwnerProfile;
+  }
+};
+
+export const updateOwnerStudioStatus = async (token: string, userId: number, studioStatus: 'active' | 'inactive'): Promise<OwnerProfile> => {
+  // Studio status is managed through verification status
+  // For now, just return mock profile
+  return {
+    user_id: userId,
+    studio_status: studioStatus
+  } as OwnerProfile;
+};
