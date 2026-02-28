@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Plus, Edit, Trash2, Home, MapPin, Users, DollarSign, ArrowLeft } from 'lucide-react';
+import { Plus, Edit, Trash2, Home, MapPin, Users, DollarSign, ArrowLeft, Package } from 'lucide-react';
 import './OwnerDashboard.css';
 
 // Types based on Swagger API
@@ -25,6 +25,30 @@ interface Room {
   created_at?: string;
   updated_at?: string;
 }
+
+interface Equipment {
+  id?: number;
+  name: string;
+  brand?: string;
+  model?: string;
+  category?: string;
+  quantity: number;
+  rental_price: number;
+  room_id?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface CreateEquipmentRequest {
+  name: string;
+  brand?: string;
+  model?: string;
+  category?: string;
+  quantity: number;
+  rental_price: number;
+}
+
+interface UpdateEquipmentRequest extends Partial<CreateEquipmentRequest> {}
 
 interface CreateRoomRequest {
   name: string;
@@ -138,6 +162,20 @@ const deleteRoom = async (token: string, roomId: number): Promise<void> => {
   if (!response.ok) throw new Error('Failed to delete room');
 };
 
+// Equipment API functions
+const addEquipment = async (token: string, roomId: number, equipmentData: CreateEquipmentRequest): Promise<Equipment> => {
+  const response = await fetch(`${API_BASE}/rooms/${roomId}/equipment`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(equipmentData)
+  });
+  if (!response.ok) throw new Error('Failed to add equipment');
+  return response.json();
+};
+
 interface StudioRoomsManagementProps {
   studio: Studio;
   onBack: () => void;
@@ -151,6 +189,8 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [showEquipmentForm, setShowEquipmentForm] = useState(false);
+  const [selectedRoomForEquipment, setSelectedRoomForEquipment] = useState<Room | null>(null);
 
   const [formData, setFormData] = useState<CreateRoomRequest>({
     name: '',
@@ -162,6 +202,15 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
     price_per_hour_max: 0,
     photos: [],
     amenities: []
+  });
+
+  const [equipmentFormData, setEquipmentFormData] = useState<CreateEquipmentRequest>({
+    name: '',
+    brand: '',
+    model: '',
+    category: '',
+    quantity: 1,
+    rental_price: 0
   });
 
   // Fetch room types and rooms for this studio
@@ -273,6 +322,33 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
     });
     setEditingRoom(null);
     setShowForm(false);
+  };
+
+  const handleAddEquipment = (room: Room) => {
+    setSelectedRoomForEquipment(room);
+    setEquipmentFormData({
+      name: '',
+      brand: '',
+      model: '',
+      category: '',
+      quantity: 1,
+      rental_price: 0
+    });
+    setShowEquipmentForm(true);
+  };
+
+  const handleEquipmentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token || !selectedRoomForEquipment) return;
+
+    try {
+      await addEquipment(token, selectedRoomForEquipment.id, equipmentFormData);
+      alert('Оборудование успешно добавлено!');
+      setShowEquipmentForm(false);
+      setSelectedRoomForEquipment(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to add equipment');
+    }
   };
 
   if (loading) {
@@ -483,6 +559,13 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
                   <Edit size={16} />
                 </button>
                 <button 
+                  className="btn-primary"
+                  onClick={() => handleAddEquipment(room)}
+                >
+                  <Package size={16} />
+                  Оборудование
+                </button>
+                <button 
                   className="btn-danger"
                   onClick={() => handleDelete(room.id)}
                 >
@@ -493,6 +576,100 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
           ))
         )}
       </div>
+
+      {showEquipmentForm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Добавить оборудование в комнату "{selectedRoomForEquipment?.name}"</h3>
+              <button onClick={() => {
+                setShowEquipmentForm(false);
+                setSelectedRoomForEquipment(null);
+              }} className="close-button">×</button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleEquipmentSubmit} className="equipment-form">
+                <div className="form-group">
+                  <label>Название оборудования *</label>
+                  <input
+                    type="text"
+                    value={equipmentFormData.name}
+                    onChange={(e) => setEquipmentFormData({...equipmentFormData, name: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Бренд</label>
+                    <input
+                      type="text"
+                      value={equipmentFormData.brand}
+                      onChange={(e) => setEquipmentFormData({...equipmentFormData, brand: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Модель</label>
+                    <input
+                      type="text"
+                      value={equipmentFormData.model}
+                      onChange={(e) => setEquipmentFormData({...equipmentFormData, model: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Категория</label>
+                  <input
+                    type="text"
+                    value={equipmentFormData.category}
+                    onChange={(e) => setEquipmentFormData({...equipmentFormData, category: e.target.value})}
+                    placeholder="Например: Освещение, Аудио, Камеры"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Количество *</label>
+                    <input
+                      type="number"
+                      value={equipmentFormData.quantity}
+                      onChange={(e) => setEquipmentFormData({...equipmentFormData, quantity: Number(e.target.value)})}
+                      min="1"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Цена аренды (₽/час) *</label>
+                    <input
+                      type="number"
+                      value={equipmentFormData.rental_price}
+                      onChange={(e) => setEquipmentFormData({...equipmentFormData, rental_price: Number(e.target.value)})}
+                      min="0"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-actions">
+                  <button type="button" className="btn-secondary" onClick={() => {
+                    setShowEquipmentForm(false);
+                    setSelectedRoomForEquipment(null);
+                  }}>
+                    Отмена
+                  </button>
+                  <button type="submit" className="btn-primary">
+                    Добавить оборудование
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
