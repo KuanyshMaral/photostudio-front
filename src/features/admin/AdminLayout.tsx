@@ -21,6 +21,7 @@ export const AdminLayout: React.FC = () => {
     { path: '/admin/users', label: 'Пользователи', icon: Users },
     { path: '/admin/analytics', label: 'Аналитика', icon: BarChart3 },
     { path: '/admin/studios', label: 'Студии', icon: Building2 },
+    { path: '/admin/verification', label: 'Верификация', icon: Shield },
     { path: '/admin/leads', label: 'Лиды', icon: UserPlus },
     { path: '/admin/ads', label: 'Реклама', icon: Megaphone },
     { path: '/admin/reviews', label: 'Отзывы', icon: MessageSquare },
