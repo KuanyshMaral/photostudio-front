@@ -9,7 +9,8 @@ import {
   type StudioCreateRequest,
   type StudioUpdateRequest
 } from './owner.api';
-import { Plus, Edit, Trash2, MapPin, Phone, Mail, Clock, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Phone, Mail, Clock, Star, Home } from 'lucide-react';
+import StudioRoomsManagement from './StudioRoomsManagement';
 import './OwnerDashboard.css';
 
 export default function StudioManagement() {
@@ -19,6 +20,7 @@ export default function StudioManagement() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingStudio, setEditingStudio] = useState<Studio | null>(null);
+  const [selectedStudioForRooms, setSelectedStudioForRooms] = useState<Studio | null>(null);
   const [form, setForm] = useState<StudioCreateRequest>({
     name: '',
     description: '',
@@ -185,182 +187,206 @@ export default function StudioManagement() {
 
   return (
     <div className="tab-content">
-      <div className="content-header">
-        <h2>Мои студии</h2>
-        <button className="btn-primary" onClick={() => {
-          setEditingStudio(null);
-          resetForm();
-          setShowForm(true);
-        }}>
-          <Plus size={16} /> Добавить студию
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>{editingStudio ? 'Редактировать студию' : 'Добавить студию'}</h3>
-              <button onClick={() => {
-                setShowForm(false);
-                setEditingStudio(null);
-              }} className="close-button">×</button>
-            </div>
-            <div className="modal-body">
-              <form onSubmit={handleSubmit} className="studio-form">
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label>Название студии</label>
-                    <input
-                      type="text"
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Город</label>
-                    <input
-                      type="text"
-                      value={form.city}
-                      onChange={(e) => setForm({ ...form, city: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Район</label>
-                    <input
-                      type="text"
-                      value={form.district}
-                      onChange={(e) => setForm({ ...form, district: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Телефон</label>
-                    <input
-                      type="tel"
-                      value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Email</label>
-                    <input
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Вебсайт</label>
-                    <input
-                      type="url"
-                      value={form.website}
-                      onChange={(e) => setForm({ ...form, website: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group full-width">
-                    <label>Адрес</label>
-                    <input
-                      type="text"
-                      value={form.address}
-                      onChange={(e) => setForm({ ...form, address: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="form-group full-width">
-                    <label>Описание</label>
-                    <textarea
-                      value={form.description}
-                      onChange={(e) => setForm({ ...form, description: e.target.value })}
-                      rows={4}
-                      required
-                    />
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="modal-footer">
-              <button className="btn-secondary" onClick={() => {
-                setShowForm(false);
-                setEditingStudio(null);
-              }}>
-                Отмена
-              </button>
-              <button className="btn-primary" onClick={handleSubmit}>
-                {editingStudio ? 'Сохранить' : 'Создать'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="studios-grid">
-        {studios.length > 0 ? (
-          studios.map((studio) => (
-            <div key={studio.id} className="studio-card">
-              <div className="studio-header">
-                <h3>{studio.name}</h3>
-                <div className="studio-actions">
-                  <button className="btn-small btn-secondary" onClick={() => handleEdit(studio)}>
-                    <Edit size={14} />
-                  </button>
-                  <button className="btn-small btn-danger" onClick={() => handleDelete(studio.id)}>
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="studio-info">
-                <div className="info-item">
-                  <MapPin size={14} />
-                  <span>{studio.address}, {studio.city}</span>
-                </div>
-                {studio.phone && (
-                  <div className="info-item">
-                    <Phone size={14} />
-                    <span>{studio.phone}</span>
-                  </div>
-                )}
-                {studio.email && (
-                  <div className="info-item">
-                    <Mail size={14} />
-                    <span>{studio.email}</span>
-                  </div>
-                )}
-                {studio.website && (
-                  <div className="info-item">
-                    <span>🌐</span>
-                    <a href={studio.website} target="_blank" rel="noopener noreferrer">{studio.website}</a>
-                  </div>
-                )}
-              </div>
-              
-              <p className="studio-description">{studio.description}</p>
-              
-              {studio.rating && (
-                <div className="studio-rating">
-                  <Star size={14} />
-                  <span>{studio.rating.toFixed(1)}</span>
-                </div>
-              )}
-            </div>
-          ))
-        ) : (
-          <div className="empty-state">
-            <h3>У вас пока нет студий</h3>
-            <p>Создайте свою первую студию, чтобы начать принимать бронирования</p>
+      {selectedStudioForRooms ? (
+        <StudioRoomsManagement 
+          studio={selectedStudioForRooms} 
+          onBack={() => setSelectedStudioForRooms(null)} 
+        />
+      ) : (
+        <>
+          <div className="content-header">
+            <h2>Мои студии</h2>
             <button className="btn-primary" onClick={() => {
               setEditingStudio(null);
               resetForm();
               setShowForm(true);
             }}>
-              <Plus size={16} /> Создать студию
+              <Plus size={16} /> Добавить студию
             </button>
           </div>
-        )}
-      </div>
+
+          {showForm && (
+            <div className="modal-overlay">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h3>{editingStudio ? 'Редактировать студию' : 'Добавить студию'}</h3>
+                  <button onClick={() => {
+                    setShowForm(false);
+                    setEditingStudio(null);
+                  }} className="close-button">×</button>
+                </div>
+                <div className="modal-body">
+                  <form onSubmit={handleSubmit} className="studio-form">
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label>Название студии</label>
+                        <input
+                          type="text"
+                          value={form.name}
+                          onChange={(e) => setForm({ ...form, name: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Город</label>
+                        <input
+                          type="text"
+                          value={form.city}
+                          onChange={(e) => setForm({ ...form, city: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Район</label>
+                        <input
+                          type="text"
+                          value={form.district}
+                          onChange={(e) => setForm({ ...form, district: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Телефон</label>
+                        <input
+                          type="tel"
+                          value={form.phone}
+                          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Email</label>
+                        <input
+                          type="email"
+                          value={form.email}
+                          onChange={(e) => setForm({ ...form, email: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Вебсайт</label>
+                        <input
+                          type="url"
+                          value={form.website}
+                          onChange={(e) => setForm({ ...form, website: e.target.value })}
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label>Адрес</label>
+                        <input
+                          type="text"
+                          value={form.address}
+                          onChange={(e) => setForm({ ...form, address: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="form-group full-width">
+                        <label>Описание</label>
+                        <textarea
+                          value={form.description}
+                          onChange={(e) => setForm({ ...form, description: e.target.value })}
+                          rows={4}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn-secondary" onClick={() => {
+                    setShowForm(false);
+                    setEditingStudio(null);
+                  }}>
+                    Отмена
+                  </button>
+                  <button className="btn-primary" onClick={handleSubmit}>
+                    {editingStudio ? 'Сохранить' : 'Создать'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="studios-grid">
+            {studios.length > 0 ? (
+              studios.map((studio) => (
+                <div key={studio.id} className="studio-card">
+                  <div className="studio-header">
+                    <h3>{studio.name}</h3>
+                    <div className="studio-actions">
+                      <button 
+                        className="btn-secondary"
+                        onClick={() => handleEdit(studio)}
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button 
+                        className="btn-primary"
+                        onClick={() => {
+                          setSelectedStudioForRooms(studio);
+                        }}
+                      >
+                        <Home size={16} />
+                        Комнаты
+                      </button>
+                      <button 
+                        className="btn-danger"
+                        onClick={() => handleDelete(studio.id)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="studio-info">
+                    <div className="info-item">
+                      <MapPin size={14} />
+                      <span>{studio.address}, {studio.city}</span>
+                    </div>
+                    {studio.phone && (
+                      <div className="info-item">
+                        <Phone size={14} />
+                        <span>{studio.phone}</span>
+                      </div>
+                    )}
+                    {studio.email && (
+                      <div className="info-item">
+                        <Mail size={14} />
+                        <span>{studio.email}</span>
+                      </div>
+                    )}
+                    {studio.website && (
+                      <div className="info-item">
+                        <span>🌐</span>
+                        <a href={studio.website} target="_blank" rel="noopener noreferrer">{studio.website}</a>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <p className="studio-description">{studio.description}</p>
+                  
+                  {studio.rating && (
+                    <div className="studio-rating">
+                      <Star size={14} />
+                      <span>{studio.rating.toFixed(1)}</span>
+                    </div>
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <h3>У вас пока нет студий</h3>
+                <p>Создайте свою первую студию, чтобы начать принимать бронирования</p>
+                <button className="btn-primary" onClick={() => {
+                  setEditingStudio(null);
+                  resetForm();
+                  setShowForm(true);
+                }}>
+                  <Plus size={16} /> Создать студию
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
