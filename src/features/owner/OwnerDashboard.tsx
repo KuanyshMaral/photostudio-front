@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Building, TrendingUp, Wrench, ShoppingCart, Lock, Camera } from 'lucide-react';
+import { 
+  Building, 
+  TrendingUp, 
+  Wrench, 
+  ShoppingCart, 
+  Camera, 
+  Lock,
+  Calendar,
+  Users,
+  MessageSquare
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 // Import components
@@ -16,7 +26,7 @@ import './OwnerDashboard.css';
 export default function OwnerDashboard() {
   const { token } = useAuth();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'studios' | 'pin'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'studios' | 'bookings' | 'clients' | 'messages' | 'pin'>('profile');
 
   // Update active tab based on URL hash or query param
   useEffect(() => {
@@ -32,6 +42,12 @@ export default function OwnerDashboard() {
       setActiveTab('procurement');
     } else if (hash.includes('studios')) {
       setActiveTab('studios');
+    } else if (hash.includes('bookings')) {
+      setActiveTab('bookings');
+    } else if (hash.includes('clients')) {
+      setActiveTab('clients');
+    } else if (hash.includes('messages')) {
+      setActiveTab('messages');
     } else if (hash.includes('pin')) {
       setActiveTab('pin');
     } else {
@@ -51,6 +67,9 @@ export default function OwnerDashboard() {
     { id: 'maintenance', label: 'Обслуживание', icon: Wrench },
     { id: 'procurement', label: 'Закупки', icon: ShoppingCart },
     { id: 'studios', label: 'Мои студии', icon: Camera },
+    { id: 'bookings', label: 'Бронирования', icon: Calendar },
+    { id: 'clients', label: 'Клиенты', icon: Users },
+    { id: 'messages', label: 'Сообщения', icon: MessageSquare },
     { id: 'pin', label: 'PIN-код', icon: Lock }
   ];
 
@@ -66,6 +85,12 @@ export default function OwnerDashboard() {
         return <Procurement />;
       case 'studios':
         return <StudioManagement />;
+      case 'bookings':
+        return <div>Бронирования (в разработке)</div>;
+      case 'clients':
+        return <div>Клиенты (в разработке)</div>;
+      case 'messages':
+        return <div>Сообщения (в разработке)</div>;
       case 'pin':
         return <PinManagement />;
       default:
