@@ -1,5 +1,19 @@
 const API_BASE = '/api/v1';
 
+const parseJsonSafely = async (response: Response) => {
+  const text = await response.text();
+
+  if (!text.trim()) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
+
 export interface StudiosResponse {
   studios: any[];
   pagination: {
@@ -37,11 +51,11 @@ export const getStudios = async (filters: any) => {
       };
     }
     
-    const data = await response.json();
+    const data = await parseJsonSafely(response);
     
     return {
-      studios: data.data?.studios || [],
-      pagination: data.data?.pagination || {
+      studios: data?.data?.studios || [],
+      pagination: data?.data?.pagination || {
         current_page: 1,
         total_pages: 1,
         total_count: 0,
@@ -71,8 +85,8 @@ export const getStudioById = async (id: number) => {
       return null;
     }
     
-    const data = await response.json();
-    return data.data || null;
+    const data = await parseJsonSafely(response);
+    return data?.data || null;
   } catch (error) {
     console.error('Failed to fetch studio:', error);
     return null;

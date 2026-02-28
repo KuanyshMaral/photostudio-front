@@ -7,38 +7,47 @@ import { useAuth } from '../context/AuthContext';
 interface Props {
   roomId: number;
   pricePerHour: number;
-  onSlotSelect: (start: string, end: string) => void;
+  onSlotSelect: (date: Date, start: string, end: string) => void;
 }
 
 export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelect }: Props) {
   const { token } = useAuth();
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const selectedDateKey = formatLocalDate(selectedDate);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['availability', roomId, selectedDate.toISOString().split('T')[0]],
+    queryKey: ['availability', roomId, selectedDateKey],
     queryFn: () => getAvailability(roomId, selectedDate, token || undefined),
     enabled: !!token,
   });
 
-  // Use backend's available slots, but fallback to slots from 12:00 onwards if API fails
-  const allSlots = data?.available_slots?.map(slot => `${slot.hour.toString().padStart(2, '0')}:00`) || generateTimeSlots('12:00', '22:00', 60);
+  const normalizedAvailableSlots = normalizeAvailableSlots(data?.available_slots);
+  const normalizedBookedSlots = normalizeBookedSlots(data?.booked_slots);
+
+  // Use backend slots if present, otherwise fallback to default working window
+  const allSlots = normalizedAvailableSlots.length > 0
+    ? normalizedAvailableSlots.map((slot) => slot.time)
+    : generateTimeSlots('12:00', '22:00', 60);
 
   console.log('Calendar state:', { data, isLoading, error, allSlots });
 
   // Определяем занятые слоты
   const isSlotBooked = (slot: string) => {
-    return data?.booked_slots?.some(
-      (booked: { start: string }) => booked.start === slot
-    );
+    return normalizedBookedSlots.includes(slot);
   };
   
   // Check if slot is actually available from backend (only if data exists)
   const isSlotAvailable = (slot: string) => {
     // If no data from backend, assume all slots are available
     if (!data || !data.available_slots) return true;
-    
-    const hour = parseInt(slot.split(':')[0]);
-    return data?.available_slots?.some(availableSlot => availableSlot.hour === hour && availableSlot.available) || false;
+    if (normalizedAvailableSlots.length === 0) return true;
+
+    const match = normalizedAvailableSlots.find((availableSlot) => availableSlot.time === slot);
+
+    // If backend returned slots list but without explicit availability flags,
+    // treat listed slots as available.
+    if (!match) return false;
+    return match.available;
   };
 
   return (
@@ -83,7 +92,7 @@ export default function AvailabilityCalendar({ roomId, pricePerHour, onSlotSelec
               disabled={isSlotBooked(slot) || !isSlotAvailable(slot)}
               onClick={() => {
                 const end = addHour(slot);
-                onSlotSelect(slot, end);
+                onSlotSelect(new Date(selectedDate), slot, end);
               }}
               className={`
                 p-3 rounded-lg text-center font-medium transition
@@ -150,4 +159,88 @@ function addHour(timeStr: string): string {
   const newHours = Math.floor(totalMinutes / 60);
   const newMinutes = totalMinutes % 60;
   return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+}
+
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function toTimeLabel(value: unknown): string | null {
+  if (typeof value !== 'string' || value.length === 0) {
+    return null;
+  }
+
+  // Supports "HH:mm", "HH:mm:ss", and ISO strings
+  const isoCandidate = new Date(value);
+  if (!Number.isNaN(isoCandidate.getTime()) && value.includes('T')) {
+    const hh = isoCandidate.getHours().toString().padStart(2, '0');
+    const mm = isoCandidate.getMinutes().toString().padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  const match = value.match(/^(\d{1,2}):(\d{2})/);
+  if (!match) {
+    return null;
+  }
+
+  return `${match[1].padStart(2, '0')}:${match[2]}`;
+}
+
+function normalizeAvailableSlots(rawSlots: any): Array<{ time: string; available: boolean }> {
+  if (!Array.isArray(rawSlots)) {
+    return [];
+  }
+
+  const normalized = rawSlots
+    .map((slot) => {
+      if (typeof slot === 'string') {
+        const time = toTimeLabel(slot);
+        return time ? { time, available: true } : null;
+      }
+
+      if (typeof slot === 'object' && slot !== null) {
+        if (typeof slot.hour === 'number') {
+          const time = `${slot.hour.toString().padStart(2, '0')}:00`;
+          return { time, available: slot.available !== false };
+        }
+
+        const time = toTimeLabel(slot.start) || toTimeLabel(slot.time);
+        if (!time) {
+          return null;
+        }
+
+        const available = slot.available ?? slot.is_available;
+        return { time, available: available !== false };
+      }
+
+      return null;
+    })
+    .filter((slot): slot is { time: string; available: boolean } => Boolean(slot));
+
+  return Array.from(new Map(normalized.map((slot) => [slot.time, slot])).values());
+}
+
+function normalizeBookedSlots(rawSlots: any): string[] {
+  if (!Array.isArray(rawSlots)) {
+    return [];
+  }
+
+  const times = rawSlots
+    .map((slot) => {
+      if (typeof slot === 'string') {
+        return toTimeLabel(slot);
+      }
+
+      if (typeof slot === 'object' && slot !== null) {
+        return toTimeLabel(slot.start) || toTimeLabel(slot.time);
+      }
+
+      return null;
+    })
+    .filter((time): time is string => Boolean(time));
+
+  return Array.from(new Set(times));
 }

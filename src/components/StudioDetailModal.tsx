@@ -44,7 +44,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   const [showBookingCalendar, setShowBookingCalendar] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
-  const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ date: Date; start: string; end: string } | null>(null);
 
   // Fetch reviews when reviews tab is active
   useEffect(() => {
@@ -70,7 +70,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   }, [activeTab, studio.id]);
 
   // Tab labels removed — rely on backend or translations later
-  const tabs: { id: string; label: string }[] = [];
+  const tabs: { id: TabType; label: string }[] = [];
 
   // Utility functions
   const token = localStorage.getItem('token');
@@ -126,8 +126,8 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     }
   };
 
-  const handleSlotSelect = (start: string, end: string) => {
-    setSelectedSlot({ start, end });
+  const handleSlotSelect = (date: Date, start: string, end: string) => {
+    setSelectedSlot({ date, start, end });
     setShowBookingForm(true);
   };
 
@@ -305,7 +305,7 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                     roomName={selectedRoom.name}
                     studioName={studio.name}
                     studioId={studio.id}
-                    date={new Date()}
+                    date={selectedSlot.date}
                     startTime={selectedSlot.start}
                     endTime={selectedSlot.end}
                     pricePerHour={selectedRoom?.price_per_hour_min || studio.price_per_hour || studio.min_price || 0}

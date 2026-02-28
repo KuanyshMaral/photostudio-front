@@ -1,4 +1,5 @@
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_BASE = `${API_ORIGIN}/api/v1`;
 
 // Types for booking operations based on Swagger
 export type BookingData = {
@@ -26,6 +27,53 @@ export interface UpdateBookingStatusRequest {
   status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
 }
 
+const parseJsonSafely = async (response: Response) => {
+    const text = await response.text();
+
+    if (!text.trim()) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return null;
+    }
+};
+
+const getErrorMessage = (payload: any, fallback: string) => {
+    return payload?.error?.message || payload?.message || fallback;
+};
+
+const getResponseData = (payload: any) => {
+    return payload?.data ?? payload;
+};
+
+const extractBookingsList = (payload: any): any[] => {
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    const candidates = [
+        payload?.bookings,
+        payload?.items,
+        payload?.results,
+        payload?.list,
+        payload?.data?.bookings,
+        payload?.data?.items,
+        payload?.data?.results,
+        payload?.data?.list,
+    ];
+
+    for (const candidate of candidates) {
+        if (Array.isArray(candidate)) {
+            return candidate;
+        }
+    }
+
+    return [];
+};
+
 // Create booking - POST /api/v1/bookings
 export const createBooking = async (data: BookingData, token: string) => {
     console.log('Creating booking with data:', data);
@@ -49,14 +97,15 @@ export const createBooking = async (data: BookingData, token: string) => {
     console.log('Create booking response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Create booking error:', error);
-        throw new Error(error.error?.message || error.message || 'Booking failed');
+        throw new Error(getErrorMessage(error, 'Booking failed'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Create booking response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Cancel booking - PATCH /api/v1/bookings/{id}/cancel
@@ -75,14 +124,15 @@ export const cancelBooking = async (token: string, bookingId: number, data: Canc
     console.log('Cancel booking response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Cancel booking error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to cancel booking');
+        throw new Error(getErrorMessage(error, 'Failed to cancel booking'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Cancel booking response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Complete booking - PATCH /api/v1/bookings/{id}/complete
@@ -99,14 +149,15 @@ export const completeBooking = async (token: string, bookingId: number) => {
     console.log('Complete booking response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Complete booking error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to complete booking');
+        throw new Error(getErrorMessage(error, 'Failed to complete booking'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Complete booking response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Confirm booking - PATCH /api/v1/bookings/{id}/confirm
@@ -123,14 +174,15 @@ export const confirmBooking = async (token: string, bookingId: number) => {
     console.log('Confirm booking response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Confirm booking error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to confirm booking');
+        throw new Error(getErrorMessage(error, 'Failed to confirm booking'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Confirm booking response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Update deposit - PATCH /api/v1/bookings/{id}/deposit
@@ -149,14 +201,15 @@ export const updateBookingDeposit = async (token: string, bookingId: number, dat
     console.log('Update deposit response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Update deposit error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to update deposit');
+        throw new Error(getErrorMessage(error, 'Failed to update deposit'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Update deposit response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Mark as paid - PATCH /api/v1/bookings/{id}/mark-paid
@@ -173,14 +226,15 @@ export const markBookingAsPaid = async (token: string, bookingId: number) => {
     console.log('Mark paid response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Mark paid error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to mark as paid');
+        throw new Error(getErrorMessage(error, 'Failed to mark as paid'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Mark paid response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Update payment status - PATCH /api/v1/bookings/{id}/payment-status
@@ -199,14 +253,15 @@ export const updatePaymentStatus = async (token: string, bookingId: number, data
     console.log('Update payment status response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Update payment status error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to update payment status');
+        throw new Error(getErrorMessage(error, 'Failed to update payment status'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Update payment status response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Update booking status - PATCH /api/v1/bookings/{id}/status
@@ -225,14 +280,15 @@ export const updateBookingStatus = async (token: string, bookingId: number, data
     console.log('Update booking status response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Update booking status error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to update booking status');
+        throw new Error(getErrorMessage(error, 'Failed to update booking status'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Update booking status response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || {};
 };
 
 // Get booking by ID - GET /api/v1/bookings/{id}
@@ -248,14 +304,15 @@ export const getBookingById = async (token: string, bookingId: number) => {
     console.log('Get booking response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get booking error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to get booking');
+        throw new Error(getErrorMessage(error, 'Failed to get booking'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get booking response:', json);
-    return json.data?.booking || json.data;
+    const responseData = getResponseData(json);
+    return responseData?.booking || responseData || null;
 };
 
 // Get user bookings - GET /api/v1/users/me/bookings
@@ -275,14 +332,17 @@ export const getMyBookings = async (token: string, status?: string) => {
     console.log('Get user bookings response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get user bookings error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to fetch bookings');
+        throw new Error(getErrorMessage(error, 'Failed to fetch bookings'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get user bookings response:', json);
-    return json.data?.bookings || json.bookings || [];
+    const responseData = getResponseData(json);
+    const bookings = extractBookingsList(responseData);
+    console.log('Extracted user bookings count:', bookings.length);
+    return bookings;
 };
 
 // Get room availability - GET /api/v1/rooms/{id}/availability
@@ -298,14 +358,19 @@ export const getRoomAvailability = async (token: string, roomId: number, date: s
     console.log('Get room availability response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get room availability error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to get room availability');
+        throw new Error(getErrorMessage(error, 'Failed to get room availability'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get room availability response:', json);
-    return json.data?.availability || json;
+    const responseData = getResponseData(json);
+    return responseData?.availability || responseData || {
+        date,
+        booked_slots: [],
+        available_slots: []
+    };
 };
 
 // Get room busy slots - GET /api/v1/rooms/{id}/busy-slots
@@ -321,14 +386,14 @@ export const getRoomBusySlots = async (token: string, roomId: number, date: stri
     console.log('Get room busy slots response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get room busy slots error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to get room busy slots');
+        throw new Error(getErrorMessage(error, 'Failed to get room busy slots'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get room busy slots response:', json);
-    return json.data || json;
+    return getResponseData(json) || [];
 };
 
 // Get studio bookings - GET /api/v1/studios/{id}/bookings
@@ -344,14 +409,15 @@ export const getStudioBookings = async (token: string, studioId: number) => {
     console.log('Get studio bookings response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get studio bookings error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to get studio bookings');
+        throw new Error(getErrorMessage(error, 'Failed to get studio bookings'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get studio bookings response:', json);
-    return json.data?.bookings || json.bookings || [];
+    const responseData = getResponseData(json);
+    return responseData?.bookings || json?.bookings || [];
 };
 
 // Get user bookings with pagination - GET /api/v1/users/me/bookings
@@ -373,12 +439,22 @@ export const getUserBookings = async (token: string, limit?: number, offset?: nu
     console.log('Get user bookings with pagination response status:', response.status);
     
     if (!response.ok) {
-        const error = await response.json();
+        const error = await parseJsonSafely(response);
         console.error('Get user bookings with pagination error:', error);
-        throw new Error(error.error?.message || error.message || 'Failed to get user bookings');
+        throw new Error(getErrorMessage(error, 'Failed to get user bookings'));
     }
-    
-    const json = await response.json();
+
+    const json = await parseJsonSafely(response);
     console.log('Get user bookings with pagination response:', json);
-    return json.data || json;
+    const responseData = getResponseData(json);
+    const bookings = extractBookingsList(responseData);
+
+    return {
+        bookings,
+        pagination: responseData?.pagination || {
+            total: bookings.length,
+            limit: limit || bookings.length,
+            offset: offset || 0,
+        }
+    };
 };

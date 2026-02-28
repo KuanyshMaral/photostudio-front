@@ -3,7 +3,22 @@
  * Все данные приходят с бэкенда, без хардкодов
  */
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const API_BASE = `${API_ORIGIN}/api/v1`;
+
+const parseJsonSafely = async (response: Response) => {
+  const text = await response.text();
+
+  if (!text.trim()) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+};
 
 // ============ TYPES ============
 
@@ -57,8 +72,8 @@ export const getCities = async (): Promise<City[]> => {
       console.warn('Failed to fetch cities, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.cities || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.cities || [];
   } catch (error) {
     console.error('Error fetching cities:', error);
     return [];
@@ -78,8 +93,8 @@ export const getDistricts = async (cityId?: number): Promise<District[]> => {
       console.warn('Failed to fetch districts, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.districts || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.districts || [];
   } catch (error) {
     console.error('Error fetching districts:', error);
     return [];
@@ -93,8 +108,8 @@ export const getDistrictsByCity = async (cityName: string): Promise<District[]> 
       console.warn(`Failed to fetch districts for ${cityName}, returning empty array`);
       return [];
     }
-    const data = await response.json();
-    return data.data?.districts || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.districts || [];
   } catch (error) {
     console.error(`Error fetching districts for ${cityName}:`, error);
     return [];
@@ -110,8 +125,8 @@ export const getAmenities = async (): Promise<Amenity[]> => {
       console.warn('Failed to fetch amenities, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.amenities || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.amenities || [];
   } catch (error) {
     console.error('Error fetching amenities:', error);
     return [];
@@ -127,8 +142,8 @@ export const getRoomTypes = async (): Promise<RoomTypeRef[]> => {
       console.warn('Failed to fetch room types, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.room_types || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.room_types || [];
   } catch (error) {
     console.error('Error fetching room types:', error);
     return [];
@@ -144,8 +159,8 @@ export const getBookingStatuses = async (): Promise<BookingStatus[]> => {
       console.warn('Failed to fetch booking statuses, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.statuses || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.statuses || [];
   } catch (error) {
     console.error('Error fetching booking statuses:', error);
     return [];
@@ -161,8 +176,8 @@ export const getStudioStatuses = async (): Promise<StudioStatus[]> => {
       console.warn('Failed to fetch studio statuses, returning empty array');
       return [];
     }
-    const data = await response.json();
-    return data.data?.statuses || [];
+    const data = await parseJsonSafely(response);
+    return data?.data?.statuses || [];
   } catch (error) {
     console.error('Error fetching studio statuses:', error);
     return [];
