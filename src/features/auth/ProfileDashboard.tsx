@@ -14,6 +14,25 @@ export const ProfileDashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
+  const toDisplayString = (value: unknown): string => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    return '';
+  };
+
+  const displayName =
+    toDisplayString(profile?.name) ||
+    toDisplayString(profile?.full_name) ||
+    toDisplayString(profile?.contact_person) ||
+    'Пользователь';
+  const displayAvatar = profile?.avatar_url || profile?.avatar;
+  const recentBookings = Array.isArray(profile?.recent_bookings)
+    ? profile.recent_bookings.filter(
+        (booking): booking is NonNullable<Profile['recent_bookings']>[number] =>
+          typeof booking === 'object' && booking !== null && 'id' in booking
+      )
+    : [];
+
   // Загрузка профиля с статистикой
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,8 +53,9 @@ export const ProfileDashboard: React.FC = () => {
 
   // Получение инициалов для fallback аватара
   const getInitials = (name: string): string => {
-    if (!name) return '?';
-    return name
+    const safeName = toDisplayString(name);
+    if (!safeName) return '?';
+    return safeName
       .split(' ')
       .map(word => word.charAt(0))
       .join('')
@@ -69,11 +89,25 @@ export const ProfileDashboard: React.FC = () => {
   };
 
   // Callback после обновления профиля
-  const handleProfileUpdate = () => {
+  const handleProfileUpdate = (updatedProfile: Profile) => {
+    setProfile(updatedProfile);
+
+    try {
+      const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          ...savedUser,
+          ...updatedProfile,
+          name: updatedProfile.name || updatedProfile.full_name || updatedProfile.contact_person || savedUser.name,
+        })
+      );
+    } catch {
+      // ignore malformed localStorage
+    }
+
     setIsEditModalOpen(false);
     refreshUser?.();
-    // Re-fetch profile
-    window.location.reload();
   };
 
   if (isLoading) {
@@ -100,15 +134,15 @@ export const ProfileDashboard: React.FC = () => {
           {/* Аватар */}
           <div className="identity-card__avatar-container">
             <div className="identity-card__avatar">
-              {profile.avatar_url ? (
+              {displayAvatar ? (
                 <img 
-                  src={profile.avatar_url} 
-                  alt={profile.name || 'Аватар пользователя'}
+                  src={displayAvatar} 
+                  alt={displayName}
                   className="identity-card__avatar-img"
                 />
               ) : (
                 <span className="identity-card__avatar-fallback">
-                  {getInitials(profile.name || '')}
+                  {getInitials(displayName)}
                 </span>
               )}
             </div>
@@ -121,7 +155,7 @@ export const ProfileDashboard: React.FC = () => {
           </div>
 
           {/* Имя и роль */}
-          <h1 className="identity-card__name">{profile.name || 'Пользователь'}</h1>
+          <h1 className="identity-card__name">{displayName}</h1>
           <span className="identity-card__role">
             {getRoleLabel(profile.role || 'client')}
           </span>
@@ -191,6 +225,36 @@ export const ProfileDashboard: React.FC = () => {
                 </span>
               </div>
             </div>
+
+            {profile.role === 'admin' && (
+              <div className="info-item">
+                <Calendar size={18} className="info-item__icon" />
+                <div className="info-item__content">
+                  <span className="info-item__label">Должность</span>
+                  <span className="info-item__value">{profile.position || 'Не указана'}</span>
+                </div>
+              </div>
+            )}
+
+            {profile.role === 'studio_owner' && (
+              <>
+                <div className="info-item">
+                  <Mail size={18} className="info-item__icon" />
+                  <div className="info-item__content">
+                    <span className="info-item__label">Компания</span>
+                    <span className="info-item__value">{profile.company_name || profile.companyName || 'Не указана'}</span>
+                  </div>
+                </div>
+
+                <div className="info-item">
+                  <Phone size={18} className="info-item__icon" />
+                  <div className="info-item__content">
+                    <span className="info-item__label">Контактное лицо</span>
+                    <span className="info-item__value">{profile.contact_person || profile.contactPerson || 'Не указано'}</span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -198,14 +262,14 @@ export const ProfileDashboard: React.FC = () => {
         <section className="profile-section">
           <h2 className="profile-section__title">Недавняя активность</h2>
           <div className="activity-card">
-            {profile.recent_bookings && profile.recent_bookings.length > 0 ? (
-              profile.recent_bookings.map(booking => (
+            {recentBookings.length > 0 ? (
+              recentBookings.map((booking) => (
                 <RecentActivityItem
                   key={booking.id}
-                  studioName={booking.studio_name}
-                  roomName={booking.room_name}
-                  date={booking.date}
-                  status={booking.status}
+                  studioName={booking.studio_name || 'Студия'}
+                  roomName={booking.room_name || 'Зал'}
+                  date={booking.date || 'Дата не указана'}
+                  status={booking.status || 'pending'}
                 />
               ))
             ) : (

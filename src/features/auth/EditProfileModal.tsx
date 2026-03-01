@@ -9,7 +9,7 @@ import './EditProfileModal.css';
 interface EditProfileModalProps {
   profile: Profile;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (updatedProfile: Profile) => void;
 }
 
 export const EditProfileModal: React.FC<EditProfileModalProps> = ({
@@ -18,10 +18,19 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
   onSave,
 }) => {
   const { token } = useAuth();
+  const displayName = profile.name || profile.full_name || profile.contact_person || '';
   const [formData, setFormData] = useState({
-    name: profile.name,
+    name: displayName,
     email: profile.email,
     phone: profile.phone || '',
+    company_name: profile.company_name || profile.companyName || '',
+    bin: profile.bin || '',
+    legal_address: profile.legal_address || profile.address || '',
+    contact_person: profile.contact_person || profile.contactPerson || '',
+    contact_position: profile.contact_position || '',
+    website: profile.website || '',
+    full_name: profile.full_name || profile.name || '',
+    position: profile.position || '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -36,14 +45,22 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
         return;
       }
 
-      // Обновляем только name и phone как в Swagger API
-      await updateProfile(token, {
+      const updatedProfile = await updateProfile(token, {
         name: formData.name,
+        full_name: formData.full_name,
         phone: formData.phone,
+        email: formData.email,
+        company_name: formData.company_name,
+        bin: formData.bin,
+        legal_address: formData.legal_address,
+        contact_person: formData.contact_person,
+        contact_position: formData.contact_position,
+        website: formData.website,
+        position: formData.position,
       });
 
       toast.success('Профиль успешно обновлен!');
-      onSave();
+      onSave(updatedProfile);
     } catch (error: any) {
       console.error('Failed to update profile:', error);
       const message = error.response?.data?.error?.message || error.message || 'Ошибка обновления профиля';
@@ -108,6 +125,32 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               />
             </div>
 
+            {profile.role === 'admin' && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="full_name">ФИО</label>
+                  <input
+                    type="text"
+                    id="full_name"
+                    name="full_name"
+                    value={formData.full_name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="position">Должность</label>
+                  <input
+                    type="text"
+                    id="position"
+                    name="position"
+                    value={formData.position}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
+
             <div className="form-group">
               <label htmlFor="email">Email</label>
               <input
@@ -130,6 +173,76 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 onChange={handleChange}
               />
             </div>
+
+            {profile.role === 'studio_owner' && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="company_name">Компания</label>
+                  <input
+                    type="text"
+                    id="company_name"
+                    name="company_name"
+                    value={formData.company_name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="bin">БИН</label>
+                  <input
+                    type="text"
+                    id="bin"
+                    name="bin"
+                    value={formData.bin}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="contact_person">Контактное лицо</label>
+                  <input
+                    type="text"
+                    id="contact_person"
+                    name="contact_person"
+                    value={formData.contact_person}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="contact_position">Должность контактного лица</label>
+                  <input
+                    type="text"
+                    id="contact_position"
+                    name="contact_position"
+                    value={formData.contact_position}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="legal_address">Юридический адрес</label>
+                  <input
+                    type="text"
+                    id="legal_address"
+                    name="legal_address"
+                    value={formData.legal_address}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="website">Сайт</label>
+                  <input
+                    type="url"
+                    id="website"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Actions */}

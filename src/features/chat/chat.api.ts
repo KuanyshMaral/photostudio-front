@@ -1,9 +1,20 @@
 // ============================================================
 // CHAT API SERVICE
-// Все методы для работы с Chat API
 // ============================================================
 
-const API_BASE = '/api/v1';
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/v1`;
+
+interface ErrorData {
+    code?: string;
+    message?: string;
+}
+
+interface ApiResponse<T> {
+    success?: boolean;
+    data?: T;
+    error?: ErrorData;
+    message?: string;
+}
 
 // ============================================================
 // TYPES
@@ -74,6 +85,161 @@ export interface CreateConversationRequest {
     initial_message?: string;
 }
 
+export interface CreateDirectRequest {
+    recipient_id: number;
+}
+
+export interface CreateGroupRequest {
+    name: string;
+    member_ids?: number[];
+}
+
+export interface AddMemberRequest {
+    user_id: number;
+}
+
+export interface SendMessageRequest {
+    content?: string;
+    upload_id?: string;
+}
+
+const RETRYABLE_STATUS = new Set([404, 405]);
+
+function getErrorMessage(payload: unknown, fallback: string): string {
+    const response = payload as ApiResponse<unknown>;
+    return response?.error?.message || response?.message || fallback;
+}
+
+function unwrapData<T>(payload: unknown): T {
+    const response = payload as ApiResponse<T>;
+    if (response && typeof response === 'object' && 'data' in response) {
+        return (response.data ?? {}) as T;
+    }
+
+    return payload as T;
+}
+
+async function parseJsonSafe(response: Response): Promise<unknown> {
+    try {
+        return await response.json();
+    } catch {
+        return null;
+    }
+}
+
+async function fetchWithFallback(
+    urls: string[],
+    init: RequestInit,
+    fallbackMessage: string
+): Promise<unknown> {
+    let lastRetryPayload: unknown = null;
+
+    for (const url of urls) {
+        const response = await fetch(url, init);
+        const payload = await parseJsonSafe(response);
+
+        if (response.ok) {
+            return payload;
+        }
+
+        if (RETRYABLE_STATUS.has(response.status)) {
+            lastRetryPayload = payload;
+            continue;
+        }
+
+        throw new Error(getErrorMessage(payload, fallbackMessage));
+    }
+
+    throw new Error(getErrorMessage(lastRetryPayload, fallbackMessage));
+}
+
+function normalizeConversation(raw: any): Conversation {
+    const otherUser = raw?.other_user || raw?.otherUser || raw?.recipient || raw?.user || {};
+    const lastMessage = raw?.last_message || raw?.lastMessage;
+
+    return {
+        id: Number(raw?.id || 0),
+        other_user: {
+            id: Number(otherUser?.id || 0),
+            name: otherUser?.name || otherUser?.full_name || 'Unknown user',
+            avatar: otherUser?.avatar || otherUser?.avatar_url,
+            role: otherUser?.role,
+        },
+        studio: raw?.studio
+            ? {
+                id: Number(raw.studio.id || 0),
+                name: raw.studio.name || 'Studio',
+            }
+            : undefined,
+        booking: raw?.booking
+            ? {
+                id: Number(raw.booking.id || 0),
+                start_time: raw.booking.start_time || '',
+                status: raw.booking.status || '',
+            }
+            : undefined,
+        last_message: lastMessage
+            ? {
+                id: Number(lastMessage.id || 0),
+                content: lastMessage.content || '',
+                is_mine: Boolean(lastMessage.is_mine),
+                created_at: lastMessage.created_at || raw?.updated_at || raw?.created_at || '',
+            }
+            : undefined,
+        unread_count: Number(raw?.unread_count ?? raw?.unread ?? 0),
+        last_message_at: raw?.last_message_at || raw?.updated_at || raw?.created_at || new Date().toISOString(),
+        created_at: raw?.created_at || raw?.last_message_at || new Date().toISOString(),
+    };
+}
+
+function normalizeMessage(raw: any, conversationId?: number): Message {
+    const sender = raw?.sender || raw?.user;
+    const messageType = raw?.message_type || raw?.type || 'text';
+
+    return {
+        id: Number(raw?.id || 0),
+        conversation_id: Number(raw?.conversation_id || raw?.room_id || conversationId || 0),
+        sender_id: Number(raw?.sender_id || sender?.id || raw?.user_id || 0),
+        content: raw?.content || '',
+        message_type: messageType,
+        attachment_url: raw?.attachment_url || raw?.image_url || raw?.file_url,
+        is_read: Boolean(raw?.is_read),
+        read_at: raw?.read_at,
+        created_at: raw?.created_at || new Date().toISOString(),
+        sender: sender
+            ? {
+                id: Number(sender.id || 0),
+                name: sender.name || sender.full_name || 'Unknown user',
+                avatar: sender.avatar || sender.avatar_url,
+                role: sender.role,
+            }
+            : undefined,
+    };
+}
+
+function normalizeConversationsResponse(payload: unknown): ConversationsResponse {
+    const data = unwrapData<any>(payload);
+    const rawConversations = Array.isArray(data)
+        ? data
+        : data?.conversations || data?.rooms || [];
+
+    return {
+        conversations: rawConversations.map(normalizeConversation),
+    };
+}
+
+function normalizeMessagesResponse(payload: unknown, conversationId: number): MessagesResponse {
+    const data = unwrapData<any>(payload);
+    const rawMessages = Array.isArray(data)
+        ? data
+        : data?.messages || data?.items || [];
+
+    return {
+        messages: rawMessages.map((message: any) => normalizeMessage(message, conversationId)),
+        has_more: Boolean(data?.has_more ?? data?.hasMore ?? false),
+    };
+}
+
 // ============================================================
 // API METHODS
 // ============================================================
@@ -86,21 +252,20 @@ export async function getConversations(
     limit = 20,
     offset = 0
 ): Promise<ConversationsResponse> {
-    const response = await fetch(
-        `${API_BASE}/chat/conversations?limit=${limit}&offset=${offset}`,
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations?limit=${limit}&offset=${offset}`,
+            `${API_BASE}/chat/rooms?limit=${limit}&offset=${offset}`,
+        ],
         {
             headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
-        }
+        },
+        'Failed to fetch conversations'
     );
 
-    if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
-    }
-
-    const json = await response.json();
-    return json.data;
+    return normalizeConversationsResponse(payload);
 }
 
 /**
@@ -110,22 +275,33 @@ export async function createConversation(
     token: string,
     request: CreateConversationRequest
 ): Promise<{ conversation: Conversation; message?: Message }> {
-    const response = await fetch(`${API_BASE}/chat/conversations`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations`,
+            `${API_BASE}/chat/direct`,
+        ],
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
         },
-        body: JSON.stringify(request),
-    });
+        'Failed to create conversation'
+    );
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create conversation');
-    }
+    const data = unwrapData<any>(payload);
+    const rawConversation = data?.conversation || data?.room || data;
+    const rawMessage = data?.message;
+    const normalizedConversation = normalizeConversation(rawConversation);
 
-    const json = await response.json();
-    return json.data;
+    return {
+        conversation: normalizedConversation,
+        message: rawMessage
+            ? normalizeMessage(rawMessage, normalizedConversation.id)
+            : undefined,
+    };
 }
 
 /**
@@ -137,23 +313,21 @@ export async function getMessages(
     limit = 50,
     beforeId?: number
 ): Promise<MessagesResponse> {
-    let url = `${API_BASE}/chat/conversations/${conversationId}/messages?limit=${limit}`;
-    if (beforeId) {
-        url += `&before=${beforeId}`;
-    }
-
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
+    const before = beforeId ? `&before=${beforeId}` : '';
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations/${conversationId}/messages?limit=${limit}${before}`,
+            `${API_BASE}/chat/rooms/${conversationId}/messages?limit=${limit}${before}`,
+        ],
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
         },
-    });
+        'Failed to fetch messages'
+    );
 
-    if (!response.ok) {
-        throw new Error('Failed to fetch messages');
-    }
-
-    const json = await response.json();
-    return json.data;
+    return normalizeMessagesResponse(payload, conversationId);
 }
 
 /**
@@ -164,24 +338,24 @@ export async function sendMessage(
     conversationId: number,
     content: string
 ): Promise<Message> {
-    const response = await fetch(
-        `${API_BASE}/chat/conversations/${conversationId}/messages`,
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations/${conversationId}/messages`,
+            `${API_BASE}/chat/rooms/${conversationId}/messages`,
+        ],
         {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content }),
-        }
+            body: JSON.stringify({ content } satisfies SendMessageRequest),
+        },
+        'Failed to send message'
     );
 
-    if (!response.ok) {
-        throw new Error('Failed to send message');
-    }
-
-    const json = await response.json();
-    return json.data.message;
+    const data = unwrapData<any>(payload);
+    return normalizeMessage(data?.message || data, conversationId);
 }
 
 /**
@@ -191,22 +365,24 @@ export async function markAsRead(
     token: string,
     conversationId: number
 ): Promise<{ marked_count: number }> {
-    const response = await fetch(
-        `${API_BASE}/chat/conversations/${conversationId}/read`,
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations/${conversationId}/read`,
+            `${API_BASE}/chat/rooms/${conversationId}/read`,
+        ],
         {
             method: 'PATCH',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
-        }
+        },
+        'Failed to mark as read'
     );
 
-    if (!response.ok) {
-        throw new Error('Failed to mark as read');
-    }
-
-    const json = await response.json();
-    return json.data;
+    const data = unwrapData<any>(payload);
+    return {
+        marked_count: Number(data?.marked_count ?? data?.updated ?? 0),
+    };
 }
 
 /**
@@ -220,21 +396,77 @@ export async function uploadImage(
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(
-        `${API_BASE}/chat/conversations/${conversationId}/messages/upload`,
+    const payload = await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations/${conversationId}/messages/upload`,
+            `${API_BASE}/chat/rooms/${conversationId}/messages/upload`,
+        ],
         {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: formData,
-        }
+        },
+        'Failed to upload image'
     );
 
-    if (!response.ok) {
-        throw new Error('Failed to upload image');
-    }
+    const data = unwrapData<any>(payload);
+    return normalizeMessage(data?.message || data, conversationId);
+}
 
-    const json = await response.json();
-    return json.data.message;
+export async function createDirectConversation(
+    token: string,
+    request: CreateDirectRequest
+): Promise<{ conversation: Conversation; message?: Message }> {
+    return createConversation(token, {
+        recipient_id: request.recipient_id,
+    });
+}
+
+export async function createGroupConversation(
+    token: string,
+    request: CreateGroupRequest
+): Promise<{ conversation: Conversation }> {
+    const payload = await fetchWithFallback(
+        [`${API_BASE}/chat/groups`],
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        },
+        'Failed to create group conversation'
+    );
+
+    const data = unwrapData<any>(payload);
+    const rawConversation = data?.conversation || data?.group || data;
+
+    return {
+        conversation: normalizeConversation(rawConversation),
+    };
+}
+
+export async function addConversationMember(
+    token: string,
+    conversationId: number,
+    request: AddMemberRequest
+): Promise<void> {
+    await fetchWithFallback(
+        [
+            `${API_BASE}/chat/conversations/${conversationId}/members`,
+            `${API_BASE}/chat/groups/${conversationId}/members`,
+        ],
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(request),
+        },
+        'Failed to add conversation member'
+    );
 }

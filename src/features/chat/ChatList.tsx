@@ -17,9 +17,14 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
 
     useEffect(() => {
         const fetchConversations = async () => {
-            if (!token) return;
+            if (!token) {
+                setConversations([]);
+                setIsLoading(false);
+                return;
+            }
             
             setIsLoading(true);
+            setError(null);
             try {
                 const data = await getConversations(token);
                 setConversations(data.conversations || []);
@@ -33,6 +38,20 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
 
         fetchConversations();
     }, [token]);
+
+    useEffect(() => {
+        if (!activeConversationId || conversations.length === 0) {
+            return;
+        }
+
+        const activeConversation = conversations.find(
+            (conversation) => conversation.id === activeConversationId
+        );
+
+        if (activeConversation) {
+            onSelectConversation(activeConversation);
+        }
+    }, [activeConversationId, conversations, onSelectConversation]);
 
     if (isLoading) {
         return (

@@ -39,13 +39,23 @@ export type Profile = {
   email: string;
   phone: string;
   role: 'client' | 'studio_owner' | 'admin';
+  nickname?: string;
+  full_name?: string;
+  position?: string;
+  is_active?: boolean;
   companyName?: string;
+  company_name?: string;
   bin?: string;
+  legal_address?: string;
   address?: string;
+  website?: string;
+  contact_person?: string;
+  contact_position?: string;
   contactPerson?: string;
   studio_status?: string;
   avatar?: string;
   avatar_url?: string;
+  verification_status?: string;
   created_at?: string;
   stats?: {
     total_bookings: number;

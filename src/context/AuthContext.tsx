@@ -30,9 +30,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('AuthProvider init - token from localStorage:', !!savedToken);
     return savedToken;
   });
-  const [user, setUser] = useState<User | null>(() => {
+
+  const getStoredUser = (): User | null => {
     const savedUser = localStorage.getItem("user");
-    const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+    if (!savedUser) return null;
+
+    try {
+      return JSON.parse(savedUser);
+    } catch (error) {
+      console.warn('AuthProvider init - invalid user in localStorage, clearing it:', error);
+      localStorage.removeItem("user");
+      return null;
+    }
+  };
+
+  const [user, setUser] = useState<User | null>(() => {
+    const parsedUser = getStoredUser();
     console.log('AuthProvider init - user from localStorage:', parsedUser);
     return parsedUser;
   });

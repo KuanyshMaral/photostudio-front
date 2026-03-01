@@ -9,6 +9,20 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const toDisplayString = (value: unknown): string => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    return '';
+  };
+
+  const displayName =
+    toDisplayString(profile?.name) ||
+    toDisplayString(profile?.full_name) ||
+    toDisplayString(profile?.contact_person) ||
+    'Пользователь';
+
+  const avatarInitial = displayName.charAt(0).toUpperCase() || 'U';
+
   useEffect(() => {
     if (token) {
       getProfile(token)
@@ -44,7 +58,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
-              С возвращением, {profile?.name || 'Пользователь'}!
+              С возвращением, {displayName}!
             </h2>
             <p className="text-gray-600 mt-1">
               {isStudioOwner 
@@ -213,13 +227,13 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+              {avatarInitial}
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Ваш профиль</h3>
               <p className="text-gray-600 text-sm mt-1">Управляйте настройками вашего аккаунта и предпочтениями</p>
               {profile?.phone && (
-                <p className="text-gray-500 text-xs mt-1">📞 {profile.phone}</p>
+                <p className="text-gray-500 text-xs mt-1">📞 {toDisplayString(profile.phone)}</p>
               )}
             </div>
           </div>

@@ -114,52 +114,189 @@ export async function registerStudio(data: StudioRegisterRequest, token?: string
   return response.json();
 }
 
-export async function getProfile(token: string): Promise<Profile> {
-  console.log('getProfile called with token:', !!token);
-  console.log('Token value:', token);
-  console.log('Token length:', token?.length);
-  console.log('Authorization header:', `Bearer ${token}`);
-  
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
-  const response = await fetch(`${API_BASE}/users/me?include_stats=true`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  
-  console.log('getProfile response status:', response.status);
-  console.log('getProfile response headers:', response.headers);
-  
-  if (!response.ok) throw new Error('Failed to fetch profile');
-  
-  const json = await response.json();
-  console.log('getProfile response data:', json);
-  return json.user; // Direct access, not json.data.user
-}
+const PROFILE_GET_ENDPOINTS = [
+  `${API_BASE}/users/me?include_stats=true`,
+  `${API_BASE}/users/me`,
+  `${API_BASE}/profile/me`,
+  `${API_BASE}/profile/client/me`,
+  `${API_BASE}/profile/owner/me`,
+  `${API_BASE}/profile/admin/me`,
+  `${API_BASE}/auth/me`,
+  `${API_BASE}/admin/auth/me`,
+];
 
-export async function updateProfile(token: string, data: Partial<Pick<Profile, 'name' | 'phone'>>): Promise<Profile> {
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
-  const response = await fetch(`${API_BASE}/users/me`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
+const PROFILE_UPDATE_ENDPOINTS = [
+  `${API_BASE}/profile/me`,
+  `${API_BASE}/users/me`,
+  `${API_BASE}/profile/client/me`,
+  `${API_BASE}/profile/owner/me`,
+  `${API_BASE}/profile/admin/me`,
+];
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error?.message || 'Failed to update profile');
+const PROFILE_UPDATE_METHODS: Array<'PATCH' | 'PUT'> = ['PATCH', 'PUT'];
+
+const parseJsonSafe = async (response: Response): Promise<any> => {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+};
+
+const fetchWithTimeout = async (url: string, init: RequestInit, timeoutMs = 4000): Promise<Response> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, {
+      ...init,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+};
+
+const getErrorMessage = (payload: any, fallback: string): string => {
+  return payload?.error?.message || payload?.message || fallback;
+};
+
+const resolveRole = (rawProfile: any): Profile['role'] => {
+  if (rawProfile?.role === 'admin' || rawProfile?.role === 'studio_owner' || rawProfile?.role === 'client') {
+    return rawProfile.role;
   }
 
-  const json = await response.json();
-  return json.data.user;
+  if (rawProfile?.company_name || rawProfile?.bin || rawProfile?.verification_status) {
+    return 'studio_owner';
+  }
+
+  if (rawProfile?.position || typeof rawProfile?.is_active === 'boolean') {
+    return 'admin';
+  }
+
+  try {
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+    if (storedUser?.role === 'admin' || storedUser?.role === 'studio_owner' || storedUser?.role === 'client') {
+      return storedUser.role;
+    }
+  } catch {
+    // ignore malformed localStorage
+  }
+
+  return 'client';
+};
+
+const unwrapProfilePayload = (payload: any): any => {
+  const root = payload?.data ?? payload;
+  return root?.profile || root?.user || root?.admin || root?.owner || root?.client || root;
+};
+
+const normalizeProfile = (rawProfile: any): Profile => {
+  const role = resolveRole(rawProfile);
+
+  return {
+    ...rawProfile,
+    id: rawProfile?.id ?? rawProfile?.user_id ?? 0,
+    name: rawProfile?.name || rawProfile?.full_name || rawProfile?.contact_person || '',
+    email: rawProfile?.email || '',
+    phone: rawProfile?.phone || '',
+    role,
+    companyName: rawProfile?.companyName || rawProfile?.company_name,
+    contactPerson: rawProfile?.contactPerson || rawProfile?.contact_person,
+    address: rawProfile?.address || rawProfile?.legal_address,
+    avatar: rawProfile?.avatar || rawProfile?.avatar_url,
+  };
+};
+
+export async function getProfile(token: string): Promise<Profile> {
+  let lastError = 'Failed to fetch profile';
+
+  for (const endpoint of PROFILE_GET_ENDPOINTS) {
+    let response: Response;
+
+    try {
+      response = await fetchWithTimeout(endpoint, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        lastError = 'Profile request timeout';
+      }
+      continue;
+    }
+
+    const payload = await parseJsonSafe(response);
+
+    if (!response.ok) {
+      lastError = getErrorMessage(payload, lastError);
+      continue;
+    }
+
+    const rawProfile = unwrapProfilePayload(payload);
+    if (!rawProfile || typeof rawProfile !== 'object') {
+      continue;
+    }
+
+    return normalizeProfile(rawProfile);
+  }
+
+  throw new Error(lastError);
+}
+
+export async function updateProfile(token: string, data: Partial<Profile>): Promise<Profile> {
+  const updatePayload = {
+    name: data.name,
+    phone: data.phone,
+    avatar_url: data.avatar_url,
+    nickname: data.nickname,
+    full_name: data.full_name,
+    position: data.position,
+    company_name: data.company_name || data.companyName,
+    bin: data.bin,
+    legal_address: data.legal_address || data.address,
+    contact_person: data.contact_person || data.contactPerson,
+    contact_position: data.contact_position,
+    email: data.email,
+    website: data.website,
+  };
+
+  let lastError = 'Failed to update profile';
+
+  for (const endpoint of PROFILE_UPDATE_ENDPOINTS) {
+    for (const method of PROFILE_UPDATE_METHODS) {
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatePayload),
+      });
+
+      const payload = await parseJsonSafe(response);
+
+      if (!response.ok) {
+        lastError = getErrorMessage(payload, lastError);
+        continue;
+      }
+
+      const rawProfile = unwrapProfilePayload(payload);
+      if (!rawProfile || typeof rawProfile !== 'object') {
+        return getProfile(token);
+      }
+
+      return normalizeProfile(rawProfile);
+    }
+  }
+
+  throw new Error(lastError);
 }
 
 export async function uploadFiles(token: string, files: File[], contactInfo?: { contactName: string; contactEmail: string; contactPhone: string }): Promise<{ message: string }> {
   const formData = new FormData();
   
   // Append files with the correct field name
-  files.forEach((file, index) => {
+  files.forEach((file) => {
     formData.append('documents', file);
   });
   
