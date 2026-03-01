@@ -7,6 +7,7 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
 import Dashboard from "./features/auth/Dashboard";
+import { ProfileDashboard } from "./features/auth/ProfileDashboard";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";

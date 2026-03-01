@@ -142,53 +142,31 @@ export const ProfileDashboard: React.FC = () => {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="profile-dashboard">
-      {/* Левая колонка: Identity Card */}
-      <aside className="profile-dashboard__identity">
-        <div className="identity-card">
-          {/* Аватар */}
-          <div className="identity-card__avatar-container">
-            <div className="identity-card__avatar">
-              {displayAvatar ? (
-                <img 
-                  src={displayAvatar} 
-                  alt={displayName}
-                  className="identity-card__avatar-img"
-                />
-              ) : (
-                <span className="identity-card__avatar-fallback">
-                  {getInitials(displayName)}
-                </span>
-              )}
-=======
     <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Левая колонка: Identity Card */}
           <aside className="w-full lg:w-80 flex-shrink-0">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
               <div className="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-              
+
               <div className="px-6 pb-6 text-center">
-                {/* Аватар */}
                 <div className="relative inline-block -mt-16 mb-4">
                   <div className="w-32 h-32 rounded-full bg-white p-2 shadow-md">
                     <div className="w-full h-full rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-100">
-                      {profile.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt={profile.name || 'Аватар пользователя'}
+                      {displayAvatar ? (
+                        <img
+                          src={displayAvatar}
+                          alt={displayName}
                           className="w-full h-full object-cover"
                         />
                       ) : (
                         <span className="text-4xl font-bold text-gray-400">
-                          {getInitials(profile.name || '')}
+                          {getInitials(displayName)}
                         </span>
                       )}
                     </div>
                   </div>
-                  <button 
+                  <button
                     className="absolute bottom-2 right-2 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-indigo-700 hover:scale-110 transition-all border-2 border-white"
                     aria-label="Изменить фото"
                   >
@@ -196,22 +174,19 @@ export const ProfileDashboard: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Имя и роль */}
-                <h1 className="text-2xl font-bold text-gray-900 mb-1">{profile.name || 'Пользователь'}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-1">{displayName}</h1>
                 <div className="mb-4">
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700">
                     {getRoleLabel(profile.role || 'client')}
                   </span>
                 </div>
 
-                {/* Дата регистрации */}
                 <div className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-6 bg-gray-50 py-2 px-4 rounded-lg">
                   <Calendar size={14} className="text-gray-400" />
                   <span>С нами с {formatMemberSince(profile.created_at || '')}</span>
                 </div>
 
-                {/* Кнопка редактирования */}
-                <button 
+                <button
                   className="w-full py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-indigo-600 hover:border-indigo-200 transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                   onClick={() => setIsEditModalOpen(true)}
                 >
@@ -219,20 +194,10 @@ export const ProfileDashboard: React.FC = () => {
                   <span>Редактировать профиль</span>
                 </button>
               </div>
->>>>>>> main
             </div>
           </aside>
 
-<<<<<<< HEAD
-          {/* Имя и роль */}
-          <h1 className="identity-card__name">{displayName}</h1>
-          <span className="identity-card__role">
-            {getRoleLabel(profile.role || 'client')}
-          </span>
-=======
-          {/* Правая колонка: Stats + Info + Activity */}
           <main className="flex-1 w-full space-y-8">
-            {/* Stats секция */}
             <section>
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
@@ -244,33 +209,25 @@ export const ProfileDashboard: React.FC = () => {
                     <span className="text-sm font-medium text-gray-500">Всего бронирований</span>
                     <span className="text-xl">📊</span>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">
-                    {profile.stats?.total_bookings || 0}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{profile.stats?.total_bookings || 0}</div>
                 </div>
                 <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-500">Предстоящих</span>
                     <span className="text-xl">📅</span>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">
-                    {profile.stats?.upcoming_bookings || 0}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{profile.stats?.upcoming_bookings || 0}</div>
                 </div>
                 <div className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium text-gray-500">Завершённых</span>
                     <span className="text-xl">✅</span>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">
-                    {profile.stats?.completed_bookings || 0}
-                  </div>
+                  <div className="text-3xl font-bold text-gray-900">{profile.stats?.completed_bookings || 0}</div>
                 </div>
               </div>
             </section>
->>>>>>> main
 
-            {/* Personal Info секция */}
             <section>
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
@@ -301,22 +258,21 @@ export const ProfileDashboard: React.FC = () => {
               </div>
             </section>
 
-            {/* Recent Activity секция */}
             <section>
               <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
                 Недавняя активность
               </h2>
               <div className="bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
-                {profile.recent_bookings && profile.recent_bookings.length > 0 ? (
+                {recentBookings.length > 0 ? (
                   <div className="divide-y divide-gray-100">
-                    {profile.recent_bookings.map(booking => (
+                    {recentBookings.map((booking) => (
                       <div key={booking.id} className="p-5 hover:bg-gray-50/50 transition-colors">
                         <RecentActivityItem
-                          studioName={booking.studio_name}
-                          roomName={booking.room_name}
-                          date={booking.date}
-                          status={booking.status}
+                          studioName={booking.studio_name || 'Студия'}
+                          roomName={booking.room_name || 'Зал'}
+                          date={booking.date || 'Дата не указана'}
+                          status={booking.status || 'pending'}
                         />
                       </div>
                     ))}
@@ -335,122 +291,6 @@ export const ProfileDashboard: React.FC = () => {
           </main>
         </div>
 
-<<<<<<< HEAD
-      {/* Правая колонка: Stats + Info + Activity */}
-      <main className="profile-dashboard__main">
-        {/* Stats секция */}
-        <section className="profile-section">
-          <h2 className="profile-section__title">Статистика</h2>
-          <div className="stats-grid">
-            <StatCard
-              value={profile.stats?.total_bookings || 0}
-              label="Всего бронирований"
-              icon="📊"
-              color="primary"
-            />
-            <StatCard
-              value={profile.stats?.upcoming_bookings || 0}
-              label="Предстоящих"
-              icon="📅"
-              color="success"
-            />
-            <StatCard
-              value={profile.stats?.completed_bookings || 0}
-              label="Завершённых"
-              icon="✅"
-              color="primary"
-            />
-          </div>
-        </section>
-
-        {/* Personal Info секция */}
-        <section className="profile-section">
-          <h2 className="profile-section__title">Контактная информация</h2>
-          <div className="info-card">
-            <div className="info-item">
-              <Mail size={18} className="info-item__icon" />
-              <div className="info-item__content">
-                <span className="info-item__label">Email</span>
-                <span className="info-item__value">{profile.email || 'Не указан'}</span>
-              </div>
-            </div>
-
-            <div className="info-item">
-              <Phone size={18} className="info-item__icon" />
-              <div className="info-item__content">
-                <span className="info-item__label">Телефон</span>
-                <span className="info-item__value">
-                  {profile.phone || 'Не указан'}
-                </span>
-              </div>
-            </div>
-
-            {profile.role === 'admin' && (
-              <div className="info-item">
-                <Calendar size={18} className="info-item__icon" />
-                <div className="info-item__content">
-                  <span className="info-item__label">Должность</span>
-                  <span className="info-item__value">{profile.position || 'Не указана'}</span>
-                </div>
-              </div>
-            )}
-
-            {profile.role === 'studio_owner' && (
-              <>
-                <div className="info-item">
-                  <Mail size={18} className="info-item__icon" />
-                  <div className="info-item__content">
-                    <span className="info-item__label">Компания</span>
-                    <span className="info-item__value">{profile.company_name || profile.companyName || 'Не указана'}</span>
-                  </div>
-                </div>
-
-                <div className="info-item">
-                  <Phone size={18} className="info-item__icon" />
-                  <div className="info-item__content">
-                    <span className="info-item__label">Контактное лицо</span>
-                    <span className="info-item__value">{profile.contact_person || profile.contactPerson || 'Не указано'}</span>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* Recent Activity секция */}
-        <section className="profile-section">
-          <h2 className="profile-section__title">Недавняя активность</h2>
-          <div className="activity-card">
-            {recentBookings.length > 0 ? (
-              recentBookings.map((booking) => (
-                <RecentActivityItem
-                  key={booking.id}
-                  studioName={booking.studio_name || 'Студия'}
-                  roomName={booking.room_name || 'Зал'}
-                  date={booking.date || 'Дата не указана'}
-                  status={booking.status || 'pending'}
-                />
-              ))
-            ) : (
-              <div className="activity-empty">
-                <span>📭</span>
-                <p>Пока нет бронирований</p>
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
-
-      {/* Модалка редактирования */}
-      {isEditModalOpen && (
-        <EditProfileModal
-          profile={profile}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleProfileUpdate}
-        />
-      )}
-=======
-        {/* Модалка редактирования */}
         {isEditModalOpen && (
           <EditProfileModal
             profile={profile}
@@ -459,7 +299,6 @@ export const ProfileDashboard: React.FC = () => {
           />
         )}
       </div>
->>>>>>> main
     </div>
   );
 };

@@ -21,8 +21,8 @@ export default function ChatPage() {
             return undefined;
         }
 
-        const parsed = Number.parseInt(conversationId, 10);
-        return Number.isFinite(parsed) ? parsed : undefined;
+        const trimmed = conversationId.trim();
+        return trimmed.length > 0 ? trimmed : undefined;
     }, [conversationId]);
     
     // Mobile: показываем либо список, либо окно
@@ -30,7 +30,7 @@ export default function ChatPage() {
     const showList = !isMobile || !activeConversationId;
 
     useEffect(() => {
-        if (!token || !activeConversationId || selectedConversation?.id === activeConversationId) {
+        if (!token || !activeConversationId || String(selectedConversation?.id) === String(activeConversationId)) {
             return;
         }
 
@@ -40,7 +40,9 @@ export default function ChatPage() {
 
             try {
                 const response = await getConversations(token, 100, 0);
-                const found = response.conversations.find((conversation) => conversation.id === activeConversationId);
+                const found = response.conversations.find(
+                    (conversation) => String(conversation.id) === String(activeConversationId)
+                );
 
                 if (!found) {
                     setHydrateError('Диалог не найден');
@@ -76,11 +78,7 @@ export default function ChatPage() {
                 {showList && (
                     <aside className="chat-sidebar">
                         <ChatList
-<<<<<<< HEAD
                             activeConversationId={activeConversationId}
-=======
-                            activeConversationId={conversationId}
->>>>>>> main
                             onSelectConversation={handleSelectConversation}
                         />
                     </aside>

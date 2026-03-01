@@ -114,7 +114,6 @@ export async function registerStudio(data: StudioRegisterRequest, token?: string
   return response.json();
 }
 
-<<<<<<< HEAD
 const PROFILE_GET_ENDPOINTS = [
   `${API_BASE}/users/me`,
   `${API_BASE}/users/me?include_stats=true`,
@@ -131,41 +130,6 @@ const PROFILE_UPDATE_ENDPOINTS = [
   `${API_BASE}/profile/owner/me`,
   `${API_BASE}/profile/admin/me`,
 ];
-=======
-export async function getProfile(token: string): Promise<Profile> {
-  console.log('getProfile called with token:', !!token);
-  console.log('Token value:', token);
-  console.log('Token length:', token?.length);
-  console.log('Authorization header:', `Bearer ${token}`);
-  
-  const RAW_API_URL = String(import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090');
-  const API_BASE = RAW_API_URL.endsWith('/api/v1') ? RAW_API_URL : `${RAW_API_URL}/api/v1`;
-  const response = await fetch(`${API_BASE}/users/me?include_stats=true`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  
-  console.log('getProfile response status:', response.status);
-  console.log('getProfile response headers:', response.headers);
-  
-  if (!response.ok) throw new Error('Failed to fetch profile');
-  
-  const json = await response.json();
-  console.log('getProfile response data:', json);
-  return json.user; // Direct access, not json.data.user
-}
-
-export async function updateProfile(token: string, data: Partial<Pick<Profile, 'name' | 'phone'>>): Promise<Profile> {
-  const RAW_API_URL = String(import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090');
-  const API_BASE = RAW_API_URL.endsWith('/api/v1') ? RAW_API_URL : `${RAW_API_URL}/api/v1`;
-  const response = await fetch(`${API_BASE}/users/me`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
->>>>>>> main
 
 const PROFILE_UPDATE_METHODS: Array<'PATCH' | 'PUT'> = ['PATCH', 'PUT'];
 

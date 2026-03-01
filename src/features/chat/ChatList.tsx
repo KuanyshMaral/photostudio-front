@@ -41,30 +41,6 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
     };
 
     useEffect(() => {
-<<<<<<< HEAD
-=======
-        const fetchConversations = async () => {
-            if (!token) {
-                setConversations([]);
-                setIsLoading(false);
-                return;
-            }
-            
-            setIsLoading(true);
-            setError(null);
-            try {
-                const data = await getConversations(token);
-                console.log('[ChatList] Fetched conversations:', data.conversations);
-                setConversations(data.conversations || []);
-            } catch (err) {
-                setError('Failed to load conversations');
-                console.error('Failed to fetch conversations:', err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
->>>>>>> main
         fetchConversations();
     }, [token, retryCount]);
 
