@@ -131,10 +131,11 @@ export interface StudioCreateRequest {
   address: string;
   city: string;
   district?: string;
-  phone: string;
+  phone?: string;
   email?: string;
   website?: string;
   working_hours: Record<string, { open: string; close: string }>;
+  images?: string[];
 }
 
 export interface StudioUpdateRequest extends Partial<StudioCreateRequest> {}

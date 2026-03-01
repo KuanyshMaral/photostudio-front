@@ -6,6 +6,36 @@
   width: 100%;
 }
 
+/* Studio Images Styles */
+.studio-images {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.studio-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.studio-image-more {
+  width: 80px;
+  height: 80px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 14px;
+}
+
 .dashboard-header {
   display: flex;
   justify-content: space-between;
