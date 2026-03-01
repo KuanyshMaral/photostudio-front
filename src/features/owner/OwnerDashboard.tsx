@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 // Import components
+import OwnerProfile from './OwnerProfile';
 import CompanyProfile from './CompanyProfile';
 import Analytics from './Analytics';
 import Maintenance from './Maintenance';
@@ -27,6 +28,7 @@ export default function OwnerDashboard() {
   const { token } = useAuth();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'studios' | 'bookings' | 'clients' | 'messages' | 'pin'>('profile');
+  const [profileSubTab, setProfileSubTab] = useState<'company' | 'owner'>('company');
 
   // Update active tab based on URL hash or query param
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function OwnerDashboard() {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Профиль компании', icon: Building },
+    { id: 'profile', label: 'Профиль компании и владельца', icon: Building },
     { id: 'analytics', label: 'Аналитика', icon: TrendingUp },
     { id: 'maintenance', label: 'Обслуживание', icon: Wrench },
     { id: 'procurement', label: 'Закупки', icon: ShoppingCart },
@@ -76,7 +78,27 @@ export default function OwnerDashboard() {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'profile':
-        return <CompanyProfile />;
+        return (
+          <div className="profile-tabs-container">
+            <div className="profile-sub-tabs">
+              <button 
+                className={`sub-tab ${profileSubTab === 'company' ? 'active' : ''}`}
+                onClick={() => setProfileSubTab('company')}
+              >
+                Профиль компании
+              </button>
+              <button 
+                className={`sub-tab ${profileSubTab === 'owner' ? 'active' : ''}`}
+                onClick={() => setProfileSubTab('owner')}
+              >
+                Профиль владельца
+              </button>
+            </div>
+            <div className="profile-content">
+              {profileSubTab === 'company' ? <CompanyProfile /> : <OwnerProfile token={token || ''} />}
+            </div>
+          </div>
+        );
       case 'analytics':
         return <Analytics />;
       case 'maintenance':
@@ -94,7 +116,27 @@ export default function OwnerDashboard() {
       case 'pin':
         return <PinManagement />;
       default:
-        return <CompanyProfile />;
+        return (
+          <div className="profile-tabs-container">
+            <div className="profile-sub-tabs">
+              <button 
+                className={`sub-tab ${profileSubTab === 'company' ? 'active' : ''}`}
+                onClick={() => setProfileSubTab('company')}
+              >
+                Профиль компании
+              </button>
+              <button 
+                className={`sub-tab ${profileSubTab === 'owner' ? 'active' : ''}`}
+                onClick={() => setProfileSubTab('owner')}
+              >
+                Профиль владельца
+              </button>
+            </div>
+            <div className="profile-content">
+              {profileSubTab === 'company' ? <CompanyProfile /> : <OwnerProfile token={token || ''} />}
+            </div>
+          </div>
+        );
     }
   };
 

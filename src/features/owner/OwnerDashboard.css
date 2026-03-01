@@ -1,9 +1,62 @@
 .owner-dashboard {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 100vh;
   background: #f8fafc;
   width: 100%;
+}
+
+/* Profile Sub Tabs Styles */
+.profile-tabs-container {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.profile-sub-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 0;
+  background: white;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.sub-tab {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+  top: 2px;
+}
+
+.sub-tab:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.sub-tab.active {
+  color: #3b82f6;
+  border-bottom: 2px solid #3b82f6;
+  background: white;
+}
+
+.profile-content {
+  padding: 20px;
+  background: white;
+  min-height: 400px;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Studio Images Styles */
@@ -124,7 +177,10 @@
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: visible;
-  min-height: 0;
+  min-height: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .tab-content {

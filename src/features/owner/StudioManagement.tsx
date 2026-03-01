@@ -11,8 +11,8 @@ import {
 } from './owner.api';
 import { Plus, Edit, Trash2, MapPin, Phone, Mail, Clock, Star, Home } from 'lucide-react';
 import StudioRoomsManagement from './StudioRoomsManagement';
-import ImageUpload from '../../components/ImageUpload';
-import { normalizeImageUrl, uploadFile } from '../../api/uploadApi';
+import AttachmentsManager from '../../components/AttachmentsManager';
+import { normalizeImageUrl } from '../../api/uploadApi';
 import './OwnerDashboard.css';
 
 export default function StudioManagement() {
@@ -23,7 +23,6 @@ export default function StudioManagement() {
   const [showForm, setShowForm] = useState(false);
   const [editingStudio, setEditingStudio] = useState<Studio | null>(null);
   const [selectedStudioForRooms, setSelectedStudioForRooms] = useState<Studio | null>(null);
-  const [studioImages, setStudioImages] = useState<string[]>([]);
   const [form, setForm] = useState<StudioCreateRequest>({
     name: '',
     description: '',
@@ -96,74 +95,25 @@ export default function StudioManagement() {
     if (!token) return;
 
     try {
-      // First upload all images if any
-      let uploadedImageUrls: string[] = [];
-      
-      if (studioImages.length > 0) {
-        console.log('Uploading images first...');
-        
-        // Upload images that are not already uploaded (base64 or file objects)
-        for (const image of studioImages) {
-          if (image.startsWith('data:image/')) {
-            // This is base64, need to convert to file and upload
-            const response = await fetch(image);
-            const blob = await response.blob();
-            const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
-            
-            const uploadResult = await uploadFile(file, token);
-            uploadedImageUrls.push(uploadResult.url);
-            console.log('Uploaded image URL:', uploadResult.url);
-          } else {
-            // Already uploaded URL
-            uploadedImageUrls.push(image);
-          }
-        }
-      }
-
       const studioData = {
-        ...form,
-        images: uploadedImageUrls
+        ...form
       };
 
-      console.log('Submitting studio data with image URLs:', studioData);
+      console.log('Submitting studio data:', studioData);
 
       if (editingStudio) {
         // Update existing studio
         console.log('Updating studio ID:', editingStudio.id);
         const updated = await updateStudio(token, editingStudio.id, studioData);
         console.log('Updated studio response:', updated);
-        console.log('Updated studio images:', updated.images);
-        
-        // If API doesn't return images, add them manually
-        const studioWithImages = {
-          ...updated,
-          images: updated.images || uploadedImageUrls
-        };
-        
-        // Save images to localStorage for editing
-        localStorage.setItem(`studio_images_${updated.id}`, JSON.stringify(uploadedImageUrls));
-        
-        setStudios(studios.map(s => s.id === updated.id ? studioWithImages : s));
+        setStudios(studios.map(s => s.id === updated.id ? updated : s));
         alert('Студия успешно обновлена');
       } else {
         // Create new studio
         console.log('Creating new studio');
         const newStudio = await createStudio(token, studioData);
         console.log('Created studio response:', newStudio);
-        console.log('Created studio images:', newStudio.images);
-        
-        // If API doesn't return images, add them manually
-        const studioWithImages = {
-          ...newStudio,
-          images: newStudio.images || uploadedImageUrls
-        };
-        
-        // Save images to localStorage for editing
-        if (newStudio.id) {
-          localStorage.setItem(`studio_images_${newStudio.id}`, JSON.stringify(uploadedImageUrls));
-        }
-        
-        setStudios([...studios, studioWithImages]);
+        setStudios([...studios, newStudio]);
         alert('Студия успешно создана');
       }
       
@@ -180,15 +130,7 @@ export default function StudioManagement() {
     console.log('Editing studio:', studio);
     console.log('Setting editingStudio to:', studio);
     
-    // Load images from API first, then fallback to localStorage
-    const apiImages = studio.images || [];
-    const storedImages = JSON.parse(localStorage.getItem(`studio_images_${studio.id}`) || '[]');
-    
-    // Use API images if available, otherwise use stored images
-    const allImages = apiImages.length > 0 ? apiImages : storedImages;
-    console.log('Loading images for editing:', { apiImages, storedImages, allImages });
-    
-    setStudioImages(allImages);
+    setEditingStudio(studio);
     setForm({
       name: studio.name,
       description: studio.description,
@@ -208,9 +150,7 @@ export default function StudioManagement() {
         sunday: { open: '09:00', close: '18:00' }
       }
     });
-    setEditingStudio(studio);
     setShowForm(true);
-    console.log('handleEdit completed - editingStudio set, form should show');
   };
 
   const handleDelete = async (id: number) => {
@@ -247,7 +187,6 @@ export default function StudioManagement() {
         sunday: { open: '09:00', close: '18:00' }
       }
     });
-    setStudioImages([]);
   };
 
   if (loading) {
@@ -365,11 +304,24 @@ export default function StudioManagement() {
                       </div>
                       <div className="form-group full-width">
                         <label>Фотографии студии</label>
-                        <ImageUpload
-                          images={studioImages}
-                          onImagesChange={setStudioImages}
-                          maxImages={5}
-                        />
+                        {editingStudio ? (
+                          <AttachmentsManager
+                            targetType="studio_gallery"
+                            targetId={editingStudio.id}
+                            token={token || ''}
+                            maxImages={5}
+                          />
+                        ) : (
+                          <div style={{ 
+                            padding: '20px', 
+                            background: '#f5f5f5', 
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            color: '#666'
+                          }}>
+                            Сначала сохраните студию, затем сможете добавить фотографии
+                          </div>
+                        )}
                       </div>
                     </div>
                   </form>
