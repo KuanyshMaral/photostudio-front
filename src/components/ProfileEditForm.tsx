@@ -54,84 +54,86 @@ export default function ProfileEditForm({ profile, onSave, onCancel, isLoading }
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Редактирование профиля</h3>
-        <p className="text-sm text-gray-600">
-          Обновите информацию о вашем профиле
-        </p>
-      </div>
-
+    <div className="space-y-8">
       {/* Avatar Upload */}
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center">
         <AvatarUpload
           currentAvatar={currentAvatar}
           onUpload={handleAvatarUpload}
           isLoading={avatarUploading}
         />
+        <p className="mt-3 text-sm text-gray-500">
+          Нажмите на фото для обновления
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Имя
-          </label>
-          <input
-            type="text"
-            {...register('name', {
-              required: 'Имя обязательно',
-              minLength: {
-                value: 2,
-                message: 'Минимум 2 символа',
-              },
-            })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Введите ваше имя"
-          />
-          {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-          )}
-        </div>
+      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-5 max-w-lg mx-auto">
+        <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100 space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Имя <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              {...register('name', {
+                required: 'Имя обязательно',
+                minLength: {
+                  value: 2,
+                  message: 'Минимум 2 символа',
+                },
+              })}
+              className={`w-full px-4 py-2.5 bg-white border ${errors.name ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'} rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-shadow`}
+              placeholder="Введите ваше имя"
+            />
+            {errors.name && (
+              <p className="mt-1.5 text-sm text-red-600 font-medium">{errors.name.message}</p>
+            )}
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Телефон
-          </label>
-          <input
-            type="tel"
-            {...register('phone', {
-              required: 'Телефон обязателен',
-              pattern: {
-                value: /^\+?[\d\s\-\(\)]+$/,
-                message: 'Некорректный номер телефона',
-              },
-            })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="+7 (777) 123-45-67"
-          />
-          {errors.phone && (
-            <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>
-          )}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Телефон <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              {...register('phone', {
+                required: 'Телефон обязателен',
+                pattern: {
+                  value: /^\+?[\d\s\-\(\)]+$/,
+                  message: 'Некорректный номер телефона',
+                },
+              })}
+              className={`w-full px-4 py-2.5 bg-white border ${errors.phone ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-indigo-500'} rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-shadow`}
+              placeholder="+7 (777) 123-45-67"
+            />
+            {errors.phone && (
+              <p className="mt-1.5 text-sm text-red-600 font-medium">{errors.phone.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Read-only fields */}
-        <div className="space-y-3">
+        <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 space-y-5 opacity-80">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+            <h4 className="text-sm font-medium text-gray-600 uppercase tracking-wider">Нельзя изменить</h4>
+          </div>
+          
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
               Email
             </label>
             <input
               type="email"
               value={profile?.email || ''}
               disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
               placeholder="Email"
             />
-            <p className="mt-1 text-xs text-gray-500">Email нельзя изменить</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-600 mb-1.5">
               Роль
             </label>
             <input
@@ -139,16 +141,16 @@ export default function ProfileEditForm({ profile, onSave, onCancel, isLoading }
               value={profile?.role === 'studio_owner' ? 'Владелец студии' : 
                      profile?.role === 'admin' ? 'Администратор' : 'Клиент'}
               disabled
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed"
             />
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4">
+        <div className="flex gap-4 pt-6">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 px-6 py-3 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:text-gray-900 transition-all active:scale-[0.98]"
             disabled={isLoading || avatarUploading}
           >
             Отмена
@@ -156,15 +158,15 @@ export default function ProfileEditForm({ profile, onSave, onCancel, isLoading }
           <button
             type="submit"
             disabled={isLoading || avatarUploading}
-            className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 active:scale-[0.98]"
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
                 Сохранение...
               </>
             ) : (
-              'Сохранить'
+              'Сохранить изменения'
             )}
           </button>
         </div>

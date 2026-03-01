@@ -5,7 +5,7 @@ import type { Conversation } from './chat.types';
 import './ChatList.css';
 
 interface ChatListProps {
-    activeConversationId?: number;
+    activeConversationId?: string | number;
     onSelectConversation: (conversation: Conversation) => void;
 }
 
@@ -36,7 +36,35 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
         }
     };
 
+    const getConversationName = (conversation: Conversation): string => {
+        return conversation.other_user?.name?.trim() || 'Unknown user';
+    };
+
     useEffect(() => {
+<<<<<<< HEAD
+=======
+        const fetchConversations = async () => {
+            if (!token) {
+                setConversations([]);
+                setIsLoading(false);
+                return;
+            }
+            
+            setIsLoading(true);
+            setError(null);
+            try {
+                const data = await getConversations(token);
+                console.log('[ChatList] Fetched conversations:', data.conversations);
+                setConversations(data.conversations || []);
+            } catch (err) {
+                setError('Failed to load conversations');
+                console.error('Failed to fetch conversations:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+>>>>>>> main
         fetchConversations();
     }, [token, retryCount]);
 
@@ -93,17 +121,17 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
                         <div
                             key={conversation.id}
                             className={`chat-list-item ${
-                                activeConversationId === conversation.id ? 'active' : ''
+                                String(activeConversationId) === String(conversation.id) ? 'active' : ''
                             }`}
                             onClick={() => onSelectConversation(conversation)}
                         >
                             <div className="chat-list-item-avatar">
-                                {conversation.other_user.name.charAt(0).toUpperCase()}
+                                {getConversationName(conversation).charAt(0).toUpperCase()}
                             </div>
                             <div className="chat-list-item-content">
                                 <div className="chat-list-item-header">
                                     <span className="chat-list-item-name">
-                                        {conversation.other_user.name}
+                                        {getConversationName(conversation)}
                                     </span>
                                     <span className="chat-list-item-time">
                                         {new Date(conversation.last_message_at).toLocaleDateString()}

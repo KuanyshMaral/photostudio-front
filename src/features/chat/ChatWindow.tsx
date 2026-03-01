@@ -33,13 +33,13 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         token,
         onNewMessage: (convId, message) => {
             // Добавляем новое сообщение если это наш диалог
-            if (convId === conversation.id) {
+            if (String(convId) === String(conversation.id) && message && typeof message === 'object') {
                 setMessages(prev => [...prev, message]);
             }
         },
         onTyping: (convId, userId, typing) => {
             // Показываем индикатор если это наш диалог и не мы
-            if (convId === conversation.id && userId !== user?.id) {
+            if (String(convId) === String(conversation.id) && userId !== user?.id) {
                 setIsTyping(typing);
             }
         },
@@ -112,6 +112,10 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
         sendTyping(conversation.id, false);
     };
 
+    const safeMessages = messages.filter(
+        (message): message is Message => Boolean(message && typeof message === 'object' && message.id)
+    );
+
     return (
         <div className="chat-window">
             {/* Header */}
@@ -136,19 +140,19 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
             <div className="chat-window-messages">
                 {isLoading ? (
                     <div className="messages-loading">Загрузка...</div>
-                ) : messages.length === 0 ? (
+                ) : safeMessages.length === 0 ? (
                     <div className="messages-empty">
                         <p>Начните диалог</p>
                     </div>
                 ) : (
-                    messages.map((msg, index) => (
+                    safeMessages.map((msg, index) => (
                         <MessageBubble
                             key={msg.id}
                             message={msg}
-                            isMine={msg.sender_id === user?.id}
+                            isMine={Number(msg.sender_id) === Number(user?.id)}
                             showAvatar={
                                 index === 0 || 
-                                messages[index - 1].sender_id !== msg.sender_id
+                                safeMessages[index - 1]?.sender_id !== msg.sender_id
                             }
                         />
                     ))

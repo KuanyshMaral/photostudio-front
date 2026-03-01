@@ -46,19 +46,19 @@ export interface WSMessage {
 
 export interface WSSendMessage extends WSMessage {
     type: 'message';
-    conversation_id: number;
+    conversation_id: string | number;
     content: string;
 }
 
 export interface WSTypingMessage extends WSMessage {
     type: 'typing';
-    conversation_id: number;
+    conversation_id: string | number;
     is_typing: boolean;
 }
 
 export interface WSReadMessage extends WSMessage {
     type: 'read';
-    conversation_id: number;
+    conversation_id: string | number;
 }
 
 export interface WSPingMessage extends WSMessage {
@@ -75,20 +75,20 @@ export type WSClientMessage =
 
 export interface WSNewMessageEvent extends WSMessage {
     type: 'new_message';
-    conversation_id: number;
+    conversation_id: string | number;
     message: Message;
 }
 
 export interface WSTypingEvent extends WSMessage {
     type: 'typing';
-    conversation_id: number;
+    conversation_id: string | number;
     user_id: number;
     is_typing: boolean;
 }
 
 export interface WSReadEvent extends WSMessage {
     type: 'read';
-    conversation_id: number;
+    conversation_id: string | number;
     user_id: number;
 }
 

@@ -6,7 +6,6 @@ import { useAuth } from './context/AuthContext';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
-import ProfileDashboard from "./features/auth/ProfileDashboard";
 import Dashboard from "./features/auth/Dashboard";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";

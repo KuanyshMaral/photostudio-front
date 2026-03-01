@@ -82,7 +82,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const isAdmin = async (userId: number): Promise<boolean> => {
     // Check if user has admin role
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/${userId}`, {
+      const apiUrl = String(import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+      const baseUrl = apiUrl.endsWith('/api/v1') ? apiUrl : `${apiUrl}/api/v1`;
+      const response = await fetch(`${baseUrl}/users/${userId}`, {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

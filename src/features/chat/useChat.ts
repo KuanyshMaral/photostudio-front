@@ -14,18 +14,18 @@ import type {
 
 export interface UseChatOptions {
     token: string | null;
-    onNewMessage?: (conversationId: number, message: Message) => void;
-    onTyping?: (conversationId: number, userId: number, isTyping: boolean) => void;
-    onRead?: (conversationId: number, userId: number) => void;
+    onNewMessage?: (conversationId: string | number, message: Message) => void;
+    onTyping?: (conversationId: string | number, userId: number, isTyping: boolean) => void;
+    onRead?: (conversationId: string | number, userId: number) => void;
     onConnect?: () => void;
     onDisconnect?: () => void;
 }
 
 export interface UseChatReturn {
     isConnected: boolean;
-    sendMessage: (conversationId: number, content: string) => void;
-    sendTyping: (conversationId: number, isTyping: boolean) => void;
-    markAsRead: (conversationId: number) => void;
+    sendMessage: (conversationId: string | number, content: string) => void;
+    sendTyping: (conversationId: string | number, isTyping: boolean) => void;
+    markAsRead: (conversationId: string | number) => void;
 }
 
 // ============================================================
@@ -186,7 +186,7 @@ export function useChat(options: UseChatOptions): UseChatReturn {
     // SEND METHODS
     // ========================================================
     
-    const sendMessage = useCallback((conversationId: number, content: string) => {
+    const sendMessage = useCallback((conversationId: string | number, content: string) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             console.error('[WS] Not connected');
             return;
@@ -199,7 +199,7 @@ export function useChat(options: UseChatOptions): UseChatReturn {
         }));
     }, []);
     
-    const sendTyping = useCallback((conversationId: number, isTyping: boolean) => {
+    const sendTyping = useCallback((conversationId: string | number, isTyping: boolean) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             return;
         }
@@ -211,7 +211,7 @@ export function useChat(options: UseChatOptions): UseChatReturn {
         }));
     }, []);
     
-    const markAsRead = useCallback((conversationId: number) => {
+    const markAsRead = useCallback((conversationId: string | number) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             return;
         }

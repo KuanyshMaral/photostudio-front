@@ -19,6 +19,7 @@ import './StudioDetailModal.css';
 interface StudioDetailModalProps {
   studio: Studio;
   rooms?: Room[];
+  onContactOwner?: (studio: Studio, initialMessage?: string) => Promise<void>;
   onClose: () => void;
 }
 
@@ -27,6 +28,7 @@ type TabType = 'overview' | 'equipment' | 'reviews';
 const StudioDetailModal: React.FC<StudioDetailModalProps> = ({ 
   studio, 
   rooms = [], 
+  onContactOwner,
   onClose 
 }) => {
   const navigate = useNavigate();
@@ -45,6 +47,9 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ date: Date; start: string; end: string } | null>(null);
+  const [castingMessage, setCastingMessage] = useState('');
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const [messageError, setMessageError] = useState<string | null>(null);
 
   // Fetch reviews when reviews tab is active
   useEffect(() => {
@@ -143,6 +148,24 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
     setSelectedSlot(null);
   };
 
+  const handleContactCasting = async () => {
+    const trimmedMessage = castingMessage.trim();
+    if (!trimmedMessage || !onContactOwner) {
+      return;
+    }
+
+    setMessageError(null);
+    setIsSendingMessage(true);
+    try {
+      await onContactOwner(studio, trimmedMessage);
+      setCastingMessage('');
+    } catch (err) {
+      setMessageError(err instanceof Error ? err.message : 'Не удалось отправить сообщение');
+    } finally {
+      setIsSendingMessage(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto my-4">
@@ -221,6 +244,29 @@ const StudioDetailModal: React.FC<StudioDetailModalProps> = ({
                   email={studio.email}
                   city="almaty"
                 />
+              </div>
+
+              <div className="mt-4">
+                <h3 className="text-base font-semibold text-gray-900 mb-3">Сообщение кастингу</h3>
+                <textarea
+                  value={castingMessage}
+                  onChange={(e) => setCastingMessage(e.target.value)}
+                  placeholder="Напишите ваш запрос кастингу..."
+                  className="w-full min-h-[96px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                {messageError && (
+                  <p className="mt-2 text-sm text-red-600">{messageError}</p>
+                )}
+                {!token && (
+                  <p className="mt-2 text-sm text-gray-500">Войдите в аккаунт, чтобы написать кастингу</p>
+                )}
+                <button
+                  onClick={handleContactCasting}
+                  disabled={!token || isSendingMessage || !castingMessage.trim()}
+                  className="mt-3 w-full bg-indigo-600 text-white py-2.5 px-4 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSendingMessage ? 'Отправка...' : 'Написать кастингу'}
+                </button>
               </div>
 
               {/* Rooms / Halls */}
