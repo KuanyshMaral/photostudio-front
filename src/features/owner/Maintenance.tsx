@@ -5,10 +5,9 @@ import {
   createMaintenanceRecord,
   updateMaintenanceRecord,
   deleteMaintenanceRecord,
-  type MaintenanceRecord,
-  type MaintenanceListResponse
+  type MaintenanceRecord
 } from './owner.api';
-import { Plus, Edit, Trash2, Check, Clock } from 'lucide-react';
+import { Plus, Trash2, Check, Clock } from 'lucide-react';
 import './OwnerDashboard.css';
 
 export default function Maintenance() {

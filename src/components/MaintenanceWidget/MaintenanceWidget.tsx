@@ -55,7 +55,7 @@ export const MaintenanceWidget: React.FC = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => null;
+  const getStatusIcon = (_status: string) => null;
   const getStatusLabel = (status: string) => status;
 
   return (

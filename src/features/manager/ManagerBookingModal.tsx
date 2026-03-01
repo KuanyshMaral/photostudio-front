@@ -157,7 +157,7 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
     };
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (_status: string) => {
     return null;
   };
 

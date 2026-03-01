@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Users, Shield, Settings, UserCheck, AlertTriangle } from 'lucide-react';
+import { Users, AlertTriangle } from 'lucide-react';
 
 interface User {
   id: number;

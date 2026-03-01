@@ -60,14 +60,6 @@ const getRooms = async (token: string, studioId?: number): Promise<Room[]> => {
   return response.json();
 };
 
-const getRoomById = async (token: string, roomId: number): Promise<Room> => {
-  const response = await fetch(`${API_BASE}/rooms/${roomId}`, {
-    headers: { 'Authorization': `Bearer ${token}` }
-  });
-  if (!response.ok) throw new Error('Failed to fetch room');
-  return response.json();
-};
-
 const createRoom = async (token: string, studioId: number, roomData: CreateRoomRequest): Promise<Room> => {
   const response = await fetch(`${API_BASE}/studios/${studioId}/rooms`, {
     method: 'POST',
@@ -110,7 +102,7 @@ export default function RoomManagement() {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
-  const [selectedStudio, setSelectedStudio] = useState<number | null>(null);
+  const [selectedStudio] = useState<number | null>(null);
 
   const [formData, setFormData] = useState<CreateRoomRequest>({
     name: '',

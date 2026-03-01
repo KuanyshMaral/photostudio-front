@@ -146,7 +146,7 @@ export const ManagerCalendar: React.FC<ManagerCalendarProps> = ({
   }, [fetchBookings]);
 
   // Цвета по статусу
-  const getEventColors = (status: string) => {
+  const getEventColors = (_status: string) => {
     return {
       backgroundColor: '',
       borderColor: '',

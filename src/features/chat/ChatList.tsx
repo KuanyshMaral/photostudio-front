@@ -14,30 +14,31 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [retryCount, setRetryCount] = useState(0);
+
+    const fetchConversations = async () => {
+        if (!token) {
+            setConversations([]);
+            setIsLoading(false);
+            return;
+        }
+        
+        setIsLoading(true);
+        setError(null);
+        try {
+            const data = await getConversations(token);
+            setConversations(data.conversations || []);
+        } catch (err) {
+            setError('Failed to load conversations');
+            console.error('Failed to fetch conversations:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchConversations = async () => {
-            if (!token) {
-                setConversations([]);
-                setIsLoading(false);
-                return;
-            }
-            
-            setIsLoading(true);
-            setError(null);
-            try {
-                const data = await getConversations(token);
-                setConversations(data.conversations || []);
-            } catch (err) {
-                setError('Failed to load conversations');
-                console.error('Failed to fetch conversations:', err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchConversations();
-    }, [token]);
+    }, [token, retryCount]);
 
     useEffect(() => {
         if (!activeConversationId || conversations.length === 0) {
@@ -64,7 +65,15 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
     if (error) {
         return (
             <div className="chat-list">
-                <div className="chat-list-error">{error}</div>
+                <div className="chat-list-error">
+                    <p>{error}</p>
+                    <button 
+                        className="chat-list-retry-btn"
+                        onClick={() => setRetryCount(prev => prev + 1)}
+                    >
+                        Retry
+                    </button>
+                </div>
             </div>
         );
     }

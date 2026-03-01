@@ -49,8 +49,6 @@ interface CreateEquipmentRequest {
   rental_price: number;
 }
 
-interface UpdateEquipmentRequest extends Partial<CreateEquipmentRequest> {}
-
 interface CreateRoomRequest {
   name: string;
   room_type: string;

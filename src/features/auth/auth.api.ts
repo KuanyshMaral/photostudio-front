@@ -114,26 +114,14 @@ export async function registerStudio(data: StudioRegisterRequest, token?: string
   return response.json();
 }
 
-export async function getProfile(token: string): Promise<Profile> {
-  console.log('getProfile called with token:', !!token);
-  console.log('Token value:', token);
-  console.log('Token length:', token?.length);
-  console.log('Authorization header:', `Bearer ${token}`);
-  
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090';
-  const response = await fetch(`${API_BASE}/api/v1/users/me?include_stats=true`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  
-  console.log('getProfile response status:', response.status);
-  console.log('getProfile response headers:', response.headers);
-  
-  if (!response.ok) throw new Error('Failed to fetch profile');
-  
-  const json = await response.json();
-  console.log('getProfile response data:', json);
-  return json.user; // Direct access, not json.data.user
-}
+const PROFILE_GET_ENDPOINTS = [
+  `${API_BASE}/users/me`,
+  `${API_BASE}/users/me?include_stats=true`,
+  `${API_BASE}/profile/me`,
+  `${API_BASE}/profile/client/me`,
+  `${API_BASE}/profile/owner/me`,
+  `${API_BASE}/profile/admin/me`,
+];
 
 const PROFILE_UPDATE_ENDPOINTS = [
   `${API_BASE}/profile/me`,

@@ -34,7 +34,7 @@ export default function BookingDetailModal({ booking, onClose }: BookingDetailMo
     });
   };
 
-  const getStatusColor = (status: string) => '';
+  const getStatusColor = (_status: string) => '';
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {

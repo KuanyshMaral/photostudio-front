@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Check, X, ToggleLeft, ToggleRight, Users, Building } from 'lucide-react';
+import { Check, X, ToggleLeft, ToggleRight, Users } from 'lucide-react';
 import {
   getOwnerProfiles,
   updateOwnerVerification,

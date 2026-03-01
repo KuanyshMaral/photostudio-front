@@ -8,7 +8,7 @@ import {
   type ProcurementRecord,
   type ProcurementListResponse
 } from './owner.api';
-import { Plus, Edit, Trash2, Check } from 'lucide-react';
+import { Plus, Trash2, Check } from 'lucide-react';
 import './OwnerDashboard.css';
 
 export default function Procurement() {

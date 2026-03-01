@@ -1,5 +1,4 @@
 import React from 'react';
-import { Shield, CheckCircle, Clock, Award } from 'lucide-react';
 import './InfoFooter.css';
 
 interface Benefit {

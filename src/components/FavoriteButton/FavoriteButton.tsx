@@ -23,6 +23,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
   onToggle,
   size = 'md',
 }) => {
+  void studioId;
   const { token } = useAuth();
   const [isFavorite, setIsFavorite] = useState(initialState);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +72,7 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
       setIsLoading(false);
       setTimeout(() => setIsAnimating(false), 300);
     }
-  }, [studioId, isFavorite, isLoading, token, onToggle, saveFavorites]);
+  }, [isFavorite, isLoading, token, onToggle]);
 
   return (
     <button

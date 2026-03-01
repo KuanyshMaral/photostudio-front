@@ -8,7 +8,7 @@ import {
   type Studio,
   type StudioCreateRequest
 } from './owner.api';
-import { Plus, Edit, Trash2, MapPin, Phone, Mail, Home } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Phone, Mail } from 'lucide-react';
 import ImageUpload from '../../components/ImageUpload';
 import './OwnerDashboard.css';
 
@@ -114,7 +114,15 @@ export default function StudioManagement() {
       phone: studio.phone,
       email: studio.email,
       website: studio.website,
-      working_hours: studio.working_hours
+      working_hours: studio.working_hours || {
+        monday: { open: '09:00', close: '18:00' },
+        tuesday: { open: '09:00', close: '18:00' },
+        wednesday: { open: '09:00', close: '18:00' },
+        thursday: { open: '09:00', close: '18:00' },
+        friday: { open: '09:00', close: '18:00' },
+        saturday: { open: '09:00', close: '18:00' },
+        sunday: { open: '09:00', close: '18:00' }
+      }
     });
     
     // Load images from localStorage

@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
-  Building, 
-  TrendingUp, 
-  Wrench, 
-  ShoppingCart, 
-  Camera, 
-  Lock,
-  Calendar,
-  Users,
-  MessageSquare
+  Building
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -32,7 +24,6 @@ export default function OwnerDashboard() {
 
   // Update active tab based on URL hash or query param
   useEffect(() => {
-    const path = location.pathname;
     const hash = location.hash;
     
     // Check for hash like #analytics, #maintenance, etc.
@@ -56,24 +47,6 @@ export default function OwnerDashboard() {
       setActiveTab('profile');
     }
   }, [location]);
-
-  const handleTabChange = (tab: typeof activeTab) => {
-    setActiveTab(tab);
-    // Update URL hash without navigation
-    window.history.pushState(null, '', `#${tab}`);
-  };
-
-  const tabs = [
-    { id: 'profile', label: 'Профиль компании и владельца', icon: Building },
-    { id: 'analytics', label: 'Аналитика', icon: TrendingUp },
-    { id: 'maintenance', label: 'Обслуживание', icon: Wrench },
-    { id: 'procurement', label: 'Закупки', icon: ShoppingCart },
-    { id: 'studios', label: 'Мои студии', icon: Camera },
-    { id: 'bookings', label: 'Бронирования', icon: Calendar },
-    { id: 'clients', label: 'Клиенты', icon: Users },
-    { id: 'messages', label: 'Сообщения', icon: MessageSquare },
-    { id: 'pin', label: 'PIN-код', icon: Lock }
-  ];
 
   const renderTabContent = () => {
     switch (activeTab) {

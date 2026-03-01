@@ -35,11 +35,11 @@ export default function MyBookings() {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (_status: string) => {
     return null;
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (_status: string) => {
     return '';
   };
 

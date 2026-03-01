@@ -42,9 +42,6 @@ import OwnerVerification from './features/admin/OwnerVerification';
 import OwnerDashboard from "./features/owner/OwnerDashboard";
 import OwnerProfile from "./features/owner/OwnerProfile";
 
-// Client components
-import ClientProfile from "./features/client/ClientProfile";
-
 // Manager components
 import { ManagerCalendar } from "./features/manager/ManagerCalendar";
 import { ClientsPage } from "./features/manager/ClientsPage";
@@ -102,7 +99,7 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Layout>
-                <ClientProfile token={token || ''} />
+                <ProfileDashboard />
               </Layout>
             </ProtectedRoute>
           } />

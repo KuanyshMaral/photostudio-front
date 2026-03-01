@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Users, Search, Phone, Mail, Calendar, CheckCircle, XCircle, Clock, UserCheck, Building, ArrowRight } from 'lucide-react';
+import { Users, Search, Phone, Mail, CheckCircle, XCircle, Clock, Building, ArrowRight } from 'lucide-react';
 import { 
   getAllLeads, 
   getLeadStats, 
-  getLeadById, 
-  assignLead, 
   markLeadAsContacted, 
   convertLead, 
   rejectLead, 
-  updateLeadStatus,
   type Lead, 
-  type LeadListResponse, 
   type LeadStats 
 } from './leads.api';
 import './LeadManagement.css';
@@ -83,28 +79,6 @@ export default function LeadManagement() {
     lead.contact_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.contact_email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleStatusChange = async (leadId: number, newStatus: string) => {
-    if (!token) {
-      console.error('No token available');
-      return;
-    }
-    
-    try {
-      await updateLeadStatus(token, leadId, newStatus);
-      // Refetch leads
-      const data = await getAllLeads(
-        token,
-        statusFilter !== 'all' ? statusFilter : undefined,
-        limit,
-        currentPage * limit
-      );
-      setLeads(data.leads || []);
-    } catch (error) {
-      console.error('Failed to update lead status:', error);
-      alert('Не удалось обновить статус лида');
-    }
-  };
 
   const handleMarkContacted = async (leadId: number) => {
     if (!token) {

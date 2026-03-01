@@ -484,7 +484,7 @@ export const updateOwnerVerification = async (token: string, studioId: number, v
   }
 };
 
-export const updateOwnerStudioStatus = async (token: string, userId: number, studioStatus: 'active' | 'inactive'): Promise<OwnerProfile> => {
+export const updateOwnerStudioStatus = async (_token: string, userId: number, studioStatus: 'active' | 'inactive'): Promise<OwnerProfile> => {
   // Studio status is managed through verification status
   // For now, just return mock profile
   return {

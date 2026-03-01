@@ -24,8 +24,8 @@ export default function ProfileView({ profile, onEdit }: ProfileViewProps) {
     enabled: !!token,
   });
 
-  const getStatusIcon = (status: string) => null;
-  const getStatusColor = (status: string) => '';
+  const getStatusIcon = (_status: string) => null;
+  const getStatusColor = (_status: string) => '';
   const getStatusLabel = (status: string) => status;
 
   const formatDate = (dateString: string) => {

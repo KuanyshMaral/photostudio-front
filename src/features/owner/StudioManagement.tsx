@@ -6,10 +6,9 @@ import {
   updateStudio,
   deleteStudio,
   type Studio,
-  type StudioCreateRequest,
-  type StudioUpdateRequest
+  type StudioCreateRequest
 } from './owner.api';
-import { Plus, Edit, Trash2, MapPin, Phone, Mail, Clock, Star, Home } from 'lucide-react';
+import { Plus, Edit, Trash2, MapPin, Phone, Mail, Star, Home } from 'lucide-react';
 import StudioRoomsManagement from './StudioRoomsManagement';
 import AttachmentsManager from '../../components/AttachmentsManager';
 import { normalizeImageUrl } from '../../api/uploadApi';
