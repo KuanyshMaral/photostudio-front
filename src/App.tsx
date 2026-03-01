@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useAuth } from './context/AuthContext';
 
 // Auth components (from Amir & Yerkanat projects)
 import LoginForm from "./features/auth/LoginForm.tsx";
@@ -40,6 +41,9 @@ import OwnerVerification from './features/admin/OwnerVerification';
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
 
+// Client components
+import ClientProfile from "./features/client/ClientProfile";
+
 // Manager components
 import { ManagerCalendar } from "./features/manager/ManagerCalendar";
 import { ClientsPage } from "./features/manager/ClientsPage";
@@ -48,6 +52,8 @@ import { ClientsPage } from "./features/manager/ClientsPage";
 import ChatPage from "./features/chat/ChatPage";
 
 function App() {
+  const { token } = useAuth();
+
   return (
     <>
       <Toaster position="top-right" toastOptions={{
@@ -95,7 +101,7 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Layout>
-                <ProfileDashboard />
+                <ClientProfile token={token || ''} />
               </Layout>
             </ProtectedRoute>
           } />

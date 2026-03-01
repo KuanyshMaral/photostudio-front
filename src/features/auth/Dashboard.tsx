@@ -103,6 +103,15 @@ export default function Dashboard() {
               <h3 className="text-lg font-medium text-gray-900 mb-2">Мои бронирования</h3>
               <p className="text-gray-600 text-sm">Просматривайте и управляйте вашими бронированиями студий</p>
             </Link>
+
+            <Link
+              to="/profile"
+              className="bg-white p-6 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors shadow-sm hover:shadow-md"
+            >
+              <div className="text-indigo-600 mb-3">👤</div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Мой профиль</h3>
+              <p className="text-gray-600 text-sm">Управляйте вашим профилем и персональными данными</p>
+            </Link>
           </>
         )}
 
