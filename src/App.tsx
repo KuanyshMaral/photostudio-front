@@ -40,6 +40,7 @@ import OwnerVerification from './features/admin/OwnerVerification';
 
 // Owner components
 import OwnerDashboard from "./features/owner/OwnerDashboard";
+import OwnerProfile from "./features/owner/OwnerProfile";
 
 // Client components
 import ClientProfile from "./features/client/ClientProfile";
@@ -102,6 +103,14 @@ function App() {
             <ProtectedRoute>
               <Layout>
                 <ClientProfile token={token || ''} />
+              </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/owner-profile" element={
+            <ProtectedRoute>
+              <Layout>
+                <OwnerProfile token={token || ''} />
               </Layout>
             </ProtectedRoute>
           } />
