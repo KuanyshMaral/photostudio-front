@@ -11,6 +11,8 @@ import {
 } from './owner.api';
 import { Plus, Edit, Trash2, MapPin, Phone, Mail, Clock, Star, Home } from 'lucide-react';
 import StudioRoomsManagement from './StudioRoomsManagement';
+import AttachmentsManager from '../../components/AttachmentsManager';
+import { normalizeImageUrl } from '../../api/uploadApi';
 import './OwnerDashboard.css';
 
 export default function StudioManagement() {
@@ -93,14 +95,24 @@ export default function StudioManagement() {
     if (!token) return;
 
     try {
+      const studioData = {
+        ...form
+      };
+
+      console.log('Submitting studio data:', studioData);
+
       if (editingStudio) {
         // Update existing studio
-        const updated = await updateStudio(token, editingStudio.id, form);
+        console.log('Updating studio ID:', editingStudio.id);
+        const updated = await updateStudio(token, editingStudio.id, studioData);
+        console.log('Updated studio response:', updated);
         setStudios(studios.map(s => s.id === updated.id ? updated : s));
         alert('Студия успешно обновлена');
       } else {
         // Create new studio
-        const newStudio = await createStudio(token, form);
+        console.log('Creating new studio');
+        const newStudio = await createStudio(token, studioData);
+        console.log('Created studio response:', newStudio);
         setStudios([...studios, newStudio]);
         alert('Студия успешно создана');
       }
@@ -115,16 +127,19 @@ export default function StudioManagement() {
   };
 
   const handleEdit = (studio: Studio) => {
+    console.log('Editing studio:', studio);
+    console.log('Setting editingStudio to:', studio);
+    
     setEditingStudio(studio);
     setForm({
       name: studio.name,
       description: studio.description,
       address: studio.address,
       city: studio.city,
-      district: studio.district || '',
+      district: studio.district,
       phone: studio.phone,
-      email: studio.email || '',
-      website: studio.website || '',
+      email: studio.email,
+      website: studio.website,
       working_hours: studio.working_hours || {
         monday: { open: '09:00', close: '18:00' },
         tuesday: { open: '09:00', close: '18:00' },
@@ -287,6 +302,27 @@ export default function StudioManagement() {
                           required
                         />
                       </div>
+                      <div className="form-group full-width">
+                        <label>Фотографии студии</label>
+                        {editingStudio ? (
+                          <AttachmentsManager
+                            targetType="studio_gallery"
+                            targetId={editingStudio.id}
+                            token={token || ''}
+                            maxImages={5}
+                          />
+                        ) : (
+                          <div style={{ 
+                            padding: '20px', 
+                            background: '#f5f5f5', 
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            color: '#666'
+                          }}>
+                            Сначала сохраните студию, затем сможете добавить фотографии
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </form>
                 </div>
@@ -335,6 +371,32 @@ export default function StudioManagement() {
                       </button>
                     </div>
                   </div>
+
+                  {/* Studio Images */}
+                  {studio.images && studio.images.length > 0 && (
+                    <div className="studio-images">
+                      {studio.images.slice(0, 3).map((image: string, index: number) => {
+                        const normalizedUrl = normalizeImageUrl(image);
+                        return normalizedUrl ? (
+                          <img 
+                            key={index}
+                            src={normalizedUrl} 
+                            alt={`${studio.name} - Image ${index + 1}`}
+                            className="studio-image"
+                            onError={(e) => {
+                              console.error('Failed to load image:', normalizedUrl);
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : null;
+                      })}
+                      {studio.images.length > 3 && (
+                        <div className="studio-image-more">
+                          +{studio.images.length - 3}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   <div className="studio-info">
                     <div className="info-item">
