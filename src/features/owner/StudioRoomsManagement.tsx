@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Plus, Edit, Trash2, Home, MapPin, Users, DollarSign, ArrowLeft, Package } from 'lucide-react';
+import AttachmentsManager from '../../components/AttachmentsManager';
 import './OwnerDashboard.css';
 
 // Types based on Swagger API
@@ -482,6 +483,28 @@ export default function StudioRoomsManagement({ studio, onBack }: StudioRoomsMan
                   })}
                   placeholder="Wi-Fi, Кондиционер, Освещение"
                 />
+              </div>
+
+              <div className="form-group">
+                <label>Фотографии комнаты</label>
+                {editingRoom ? (
+                  <AttachmentsManager
+                    targetType="room_gallery"
+                    targetId={editingRoom.id}
+                    token={token || ''}
+                    maxImages={8}
+                  />
+                ) : (
+                  <div style={{ 
+                    padding: '20px', 
+                    background: '#f5f5f5', 
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    color: '#666'
+                  }}>
+                    Сначала сохраните комнату, затем сможете добавить фотографии
+                  </div>
+                )}
               </div>
 
               <div className="form-actions">
