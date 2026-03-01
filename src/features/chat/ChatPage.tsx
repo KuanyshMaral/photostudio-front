@@ -32,7 +32,7 @@ export default function ChatPage() {
                 {showList && (
                     <aside className="chat-sidebar">
                         <ChatList
-                            activeConversationId={conversationId ? parseInt(conversationId) : undefined}
+                            activeConversationId={conversationId}
                             onSelectConversation={handleSelectConversation}
                         />
                     </aside>

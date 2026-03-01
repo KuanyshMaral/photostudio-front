@@ -4,13 +4,26 @@
 
 // Определяем WS URL на основе текущего окружения
 const getWebSocketUrl = (): string => {
-    // В production используем wss://
+    const rawServerUrl = String(
+        import.meta.env.VITE_SERVER_URL || import.meta.env.VITE_API_URL || ''
+    ).trim();
+
+    if (rawServerUrl) {
+        try {
+            const normalizedUrl = rawServerUrl.replace(/\/api\/v1\/?$/, '');
+            const parsedUrl = new URL(normalizedUrl);
+            const wsProtocol = parsedUrl.protocol === 'https:' ? 'wss:' : 'ws:';
+            return `${wsProtocol}//${parsedUrl.host}`;
+        } catch {
+            // fallback to window.location below
+        }
+    }
+
+    // Fallback на текущий хост фронтенда
     if (window.location.protocol === 'https:') {
         return `wss://${window.location.host}`;
     }
-    
-    // В development — ws:// на тот же порт что API
-    // Vite proxy перенаправит на backend
+
     return `ws://${window.location.host}`;
 };
 

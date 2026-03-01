@@ -98,51 +98,57 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="bg-white rounded-xl shadow-sm border">
-          {/* Header */}
-          <div className="border-b border-gray-200 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">Мой профиль</h1>
-              {viewMode !== 'view' && (
-                <button
-                  onClick={() => setViewMode('view')}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              )}
+    <div className="min-h-screen bg-slate-50 py-8 lg:py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {viewMode === 'view' && (
+          <ProfileView
+            profile={profile}
+            onEdit={() => setViewMode('edit')}
+          />
+        )}
+
+        {viewMode === 'edit' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="border-b border-gray-100 px-6 py-5 flex items-center justify-between bg-white">
+              <h1 className="text-xl font-bold text-gray-900">Редактирование профиля</h1>
+              <button
+                onClick={() => setViewMode('view')}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
+              >
+                ✕
+              </button>
             </div>
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {viewMode === 'view' && (
-              <ProfileView
-                profile={profile}
-                onEdit={() => setViewMode('edit')}
-              />
-            )}
-
-            {viewMode === 'edit' && (
+            <div className="p-6 lg:p-8">
               <ProfileEditForm
                 profile={profile}
                 onSave={handleSaveProfile}
                 onCancel={() => setViewMode('view')}
                 isLoading={isSubmitting}
               />
-            )}
+            </div>
+          </div>
+        )}
 
-            {viewMode === 'password' && (
+        {viewMode === 'password' && (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="border-b border-gray-100 px-6 py-5 flex items-center justify-between bg-white">
+              <h1 className="text-xl font-bold text-gray-900">Смена пароля</h1>
+              <button
+                onClick={() => setViewMode('view')}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-full transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="p-6 lg:p-8">
               <PasswordChangeForm
                 onSubmit={handleChangePassword}
                 onCancel={() => setViewMode('view')}
                 isLoading={isSubmitting}
               />
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

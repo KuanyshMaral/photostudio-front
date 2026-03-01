@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getCompanyProfile, updateCompanyProfile, type CompanyProfile, type CompanyProfileResponse } from './owner.api';
-import { Building, User, Phone, Mail, Globe, Clock, Edit } from 'lucide-react';
+import { getCompanyProfile, updateCompanyProfile, type CompanyProfile } from './owner.api';
+import { Phone, Mail, Globe, Clock, Edit } from 'lucide-react';
 import './OwnerDashboard.css';
 
 export default function CompanyProfile() {

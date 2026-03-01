@@ -47,22 +47,25 @@ export const StudioCatalog: React.FC = () => {
   };
 
   // Обработка нажатия на "Написать владельцу"
-  const handleContactOwner = async (studio: Studio) => {
+  const handleContactOwner = async (studio: Studio, initialMessage?: string) => {
     if (!token || !studio.owner_id) {
-      console.error('No token or studio owner ID');
-      return;
+      const message = 'No token or studio owner ID';
+      console.error(message);
+      throw new Error(message);
     }
 
     try {
       const response = await createConversation(token, {
         recipient_id: studio.owner_id,
-        studio_id: studio.id
+        studio_id: studio.id,
+        initial_message: initialMessage,
       });
       
       setChatConversation(response.conversation);
       setIsChatModalOpen(true);
     } catch (error) {
       console.error('Failed to create conversation:', error);
+      throw error;
     }
   };
 
@@ -102,6 +105,7 @@ export const StudioCatalog: React.FC = () => {
         <StudioDetailModal
           studio={selectedStudio}
           rooms={selectedStudio.rooms || []}
+          onContactOwner={handleContactOwner}
           onClose={handleCloseModal}
         />
       )}

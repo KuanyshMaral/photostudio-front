@@ -120,8 +120,9 @@ export async function getProfile(token: string): Promise<Profile> {
   console.log('Token length:', token?.length);
   console.log('Authorization header:', `Bearer ${token}`);
   
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090';
-  const response = await fetch(`${API_BASE}/api/v1/users/me?include_stats=true`, {
+  const RAW_API_URL = String(import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090');
+  const API_BASE = RAW_API_URL.endsWith('/api/v1') ? RAW_API_URL : `${RAW_API_URL}/api/v1`;
+  const response = await fetch(`${API_BASE}/users/me?include_stats=true`, {
     headers: { 'Authorization': `Bearer ${token}` },
   });
   
@@ -136,7 +137,8 @@ export async function getProfile(token: string): Promise<Profile> {
 }
 
 export async function updateProfile(token: string, data: Partial<Pick<Profile, 'name' | 'phone'>>): Promise<Profile> {
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
+  const RAW_API_URL = String(import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090');
+  const API_BASE = RAW_API_URL.endsWith('/api/v1') ? RAW_API_URL : `${RAW_API_URL}/api/v1`;
   const response = await fetch(`${API_BASE}/users/me`, {
     method: 'PUT',
     headers: {
