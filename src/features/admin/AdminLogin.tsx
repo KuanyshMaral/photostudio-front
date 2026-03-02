@@ -52,7 +52,7 @@ export const AdminLogin: React.FC = () => {
       };
       
       // Login with admin credentials
-      login(response.token, userForAuth);
+      login(response.token, undefined, userForAuth); // No refresh token from admin login
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');

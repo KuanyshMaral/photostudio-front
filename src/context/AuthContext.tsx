@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { refreshTokens } from "../api/authApi";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -12,10 +13,12 @@ interface User {
 
 type AuthContextType = {
   token: string | null;
+  refreshToken: string | null;
   user: User | null;
-  login: (token: string, user?: User) => void;
+  login: (token: string, refreshToken?: string, user?: User) => void;
   logout: () => void;
   refreshUser?: () => void;
+  refreshAccessToken: () => Promise<boolean>;
   // Admin functions
   promoteToAdmin: (userId: number) => Promise<void>;
   demoteFromAdmin: (userId: number) => Promise<void>;
@@ -30,6 +33,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('AuthProvider init - token from localStorage:', !!savedToken);
     return savedToken;
   });
+  const [refreshToken, setRefreshToken] = useState<string | null>(() => {
+    const savedRefreshToken = localStorage.getItem("refreshToken");
+    console.log('AuthProvider init - refreshToken from localStorage:', !!savedRefreshToken);
+    return savedRefreshToken;
+  });
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem("user");
     const parsedUser = savedUser ? JSON.parse(savedUser) : null;
@@ -37,9 +45,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return parsedUser;
   });
 
-  const login = (token: string, user?: User) => {
-    console.log('AuthContext.login - token:', !!token, 'user:', user);
+  const login = (token: string, refreshToken?: string, user?: User) => {
+    console.log('AuthContext.login - token:', !!token, 'refreshToken:', !!refreshToken, 'user:', user);
     setToken(token);
+    if (refreshToken) {
+      setRefreshToken(refreshToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      console.log('RefreshToken saved to localStorage');
+    }
     if (user) {
       setUser(user);
       localStorage.setItem("user", JSON.stringify(user));
@@ -51,9 +64,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = () => {
     setToken(null);
+    setRefreshToken(null);
     setUser(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+  };
+
+  const refreshAccessToken = async (): Promise<boolean> => {
+    if (!refreshToken) {
+      console.log('No refresh token available');
+      return false;
+    }
+
+    try {
+      console.log('Attempting to refresh access token...');
+      const newTokens = await refreshTokens(refreshToken);
+      
+      setToken(newTokens.access_token);
+      setRefreshToken(newTokens.refresh_token);
+      localStorage.setItem("token", newTokens.access_token);
+      localStorage.setItem("refreshToken", newTokens.refresh_token);
+      
+      console.log('Access token refreshed successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to refresh access token:', error);
+      logout(); // Clear tokens on refresh failure
+      return false;
+    }
   };
 
   const promoteToAdmin = async (userId: number): Promise<void> => {
@@ -123,7 +162,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout, refreshUser, promoteToAdmin, demoteFromAdmin, isAdmin }}>
+    <AuthContext.Provider value={{ 
+      token, 
+      refreshToken, 
+      user, 
+      login, 
+      logout, 
+      refreshUser, 
+      refreshAccessToken, 
+      promoteToAdmin, 
+      demoteFromAdmin, 
+      isAdmin 
+    }}>
       {children}
     </AuthContext.Provider>
   );

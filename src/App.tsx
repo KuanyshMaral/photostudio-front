@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthContext';
+import { setAuthContext } from './utils/apiWrapper';
+import { useEffect } from 'react';
 
 // Auth components (from Amir & Yerkanat projects)
 import LoginForm from "./features/auth/LoginForm.tsx";
@@ -52,7 +54,11 @@ import { ClientsPage } from "./features/manager/ClientsPage";
 import ChatPage from "./features/chat/ChatPage";
 
 function App() {
-  const { token } = useAuth();
+  const auth = useAuth();
+
+  useEffect(() => {
+    setAuthContext(auth);
+  }, [auth]);
 
   return (
     <>
@@ -101,7 +107,7 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Layout>
-                <ClientProfile token={token || ''} />
+                <ClientProfile token={auth.token || ''} />
               </Layout>
             </ProtectedRoute>
           } />
@@ -109,7 +115,7 @@ function App() {
           <Route path="/owner-profile" element={
             <ProtectedRoute>
               <Layout>
-                <OwnerProfile token={token || ''} />
+                <OwnerProfile token={auth.token || ''} />
               </Layout>
             </ProtectedRoute>
           } />
