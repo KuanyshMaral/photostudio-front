@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
+import { apiCall } from '../utils/apiWrapper';
 
 export interface ClientProfile {
   id: number;
@@ -30,12 +31,8 @@ export interface ClientProfileResponse {
 }
 
 export const getClientProfile = async (token: string): Promise<ClientProfile> => {
-  const response = await fetch(`${API_BASE}/profile/client`, {
+  const response = await apiCall(`${API_BASE}/profile/client`, {
     method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
   });
 
   if (!response.ok) {
@@ -48,12 +45,8 @@ export const getClientProfile = async (token: string): Promise<ClientProfile> =>
 };
 
 export const updateClientProfile = async (token: string, profileData: ClientProfileUpdateRequest): Promise<ClientProfile> => {
-  const response = await fetch(`${API_BASE}/profile/client`, {
+  const response = await apiCall(`${API_BASE}/profile/client`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(profileData),
   });
 

@@ -28,7 +28,7 @@ export default function LoginForm() {
     try {
       const response = await login(data);
       console.log('Login response:', response); // Отладка
-      authLogin(response.token, response.user);
+      authLogin(response.token, response.refreshToken, response.user);
       toast.success('Вы успешно вошли!');
       
       // Redirect based on user role

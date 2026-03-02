@@ -25,7 +25,7 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
   console.log('json.data:', json.data);
   
   // Проверяем разные возможные структуры ответа
-  let token, user;
+  let token, refreshToken, user;
   
   if (json.data) {
     console.log('Found json.data structure');
@@ -33,18 +33,23 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     if (json.data.tokens) {
       console.log('Found tokens object:', json.data.tokens);
       token = json.data.tokens.access_token || json.data.tokens.token;
+      refreshToken = json.data.tokens.refresh_token;
       console.log('Extracted token from tokens:', !!token);
+      console.log('Extracted refresh token from tokens:', !!refreshToken);
     } else {
       token = json.data.token;
+      refreshToken = json.data.refresh_token;
     }
     user = json.data.user;
   } else if (json.token) {
     console.log('Found direct token structure');
     token = json.token;
+    refreshToken = json.refresh_token;
     user = json.user;
   } else if (json.access_token) {
     console.log('Found access_token structure');
     token = json.access_token;
+    refreshToken = json.refresh_token;
     user = json.user;
   } else {
     console.log('Unknown structure, logging all keys:', Object.keys(json));
@@ -57,8 +62,8 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
     user = json.user || json.userData || json.profile;
   }
   
-  console.log('Extracted token:', !!token, 'user:', user);
-  return { token, user };
+  console.log('Extracted token:', !!token, 'refresh token:', !!refreshToken, 'user:', user);
+  return { token, refreshToken, user };
 }
 
 export async function register(data: RegisterRequest): Promise<RegisterResponse> {

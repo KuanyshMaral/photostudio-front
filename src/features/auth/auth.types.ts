@@ -5,6 +5,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
   token: string;
+  refreshToken?: string;
   user: Profile;
 };
 
@@ -18,6 +19,7 @@ export type RegisterRequest = {
 
 export type RegisterResponse = {
   token: string;
+  refreshToken?: string;
   user: Profile;
   message?: string;
 };
