@@ -1,14 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { getClientProfile, updateClientProfile, type ClientProfile as ClientProfileType, type ClientProfileUpdateRequest } from '../../api/clientApi';
 import { uploadFile } from '../../api/uploadApi';
+import { useAuth } from '../../context/AuthContext';
 import ImageUpload from '../../components/ImageUpload';
 import './ClientProfile.css';
 
 interface ClientProfileProps {
-  token: string;
+  token?: string;
 }
 
-const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
+interface ClientProfileType {
+  id: number;
+  user_id: number;
+  name: string;
+  nickname: string;
+  phone: string;
+  avatar_url: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ClientProfileUpdateRequest {
+  name?: string;
+  nickname?: string;
+  phone?: string;
+  avatar_url?: string;
+}
+
+const ClientProfile: React.FC<ClientProfileProps> = ({ token: propToken }) => {
+  const auth = useAuth();
+  const token = propToken || auth.token;
   const [profile, setProfile] = useState<ClientProfileType | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -22,31 +42,71 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadProfile();
+    // Small delay to ensure auth context is properly set up
+    const timer = setTimeout(() => {
+      if (token) {
+        loadProfile();
+      } else {
+        setLoading(false);
+        setError('Требуется авторизация');
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [token]);
 
+  // Helper function to extract string values from sql.NullString objects
+  const extractStringValue = (value: any) => {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value.String !== undefined) return value.String;
+    return '';
+  };
+
   const loadProfile = async () => {
+    if (!token) {
+      setError('Требуется авторизация');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      const profileData = await getClientProfile(token);
       
-      // Extract values from API response format
+      // Direct API call to bypass apiWrapper auth context issues
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'}/profiles/client`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to fetch client profile');
+      }
+
+      const result = await response.json();
+      const profileData = result.data;
+      
+      // Extract values from API response format (handle sql.NullString objects)
       const extractedData = {
         ...profileData,
-        name: (profileData.name as any)?.String || '',
-        nickname: (profileData.nickname as any)?.String || '',
-        phone: (profileData.phone as any)?.String || '',
-        avatar_url: (profileData.avatar_url as any)?.String || ''
+        name: extractStringValue(profileData.name),
+        nickname: extractStringValue(profileData.nickname),
+        phone: extractStringValue(profileData.phone),
+        avatar_url: extractStringValue(profileData.avatar_url)
       };
       
       setProfile(extractedData);
       setFormData({
-        name: (profileData.name as any)?.String || '',
-        nickname: (profileData.nickname as any)?.String || '',
-        phone: (profileData.phone as any)?.String || '',
-        avatar_url: (profileData.avatar_url as any)?.String || ''
+        name: extractStringValue(profileData.name),
+        nickname: extractStringValue(profileData.nickname),
+        phone: extractStringValue(profileData.phone),
+        avatar_url: extractStringValue(profileData.avatar_url)
       });
-      setAvatar((profileData.avatar_url as any)?.String || '');
+      setAvatar(extractStringValue(profileData.avatar_url));
     } catch (error) {
       console.error('Failed to load client profile:', error);
       setError('Не удалось загрузить профиль');
@@ -64,12 +124,12 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
     setEditing(false);
     if (profile) {
       setFormData({
-        name: (profile.name as any)?.String || '',
-        nickname: (profile.nickname as any)?.String || '',
-        phone: (profile.phone as any)?.String || '',
-        avatar_url: (profile.avatar_url as any)?.String || ''
+        name: extractStringValue(profile.name),
+        nickname: extractStringValue(profile.nickname),
+        phone: extractStringValue(profile.phone),
+        avatar_url: extractStringValue(profile.avatar_url)
       });
-      setAvatar((profile.avatar_url as any)?.String || '');
+      setAvatar(extractStringValue(profile.avatar_url));
     }
     setError('');
   };
@@ -91,22 +151,44 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
         const mimeType = newAvatar.split(';')[0].split(':')[1];
         const file = new File([byteArray], 'avatar.jpg', { type: mimeType });
         
-        const uploadResult = await uploadFile(file, token);
-        setFormData(prev => ({ ...prev, avatar_url: uploadResult.url }));
+        const uploadResult = await uploadFile(file, token || '');
+        setFormData((prev: ClientProfileUpdateRequest) => ({ ...prev, avatar_url: uploadResult.url }));
       } catch (error) {
         console.error('Failed to upload avatar:', error);
         setError('Не удалось загрузить аватар');
       }
     } else {
-      setFormData(prev => ({ ...prev, avatar_url: newAvatar || '' }));
+      setFormData((prev: ClientProfileUpdateRequest) => ({ ...prev, avatar_url: newAvatar || '' }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!token) {
+      setError('Требуется авторизация');
+      return;
+    }
+    
     try {
-      const updatedProfile = await updateClientProfile(token, formData);
+      // Direct API call to bypass apiWrapper auth context issues
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'}/profiles/client`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || 'Failed to update client profile');
+      }
+
+      const result = await response.json();
+      const updatedProfile = result.data;
+      
       setProfile(updatedProfile);
       setEditing(false);
       setError('');
@@ -119,7 +201,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev: ClientProfileUpdateRequest) => ({ ...prev, [name]: value }));
   };
 
   if (loading) {
@@ -191,7 +273,7 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-gray-300">
-                        {(formData.name?.[0] || profile?.name?.[0] || '?').toUpperCase()}
+                        {(extractStringValue(formData.name) || extractStringValue(profile?.name) || '?').toUpperCase()}
                       </div>
                     )}
                   </div>
@@ -283,27 +365,21 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ token }) => {
                       <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
                         <span className="block text-sm font-medium text-gray-500 mb-1">Имя</span>
                         <span className="block text-base font-semibold text-gray-900">
-                          {profile && profile.name ? 
-                            (typeof profile.name === 'object' ? (profile.name as any).String : profile.name) 
-                            : 'Не указано'}
+                          {extractStringValue(profile?.name) || 'Не указано'}
                         </span>
                       </div>
                       
                       <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
                         <span className="block text-sm font-medium text-gray-500 mb-1">Никнейм</span>
                         <span className="block text-base font-semibold text-gray-900">
-                          {profile && profile.nickname ? 
-                            (typeof profile.nickname === 'object' ? (profile.nickname as any).String : profile.nickname) 
-                            : 'Не указано'}
+                          {extractStringValue(profile?.nickname) || 'Не указано'}
                         </span>
                       </div>
                       
                       <div className="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
                         <span className="block text-sm font-medium text-gray-500 mb-1">Телефон</span>
                         <span className="block text-base font-semibold text-gray-900">
-                          {profile && profile.phone ? 
-                            (typeof profile.phone === 'object' ? (profile.phone as any).String : profile.phone) 
-                            : 'Не указано'}
+                          {extractStringValue(profile?.phone) || 'Не указано'}
                         </span>
                       </div>
                       

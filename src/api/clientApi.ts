@@ -30,8 +30,8 @@ export interface ClientProfileResponse {
   };
 }
 
-export const getClientProfile = async (token: string): Promise<ClientProfile> => {
-  const response = await apiCall(`${API_BASE}/profile/client`, {
+export const getClientProfile = async (): Promise<ClientProfile> => {
+  const response = await apiCall(`${API_BASE}/profiles/client`, {
     method: 'GET',
   });
 
@@ -44,8 +44,8 @@ export const getClientProfile = async (token: string): Promise<ClientProfile> =>
   return result.data;
 };
 
-export const updateClientProfile = async (token: string, profileData: ClientProfileUpdateRequest): Promise<ClientProfile> => {
-  const response = await apiCall(`${API_BASE}/profile/client`, {
+export const updateClientProfile = async (profileData: ClientProfileUpdateRequest): Promise<ClientProfile> => {
+  const response = await apiCall(`${API_BASE}/profiles/client`, {
     method: 'PUT',
     body: JSON.stringify(profileData),
   });

@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    localStorage.removeItem("adminToken"); // Clear admin token too
   };
 
   const refreshAccessToken = async (): Promise<boolean> => {
