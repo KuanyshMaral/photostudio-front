@@ -1,23 +1,21 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { Users, Search, Phone, Mail, Calendar, CheckCircle, XCircle, Clock, UserCheck, Building, ArrowRight } from 'lucide-react';
+import { Users, Search, Phone, Mail, CheckCircle, XCircle, Clock, Building, ArrowRight } from 'lucide-react';
 import { 
   getAllLeads, 
   getLeadStats, 
-  getLeadById, 
-  assignLead, 
   markLeadAsContacted, 
   convertLead, 
   rejectLead, 
   updateLeadStatus,
   type Lead, 
-  type LeadListResponse, 
   type LeadStats 
 } from './leads.api';
 import './LeadManagement.css';
 
 export default function LeadManagement() {
-  const { token } = useAuth();
+  const [adminToken] = useState<string | null>(() => {
+    return localStorage.getItem("adminToken");
+  });
   const [leads, setLeads] = useState<Lead[]>([]);
   const [stats, setStats] = useState<LeadStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,15 +31,15 @@ export default function LeadManagement() {
 
   useEffect(() => {
     const fetchLeads = async () => {
-      if (!token) {
-        console.log('LeadManagement: No token, skipping fetch');
+      if (!adminToken) {
+        console.log('LeadManagement: No admin token, skipping fetch');
         return;
       }
       
       try {
         setLoading(true);
         const data = await getAllLeads(
-          token, 
+          adminToken, 
           statusFilter !== 'all' ? statusFilter : undefined,
           limit,
           currentPage * limit
@@ -57,17 +55,17 @@ export default function LeadManagement() {
     };
 
     fetchLeads();
-  }, [token, statusFilter, currentPage]);
+  }, [adminToken, statusFilter, currentPage]);
 
   useEffect(() => {
     const fetchStats = async () => {
-      if (!token) {
-        console.log('LeadManagement: No token, skipping stats fetch');
+      if (!adminToken) {
+        console.log('LeadManagement: No admin token, skipping stats fetch');
         return;
       }
       
       try {
-        const statsData = await getLeadStats(token);
+        const statsData = await getLeadStats(adminToken);
         console.log('LeadManagement: Stats data:', statsData);
         setStats(statsData);
       } catch (error) {
@@ -76,7 +74,7 @@ export default function LeadManagement() {
     };
 
     fetchStats();
-  }, [token]);
+  }, [adminToken]);
 
   const filteredLeads = leads.filter(lead => 
     lead.company_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -85,16 +83,16 @@ export default function LeadManagement() {
   );
 
   const handleStatusChange = async (leadId: number, newStatus: string) => {
-    if (!token) {
-      console.error('No token available');
+    if (!adminToken) {
+      console.error('No admin token available');
       return;
     }
     
     try {
-      await updateLeadStatus(token, leadId, newStatus);
+      await updateLeadStatus(adminToken, leadId, newStatus);
       // Refetch leads
       const data = await getAllLeads(
-        token,
+        adminToken,
         statusFilter !== 'all' ? statusFilter : undefined,
         limit,
         currentPage * limit
@@ -107,16 +105,16 @@ export default function LeadManagement() {
   };
 
   const handleMarkContacted = async (leadId: number) => {
-    if (!token) {
-      console.error('No token available');
+    if (!adminToken) {
+      console.error('No admin token available');
       return;
     }
     
     try {
-      await markLeadAsContacted(token, leadId);
+      await markLeadAsContacted(adminToken, leadId);
       // Refetch leads
       const data = await getAllLeads(
-        token,
+        adminToken,
         statusFilter !== 'all' ? statusFilter : undefined,
         limit,
         currentPage * limit
@@ -135,8 +133,8 @@ export default function LeadManagement() {
   };
 
   const handleConvertWithPassword = async () => {
-    if (!token || !selectedLeadForConversion) {
-      console.error('No token or lead available');
+    if (!adminToken || !selectedLeadForConversion) {
+      console.error('No admin token or lead available');
       return;
     }
     
@@ -183,7 +181,7 @@ export default function LeadManagement() {
       
       console.log('LeadManagement: Conversion data:', conversionData);
       
-      await convertLead(token, selectedLeadForConversion.id, conversionData);
+      await convertLead(adminToken, selectedLeadForConversion.id, conversionData);
       alert('Лид успешно конвертирован в студию!');
       
       // Close modal and reset
@@ -193,7 +191,7 @@ export default function LeadManagement() {
       
       // Refetch leads
       const data = await getAllLeads(
-        token,
+        adminToken,
         statusFilter !== 'all' ? statusFilter : undefined,
         limit,
         currentPage * limit
@@ -206,8 +204,8 @@ export default function LeadManagement() {
   };
 
   const handleReject = async (leadId: number) => {
-    if (!token) {
-      console.error('No token available');
+    if (!adminToken) {
+      console.error('No admin token available');
       return;
     }
     
@@ -215,12 +213,12 @@ export default function LeadManagement() {
     if (!reason) return;
     
     try {
-      await rejectLead(token, leadId, reason);
+      await rejectLead(adminToken, leadId, reason);
       alert('Лид отклонен');
       
       // Refetch leads
       const data = await getAllLeads(
-        token,
+        adminToken,
         statusFilter !== 'all' ? statusFilter : undefined,
         limit,
         currentPage * limit
@@ -258,8 +256,8 @@ export default function LeadManagement() {
 
   const totalPages = Math.ceil(total / limit);
 
-  // Show loading state if no token
-  if (!token) {
+  // Show loading state if no admin token
+  if (!adminToken) {
     return (
       <div className="lead-management--loading">
         <p>Требуется авторизация для доступа к управлению лидами</p>

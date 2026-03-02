@@ -107,7 +107,7 @@ function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <Layout>
-                <ClientProfile token={auth.token || ''} />
+                <ClientProfile />
               </Layout>
             </ProtectedRoute>
           } />

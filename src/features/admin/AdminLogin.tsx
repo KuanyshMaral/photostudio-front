@@ -53,6 +53,9 @@ export const AdminLogin: React.FC = () => {
       
       // Login with admin credentials
       login(response.token, undefined, userForAuth); // No refresh token from admin login
+      
+      // Also store admin token separately for admin components
+      localStorage.setItem("adminToken", response.token);
 
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
