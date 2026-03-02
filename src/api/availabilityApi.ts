@@ -1,5 +1,4 @@
-const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-const API_BASE = `${API_ORIGIN}/api/v1`;
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
 
 export interface TimeSlot {
   hour: number;
@@ -50,7 +49,7 @@ export const getRoomAvailability = async (roomId: number, date: string, token?: 
         headers['Authorization'] = `Bearer ${token}`;
     }
     
-    const response = await fetch(`${API_BASE}/rooms/${roomId}/availability?date=${date}`, {
+    const response = await fetch(`${API_BASE}/booking/room/${roomId}/availability?date=${date}`, {
         headers,
     });
     
