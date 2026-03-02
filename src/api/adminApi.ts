@@ -1,4 +1,4 @@
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1/admin`;
+const API_BASE = `${import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090'}/api/v1/admin`;
 
 export const getPendingStudios = async (token: string) => {
     const response = await fetch(`${API_BASE}/studios/pending`, {

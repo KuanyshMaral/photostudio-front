@@ -26,7 +26,7 @@ export default function UserManagement() {
       console.log('UserManagement: Token starts with:', token.substring(0, 20) + '...');
       
       try {
-        const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined);
+        const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined, searchTerm);
         console.log('UserManagement: Received data:', data);
         setUserList(data);
       } catch (error) {
@@ -43,7 +43,7 @@ export default function UserManagement() {
     };
     
     fetchUsers();
-  }, [token, statusFilter, user]);
+  }, [token, statusFilter, searchTerm, user]);
 
   const handleBanUser = async (userId: number, reason: string) => {
     if (!token) return;
@@ -51,7 +51,7 @@ export default function UserManagement() {
     try {
       await banUser(token, userId, reason);
       // Refresh users list
-      const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined);
+      const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined, searchTerm);
       setUserList(data);
     } catch (error) {
       console.error('Failed to ban user:', error);
@@ -65,7 +65,7 @@ export default function UserManagement() {
     try {
       await unbanUser(token, userId);
       // Refresh users list
-      const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined);
+      const data = await getAllUsers(token, 1, 50, statusFilter !== 'all' ? statusFilter : undefined, searchTerm);
       setUserList(data);
     } catch (error) {
       console.error('Failed to unban user:', error);
@@ -73,10 +73,7 @@ export default function UserManagement() {
     }
   };
 
-  const filteredUsers = userList?.users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredUsers = userList?.users || [];
 
   if (loading) {
     return <div className="user-management--loading">Загрузка пользователей...</div>;

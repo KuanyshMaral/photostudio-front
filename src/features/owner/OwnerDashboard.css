@@ -111,8 +111,26 @@
 
 .header-info {
   display: flex;
-  gap: 20px;
   align-items: center;
+  gap: 12px;
+}
+
+.api-test-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.api-test-btn:hover {
+  background: #d97706;
 }
 
 .header-info span {

@@ -55,7 +55,9 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
   };
 
   // Получение инициалов для fallback аватара
-  const getInitials = (name: string): string => {
+  const getInitials = (name?: string): string => {
+    if (!name) return '';
+    
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -113,12 +115,12 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
                 {user?.avatar_url ? (
                   <img 
                     src={user.avatar_url} 
-                    alt={user.name} 
+                    alt={user.name || 'User'} 
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-white font-semibold text-sm">
-                    {user ? getInitials(user.name) : <User size={16} className="text-white" />}
+                    {user?.name ? getInitials(user.name) : <User size={16} className="text-white" />}
                   </span>
                 )}
               </div>

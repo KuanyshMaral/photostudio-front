@@ -32,10 +32,20 @@ const WriteReviewPage: React.FC = () => {
       if (!token) return;
       
       try {
-        const bookingsData = await getMyBookings(token);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1'}/studios/${selectedBooking?.studio_id}/can-review`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to check review eligibility');
+        }
+        
+        const bookingsData = await response.json();
         
         // Filter only completed bookings that can be reviewed
-        const completedBookings = bookingsData.filter(() => false);
+        const completedBookings = bookingsData.filter((booking: Booking) => booking.status === 'completed');
         
         setBookings(completedBookings);
       } catch (error) {
