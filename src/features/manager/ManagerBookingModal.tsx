@@ -6,6 +6,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import './ManagerBookingModal.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
+
 interface BookingDetails {
   id: number;
   room_name: string;
@@ -51,7 +53,7 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
 
   const fetchBooking = async () => {
     try {
-      const response = await fetch(`/api/v1/manager/bookings/${bookingId}`, {
+      const response = await fetch(`${API_BASE}/manager/bookings/${bookingId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (response.ok) {
@@ -69,7 +71,7 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
   const handleUpdateDeposit = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/v1/manager/bookings/${bookingId}/deposit`, {
+      const response = await fetch(`${API_BASE}/manager/bookings/${bookingId}/deposit`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -93,7 +95,7 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
   const handleUpdateStatus = async (status: string) => {
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/v1/manager/bookings/${bookingId}/status`, {
+      const response = await fetch(`${API_BASE}/manager/bookings/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -121,8 +123,8 @@ export const ManagerBookingModal: React.FC<ManagerBookingModalProps> = ({
 
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/v1/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
+      const response = await fetch(`${API_BASE}/booking/${bookingId}/cancel`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

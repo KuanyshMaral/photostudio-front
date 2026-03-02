@@ -13,6 +13,8 @@ import Maintenance from './Maintenance';
 import Procurement from './Procurement';
 import PinManagement from './PinManagement';
 import StudioManagement from './StudioManagement';
+import { ManagerCalendar } from '../manager/ManagerCalendar';
+import { getMyStudios, type Studio } from './owner.api';
 
 import './OwnerDashboard.css';
 
@@ -21,6 +23,25 @@ export default function OwnerDashboard() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<'profile' | 'analytics' | 'maintenance' | 'procurement' | 'studios' | 'bookings' | 'clients' | 'messages' | 'pin'>('profile');
   const [profileSubTab, setProfileSubTab] = useState<'company' | 'owner'>('company');
+  const [studios, setStudios] = useState<Studio[]>([]);
+  const [studiosLoading, setStudiosLoading] = useState(true);
+
+  // Fetch owner's studios
+  useEffect(() => {
+    const fetchStudios = async () => {
+      if (!token) return;
+      setStudiosLoading(true);
+      try {
+        const studiosData = await getMyStudios(token);
+        setStudios(studiosData.data?.items || []);
+      } catch (error) {
+        console.error('Failed to fetch studios:', error);
+      } finally {
+        setStudiosLoading(false);
+      }
+    };
+    fetchStudios();
+  }, [token]);
 
   // Update active tab based on URL hash or query param
   useEffect(() => {
@@ -81,7 +102,21 @@ export default function OwnerDashboard() {
       case 'studios':
         return <StudioManagement />;
       case 'bookings':
-        return <div>Бронирования (в разработке)</div>;
+        if (studiosLoading) {
+          return (
+            <div className="profile-tabs-container">
+              <div className="loading">Загрузка студий...</div>
+            </div>
+          );
+        }
+        if (studios.length === 0) {
+          return (
+            <div className="profile-tabs-container">
+              <div className="loading">У вас нет студий</div>
+            </div>
+          );
+        }
+        return <ManagerCalendar />;
       case 'clients':
         return <div>Клиенты (в разработке)</div>;
       case 'messages':

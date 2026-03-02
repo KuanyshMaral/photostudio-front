@@ -26,7 +26,7 @@ export const LiveStatusBadge: React.FC<LiveStatusBadgeProps> = ({
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch(`/api/v1/studios/${studioId}/working-hours`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1'}/studios/${studioId}/working-hours`);
         if (response.ok) {
           const data = await response.json();
           setStatus(data);

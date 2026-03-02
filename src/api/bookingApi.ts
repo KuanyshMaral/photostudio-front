@@ -1,5 +1,4 @@
-const API_ORIGIN = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
-const API_BASE = `${API_ORIGIN}/api/v1`;
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
 
 // Types for booking operations based on Swagger
 export type BookingData = {
@@ -74,11 +73,11 @@ const extractBookingsList = (payload: any): any[] => {
     return [];
 };
 
-// Create booking - POST /api/v1/bookings
+// Create booking - POST /api/v1/booking
 export const createBooking = async (data: BookingData, token: string) => {
     console.log('Creating booking with data:', data);
     
-    const response = await fetch(`${API_BASE}/bookings`, {
+    const response = await fetch(`${API_BASE}/booking`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -108,12 +107,12 @@ export const createBooking = async (data: BookingData, token: string) => {
     return responseData?.booking || responseData || {};
 };
 
-// Cancel booking - PATCH /api/v1/bookings/{id}/cancel
+// Cancel booking - POST /api/v1/booking/{id}/cancel
 export const cancelBooking = async (token: string, bookingId: number, data: CancelBookingRequest) => {
     console.log('Cancelling booking:', bookingId, 'reason:', data.reason);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/cancel`, {
-        method: 'PATCH',
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/cancel`, {
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
@@ -135,12 +134,12 @@ export const cancelBooking = async (token: string, bookingId: number, data: Canc
     return responseData?.booking || responseData || {};
 };
 
-// Complete booking - PATCH /api/v1/bookings/{id}/complete
+// Complete booking - POST /api/v1/booking/{id}/complete
 export const completeBooking = async (token: string, bookingId: number) => {
     console.log('Completing booking:', bookingId);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/complete`, {
-        method: 'PATCH',
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/complete`, {
+        method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -160,12 +159,12 @@ export const completeBooking = async (token: string, bookingId: number) => {
     return responseData?.booking || responseData || {};
 };
 
-// Confirm booking - PATCH /api/v1/bookings/{id}/confirm
+// Confirm booking - POST /api/v1/booking/{id}/confirm
 export const confirmBooking = async (token: string, bookingId: number) => {
     console.log('Confirming booking:', bookingId);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/confirm`, {
-        method: 'PATCH',
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/confirm`, {
+        method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -185,11 +184,11 @@ export const confirmBooking = async (token: string, bookingId: number) => {
     return responseData?.booking || responseData || {};
 };
 
-// Update deposit - PATCH /api/v1/bookings/{id}/deposit
+// Update deposit - PATCH /api/v1/booking/{id}/deposit
 export const updateBookingDeposit = async (token: string, bookingId: number, data: UpdateDepositRequest) => {
     console.log('Updating deposit for booking:', bookingId, 'amount:', data.deposit_amount);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/deposit`, {
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/deposit`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -212,12 +211,12 @@ export const updateBookingDeposit = async (token: string, bookingId: number, dat
     return responseData?.booking || responseData || {};
 };
 
-// Mark as paid - PATCH /api/v1/bookings/{id}/mark-paid
+// Mark as paid - POST /api/v1/booking/{id}/pay
 export const markBookingAsPaid = async (token: string, bookingId: number) => {
     console.log('Marking booking as paid:', bookingId);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/mark-paid`, {
-        method: 'PATCH',
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/pay`, {
+        method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -237,12 +236,12 @@ export const markBookingAsPaid = async (token: string, bookingId: number) => {
     return responseData?.booking || responseData || {};
 };
 
-// Update payment status - PATCH /api/v1/bookings/{id}/payment-status
+// Update payment status - PUT /api/v1/booking/{id}/payment-status
 export const updatePaymentStatus = async (token: string, bookingId: number, data: UpdatePaymentStatusRequest) => {
     console.log('Updating payment status for booking:', bookingId, 'status:', data.payment_status);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/payment-status`, {
-        method: 'PATCH',
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/payment-status`, {
+        method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
@@ -264,11 +263,11 @@ export const updatePaymentStatus = async (token: string, bookingId: number, data
     return responseData?.booking || responseData || {};
 };
 
-// Update booking status - PATCH /api/v1/bookings/{id}/status
+// Update booking status - PATCH /api/v1/booking/{id}/status
 export const updateBookingStatus = async (token: string, bookingId: number, data: UpdateBookingStatusRequest) => {
     console.log('Updating booking status:', bookingId, 'status:', data.status);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}/status`, {
+    const response = await fetch(`${API_BASE}/booking/${bookingId}/status`, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
@@ -291,11 +290,11 @@ export const updateBookingStatus = async (token: string, bookingId: number, data
     return responseData?.booking || responseData || {};
 };
 
-// Get booking by ID - GET /api/v1/bookings/{id}
+// Get booking by ID - GET /api/v1/booking/{id}
 export const getBookingById = async (token: string, bookingId: number) => {
     console.log('Getting booking by ID:', bookingId);
     
-    const response = await fetch(`${API_BASE}/bookings/${bookingId}`, {
+    const response = await fetch(`${API_BASE}/booking/${bookingId}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -315,13 +314,13 @@ export const getBookingById = async (token: string, bookingId: number) => {
     return responseData?.booking || responseData || null;
 };
 
-// Get user bookings - GET /api/v1/users/me/bookings
+// Get user bookings - GET /api/v1/booking/my
 export const getMyBookings = async (token: string, status?: string) => {
     console.log('Getting user bookings, status:', status);
     
     const url = status 
-        ? `${API_BASE}/users/me/bookings?status=${status}`
-        : `${API_BASE}/users/me/bookings`;
+        ? `${API_BASE}/booking/my?status=${status}`
+        : `${API_BASE}/booking/my`;
     
     const response = await fetch(url, {
         headers: {
@@ -345,11 +344,11 @@ export const getMyBookings = async (token: string, status?: string) => {
     return bookings;
 };
 
-// Get room availability - GET /api/v1/rooms/{id}/availability
+// Get room availability - GET /api/v1/booking/room/{id}/availability
 export const getRoomAvailability = async (token: string, roomId: number, date: string) => {
     console.log('Getting room availability:', roomId, 'date:', date);
     
-    const response = await fetch(`${API_BASE}/rooms/${roomId}/availability?date=${date}`, {
+    const response = await fetch(`${API_BASE}/booking/room/${roomId}/availability?date=${date}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -373,11 +372,11 @@ export const getRoomAvailability = async (token: string, roomId: number, date: s
     };
 };
 
-// Get room busy slots - GET /api/v1/rooms/{id}/busy-slots
+// Get room busy slots - GET /api/v1/booking/room/{id}/busy-slots
 export const getRoomBusySlots = async (token: string, roomId: number, date: string) => {
     console.log('Getting room busy slots:', roomId, 'date:', date);
     
-    const response = await fetch(`${API_BASE}/rooms/${roomId}/busy-slots?date=${date}`, {
+    const response = await fetch(`${API_BASE}/booking/room/${roomId}/busy-slots?date=${date}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -396,11 +395,11 @@ export const getRoomBusySlots = async (token: string, roomId: number, date: stri
     return getResponseData(json) || [];
 };
 
-// Get studio bookings - GET /api/v1/studios/{id}/bookings
+// Get studio bookings - GET /api/v1/booking/studio/{id}
 export const getStudioBookings = async (token: string, studioId: number) => {
     console.log('Getting studio bookings:', studioId);
     
-    const response = await fetch(`${API_BASE}/studios/${studioId}/bookings`, {
+    const response = await fetch(`${API_BASE}/booking/studio/${studioId}`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -420,7 +419,7 @@ export const getStudioBookings = async (token: string, studioId: number) => {
     return responseData?.bookings || json?.bookings || [];
 };
 
-// Get user bookings with pagination - GET /api/v1/users/me/bookings
+// Get user bookings with pagination - GET /api/v1/booking/my
 export const getUserBookings = async (token: string, limit?: number, offset?: number) => {
     console.log('Getting user bookings with pagination, limit:', limit, 'offset:', offset);
     
@@ -428,7 +427,7 @@ export const getUserBookings = async (token: string, limit?: number, offset?: nu
     if (limit) params.append('limit', limit.toString());
     if (offset) params.append('offset', offset.toString());
     
-    const url = `${API_BASE}/users/me/bookings${params.toString() ? `?${params.toString()}` : ''}`;
+    const url = `${API_BASE}/booking/my${params.toString() ? `?${params.toString()}` : ''}`;
     
     const response = await fetch(url, {
         headers: {

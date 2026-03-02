@@ -3,6 +3,8 @@ import { X, Calendar, Clock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './CreateBookingModal.css';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
+
 interface Studio {
   id: number;
   name: string;
@@ -57,7 +59,7 @@ export const CreateBookingModal: React.FC<CreateBookingModalProps> = ({
     try {
       console.log('Fetching studios...');
       // Пробуем сначала получить студии владельца
-      const response = await fetch('/api/v1/owner/studios', {
+      const response = await fetch(`${API_BASE}/owner/studios`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       console.log('Owner studios response:', response.status);
@@ -75,7 +77,7 @@ export const CreateBookingModal: React.FC<CreateBookingModalProps> = ({
         setStudios(formattedStudios);
       } else {
         // Пробуем альтернативный эндпоинт
-        const response2 = await fetch('/api/v1/studios', {
+        const response2 = await fetch(`${API_BASE}/studios`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         console.log('All studios response:', response2.status);
@@ -104,7 +106,7 @@ export const CreateBookingModal: React.FC<CreateBookingModalProps> = ({
       console.log('Fetching clients...');
       
       // Пробуем самый простой эндпоинт - всех пользователей
-      const response = await fetch('/api/v1/users', {
+      const response = await fetch(`${API_BASE}/users`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -147,7 +149,7 @@ export const CreateBookingModal: React.FC<CreateBookingModalProps> = ({
 
     setIsCreating(true);
     try {
-      const response = await fetch('/api/v1/manager/bookings', {
+      const response = await fetch(`${API_BASE}/manager/bookings`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

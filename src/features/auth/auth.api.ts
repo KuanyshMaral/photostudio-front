@@ -1,6 +1,6 @@
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StudioRegisterRequest, Profile, ApiError } from './auth.types';
 
-const API_BASE = '/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE}/auth/login`, {
@@ -305,7 +305,6 @@ export async function uploadFiles(token: string, files: File[], contactInfo?: { 
     formData.append('contact_phone', contactInfo.contactPhone);
   }
 
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
   const response = await fetch(`${API_BASE}/upload`, {
     method: 'POST',
     headers: {
@@ -325,8 +324,8 @@ export async function uploadFiles(token: string, files: File[], contactInfo?: { 
 // Additional API functions for studio registration workflow
 export async function registerStudioOwner(data: StudioRegisterRequest): Promise<{ user: { id: number }; token?: string }> {
   console.log('Registering studio owner with data:', JSON.stringify(data, null, 2));
-  const API_BASE = '/api/v1';
-  console.log('Full URL:', `${API_BASE}/leads/submit`);
+  const API_BASE_FULL = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
+  console.log('Full URL:', `${API_BASE_FULL}/leads/submit`);
   
   // Transform data to match backend SubmitLeadRequest format
   const leadData = {
@@ -358,7 +357,7 @@ export async function registerStudioOwner(data: StudioRegisterRequest): Promise<
     throw new Error('Company name is required');
   }
   
-  const response = await fetch(`${API_BASE}/leads/submit`, {
+  const response = await fetch(`${API_BASE_FULL}/leads/submit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -398,7 +397,8 @@ export async function registerStudioOwner(data: StudioRegisterRequest): Promise<
 }
 
 export async function createStudioOwner(data: { userId: number; bin: string; companyName: string; address: string; contactPerson: string }): Promise<{ message: string }> {
-  const response = await fetch(`${API_BASE}/studio-owner`, {
+  const API_BASE_FULL = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
+  const response = await fetch(`${API_BASE_FULL}/studio-owner`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -481,7 +481,6 @@ export async function uploadVerificationDocs(token: string, documents: File[]): 
     console.log(key, value);
   }
 
-  const API_BASE = `${import.meta.env.VITE_API_URL}/api/v1`;
   const response = await fetch(`${API_BASE}/users/verification/documents`, {
     method: 'POST',
     headers: {

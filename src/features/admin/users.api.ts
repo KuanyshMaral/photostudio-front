@@ -27,7 +27,7 @@ export interface UserListResponse {
 }
 
 // Получаем ВСЕХ пользователей из базы данных
-export const getAllUsers = async (token: string, page: number = 1, limit: number = 20, status?: string): Promise<UserListResponse> => {
+export const getAllUsers = async (token: string, page: number = 1, limit: number = 20, status?: string, search?: string): Promise<UserListResponse> => {
   try {
     console.log('getAllUsers: Making API call to:', `${API_BASE}/admin/users`);
     console.log('getAllUsers: Token provided:', !!token);
@@ -39,6 +39,9 @@ export const getAllUsers = async (token: string, page: number = 1, limit: number
     params.append('limit', limit.toString());
     if (status) {
       params.append('status', status);
+    }
+    if (search) {
+      params.append('search', search);
     }
     
     const headers: Record<string, string> = {
@@ -92,7 +95,7 @@ export const getAllUsers = async (token: string, page: number = 1, limit: number
 
 export const banUser = async (token: string, userId: number, reason: string): Promise<void> => {
   const response = await fetch(`${API_BASE}/admin/users/${userId}/ban`, {
-    method: 'PATCH',
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -110,7 +113,7 @@ export const banUser = async (token: string, userId: number, reason: string): Pr
 
 export const unbanUser = async (token: string, userId: number): Promise<void> => {
   const response = await fetch(`${API_BASE}/admin/users/${userId}/unban`, {
-    method: 'PATCH',
+    method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
       'accept': 'application/json',

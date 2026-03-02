@@ -77,7 +77,7 @@ interface Studio {
 }
 
 // API functions
-const API_BASE = '/api/v1';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
 
 const getRoomTypes = async (token: string): Promise<RoomType[]> => {
   const response = await fetch(`${API_BASE}/room-types`, {

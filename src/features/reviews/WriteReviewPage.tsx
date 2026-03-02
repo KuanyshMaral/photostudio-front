@@ -29,13 +29,19 @@ const WriteReviewPage: React.FC = () => {
 
   useEffect(() => {
     const fetchBookings = async () => {
-      if (!token) return;
+      if (!token) {
+        setLoading(false);
+        return;
+      }
       
       try {
         const bookingsData = await getMyBookings(token);
         
         // Filter only completed bookings that can be reviewed
-        const completedBookings = bookingsData.filter(() => false);
+        const completedBookings = bookingsData.filter((booking: Booking) => {
+          const status = booking.status;
+          return (status === 'completed' || status === 'finished') && Boolean(booking.studio_id);
+        });
         
         setBookings(completedBookings);
       } catch (error) {
