@@ -11,6 +11,7 @@ export interface OwnerProfile {
   legal_address: string;
   website: string;
   bin: string;
+  avatar_url?: string;
   verification_status: string;
   verification_docs: string[];
   verified_at?: string;
@@ -30,6 +31,7 @@ export interface OwnerProfileUpdateRequest {
   phone?: string;
   website?: string;
   bin?: string;
+  avatar_url?: string;
 }
 
 export interface OwnerProfileResponse {

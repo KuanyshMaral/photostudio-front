@@ -8,10 +8,18 @@ interface MainHeaderProps {
 }
 
 export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
-  const { user, token } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Refresh user data if token exists but no user name
+  useEffect(() => {
+    if (token && (!user || !user.name)) {
+      console.log('MainHeader: Token exists but no user name, refreshing user data...');
+      refreshUser?.();
+    }
+  }, [token]); // Only depend on token, not user
 
   // Загрузка количества непрочитанных уведомлений
   useEffect(() => {
@@ -55,10 +63,11 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
   };
 
   // Получение инициалов для fallback аватара
-  const getInitials = (name?: string): string => {
-    if (!name) return '';
+  const getInitials = (name?: any): string => {
+    const nameStr = String(name || '');
+    if (!nameStr) return '';
     
-    return name
+    return nameStr
       .split(' ')
       .map(word => word.charAt(0))
       .join('')
@@ -114,18 +123,18 @@ export const MainHeader: React.FC<MainHeaderProps> = ({ onSearch }) => {
               <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
                 {user?.avatar_url ? (
                   <img 
-                    src={user.avatar_url} 
-                    alt={user.name || 'User'} 
+                    src={`http://89.35.125.136:8090${user?.avatar_url || ''}`} 
+                    alt={user?.name || 'User'} 
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-white font-semibold text-sm">
-                    {user?.name ? getInitials(user.name) : <User size={16} className="text-white" />}
+                    {user?.name ? getInitials(user?.name) : <User size={16} className="text-white" />}
                   </span>
                 )}
               </div>
               <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                {user?.name || 'Гость'}
+                {user?.name || user?.email || 'Гость'}
               </span>
             </Link>
           </div>

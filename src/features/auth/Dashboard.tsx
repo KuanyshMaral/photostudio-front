@@ -1,41 +1,21 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { useEffect, useState } from "react";
-import { getProfile } from "./auth.api";
-import type { Profile } from "./auth.types";
 
 export default function Dashboard() {
-  const { token } = useAuth();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
-  useEffect(() => {
-    if (token) {
-      getProfile(token)
-        .then(setProfile)
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    }
-  }, [token]);
+  // Роль на русском
+  const getRoleLabel = (role: string): string => {
+    const roles: Record<string, string> = {
+      client: 'Клиент',
+      studio_owner: 'Владелец студии',
+      admin: 'Администратор',
+    };
+    return roles[role] || role;
+  };
 
-  if (loading) {
-    return (
-      <div className="p-8">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-8"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const isStudioOwner = profile?.role === 'studio_owner';
-  const isAdmin = profile?.role === 'admin';
+  const isStudioOwner = user?.role === 'studio_owner';
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div className="p-8">
@@ -44,7 +24,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
-              С возвращением, {profile?.name || 'Пользователь'}!
+              С возвращением, {String(user?.name || user?.email || 'Пользователь')}!
             </h2>
             <p className="text-gray-600 mt-1">
               {isStudioOwner 
@@ -56,18 +36,13 @@ export default function Dashboard() {
             </p>
             <div className="mt-2 flex items-center gap-2">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                {profile?.role || 'client'}
+                {getRoleLabel(String(user?.role || 'client'))}
               </span>
-              {profile?.companyName && (
-                <span className="text-sm text-gray-500">
-                  {profile.companyName}
-                </span>
-              )}
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500">Вошли как:</p>
-            <p className="text-sm font-medium text-gray-900">{profile?.email}</p>
+            <p className="text-sm font-medium text-gray-900">{String(user?.email || '')}</p>
           </div>
         </div>
       </div>
@@ -222,14 +197,11 @@ export default function Dashboard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-              {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
+              {String(user?.name || user?.email || 'User').charAt(0).toUpperCase()}
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Ваш профиль</h3>
               <p className="text-gray-600 text-sm mt-1">Управляйте настройками вашего аккаунта и предпочтениями</p>
-              {profile?.phone && (
-                <p className="text-gray-500 text-xs mt-1">📞 {profile.phone}</p>
-              )}
             </div>
           </div>
           <Link

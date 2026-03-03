@@ -1,5 +1,6 @@
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { 
   Building2, Calendar, MessageSquare, User, 
   Settings, BarChart2, Users, LogOut, Camera
@@ -10,9 +11,21 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const { logout, user } = useAuth();
+  const { logout, user, token, refreshUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Debug logging
+  console.log('Layout - user data:', user);
+  console.log('Layout - user.role:', user?.role);
+
+  // Refresh user data if token exists but no user name
+  useEffect(() => {
+    if (token && (!user || !user.name)) {
+      console.log('Layout: Token exists but no user name, refreshing user data...');
+      refreshUser?.();
+    }
+  }, [token]); // Only depend on token, not user
 
   const handleLogout = () => {
     logout();
@@ -77,16 +90,53 @@ export default function Layout({ children }: LayoutProps) {
           {user && (
             <div className="mb-8 p-4 bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl border border-primary-100">
               <div className="flex items-center mb-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mr-3">
-                  <User className="w-4 h-4 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center mr-3">
+                  {user?.avatar_url && user?.avatar_url !== '' ? (
+                    <>
+                      <img 
+                        src={`http://89.35.125.136:8090${user?.avatar_url || ''}`} 
+                        alt={user?.name || 'User'} 
+                        className="w-full h-full rounded-full object-cover"
+                        onError={(e) => {
+                          console.log('Avatar image failed to load:', user.avatar_url);
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                        }}
+                      />
+                      <User className="w-5 h-5 text-white hidden" />
+                    </>
+                  ) : (
+                    <User className="w-5 h-5 text-white" />
+                  )}
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-primary-600 uppercase tracking-wide">
-                    {user.role === 'studio_owner' && 'Владелец студии'}
-                    {user.role === 'admin' && 'Администратор'}
-                    {user.role === 'client' && 'Клиент'}
+                    {(() => {
+                      const roleDisplay = (() => {
+                        console.log('Layout - checking role:', user.role);
+                        console.log('Layout - studio_owner check:', user.role === 'studio_owner');
+                        console.log('Layout - admin check:', user.role === 'admin');
+                        console.log('Layout - client check:', user.role === 'client');
+                        
+                        if (user.role === 'studio_owner') return 'Владелец студии';
+                        if (user.role === 'admin') return 'Администратор';
+                        if (user.role === 'client') return 'Клиент';
+                        return user.role || 'Unknown';
+                      })();
+                      
+                      console.log('Layout - final role display:', roleDisplay);
+                      return roleDisplay;
+                    })()}
                   </p>
-                  <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {(() => {
+                      const nameDisplay = user?.name || user?.email || 'Пользователь';
+                      console.log('Layout - name display:', nameDisplay);
+                      console.log('Layout - full user object:', user);
+                      console.log('Layout - avatar_url:', user?.avatar_url);
+                      return nameDisplay;
+                    })()}
+                  </p>
                 </div>
               </div>
             </div>

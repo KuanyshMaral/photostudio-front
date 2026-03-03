@@ -127,10 +127,10 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
                 )}
                 
                 <div className="header-info">
-                    <h3>{conversation.other_user.name}</h3>
+                    <h3>{String(conversation.other_user.name || 'Пользователь')}</h3>
                     {conversation.studio && (
                         <span className="header-context">
-                            {conversation.studio.name}
+                            {String(conversation.studio.name || 'Студия')}
                         </span>
                     )}
                 </div>
@@ -159,7 +159,7 @@ export default function ChatWindow({ conversation, onBack }: ChatWindowProps) {
                 )}
                 {isTyping && (
                     <div className="typing-indicator">
-                        <span>{conversation.other_user.name} печатает</span>
+                        <span>{String(conversation.other_user.name || 'Пользователь')} печатает</span>
                         <div className="typing-dots">
                             <span></span>
                             <span></span>

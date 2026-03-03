@@ -31,7 +31,6 @@ export default function ChatList({ activeConversationId, onSelectConversation }:
             setError(null);
             try {
                 const data = await getConversations(token);
-                console.log('[ChatList] Fetched conversations:', data.conversations);
                 setConversations(data.conversations || []);
             } catch (err) {
                 setError('Failed to load conversations');
