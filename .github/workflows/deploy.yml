@@ -53,7 +53,7 @@ jobs:
             docker compose pull web
 
             # 2. Пересоздаем контейнер web (бэкенд при этом не трогается)
-            docker compose up -d web
+            docker compose up -d --force-recreate web
 
             # 3. Чистим мусор
             docker image prune -f
