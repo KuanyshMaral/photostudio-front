@@ -102,35 +102,56 @@ const resolveConversationId = (raw: any): string | number => {
 };
 
 const getOtherUserName = (raw: any): string => {
-    return (
-        raw?.other_user?.name ||
-        raw?.otherUser?.name ||
-        raw?.recipient?.name ||
-        raw?.user?.name ||
-        raw?.participant?.name ||
-        raw?.owner_name ||
-        raw?.name ||
-        'Unknown user'
-    );
+    // Try direct user fields first
+    if (raw?.other_user?.name) return raw.other_user.name;
+    if (raw?.otherUser?.name) return raw.otherUser.name;
+    if (raw?.recipient?.name) return raw.recipient.name;
+    if (raw?.user?.name) return raw.user.name;
+    if (raw?.participant?.name) return raw.participant.name;
+    if (raw?.owner_name) return raw.owner_name;
+    if (raw?.name) return raw.name;
+    
+    // Try to get user info from members array (for direct chats)
+    if (raw?.members && Array.isArray(raw.members)) {
+        // For direct rooms, find the other user (not current user)
+        const otherMember = raw.members.find((member: any) => {
+            // This assumes we can identify current user somehow
+            // For now, just return the first member with a name
+            return member.user_name || member.name || member.email;
+        });
+        
+        if (otherMember) {
+            return otherMember.user_name || otherMember.name || otherMember.email || 'Unknown user';
+        }
+    }
+    
+    return 'Unknown user';
 };
 
 const normalizeConversation = (raw: any): Conversation => {
     const fallbackLastMessageAt =
         raw?.last_message?.created_at || raw?.updated_at || raw?.created_at;
 
+    // Extract other user ID from members if not directly available
+    let otherUserId = raw?.other_user?.id ??
+        raw?.otherUser?.id ??
+        raw?.recipient?.id ??
+        raw?.user?.id ??
+        raw?.participant?.id ??
+        raw?.other_user_id ??
+        raw?.recipient_id;
+
+    if (!otherUserId && raw?.members && Array.isArray(raw.members)) {
+        const otherMember = raw.members.find((member: any) => {
+            return member.user_id || member.id;
+        });
+        otherUserId = otherMember?.user_id || otherMember?.id || 0;
+    }
+
     return {
         id: resolveConversationId(raw),
         other_user: {
-            id: Number(
-                raw?.other_user?.id ??
-                raw?.otherUser?.id ??
-                raw?.recipient?.id ??
-                raw?.user?.id ??
-                raw?.participant?.id ??
-                raw?.other_user_id ??
-                raw?.recipient_id ??
-                0
-            ),
+            id: Number(otherUserId || 0),
             name: getOtherUserName(raw),
             avatar:
                 raw?.other_user?.avatar ||
@@ -265,7 +286,7 @@ export async function getConversations(
     console.log('[Chat API] getConversations called with token:', token ? `${token.substring(0, 20)}...` : 'null');
     
     const response = await fetch(
-        `${API_BASE}/chats?limit=${limit}&offset=${offset}`,
+        `${API_BASE}/chat/rooms?limit=${limit}&offset=${offset}`,
         {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -278,6 +299,7 @@ export async function getConversations(
     }
 
     const json = await response.json();
+    console.log('[Chat API] Raw backend response:', json);
     const rawConversations = Array.isArray(json?.data)
         ? json.data
         : Array.isArray(json?.data?.conversations)
@@ -289,6 +311,8 @@ export async function getConversations(
     const normalizedConversations = rawConversations
         .map(normalizeConversation)
         .filter((conversation: Conversation) => String(conversation.id).trim().length > 0);
+
+    console.log('[Chat API] Normalized conversations:', normalizedConversations);
 
     return {
         conversations: normalizedConversations,
@@ -303,7 +327,7 @@ export async function createConversation(
     request: CreateConversationRequest
 ): Promise<{ conversation: Conversation; message?: Message }> {
     // Assuming creating a direct chat room based on swagger
-    const response = await fetch(`${API_BASE}/chats/direct`, {
+    const response = await fetch(`${API_BASE}/chat/rooms/direct`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -335,7 +359,7 @@ export async function getMessages(
     limit = 50,
     beforeId?: number
 ): Promise<MessagesResponse> {
-    let url = `${API_BASE}/chats/${conversationId}/messages?limit=${limit}`;
+    let url = `${API_BASE}/chat/rooms/${conversationId}/messages?limit=${limit}`;
     if (beforeId) {
         url += `&before=${beforeId}`;
     }
@@ -363,7 +387,7 @@ export async function sendMessage(
     content: string
 ): Promise<Message> {
     const response = await fetch(
-        `${API_BASE}/chats/${conversationId}/messages`,
+        `${API_BASE}/chat/rooms/${conversationId}/messages`,
         {
             method: 'POST',
             headers: {
@@ -375,7 +399,15 @@ export async function sendMessage(
     );
 
     if (!response.ok) {
-        throw new Error('Failed to send message');
+        const errorText = await response.text();
+        console.error('[Chat API] Send message failed:', {
+            status: response.status,
+            statusText: response.statusText,
+            url: response.url,
+            body: { content },
+            errorResponse: errorText
+        });
+        throw new Error(`Failed to send message (${response.status}): ${errorText}`);
     }
 
     const json = await response.json();
@@ -391,7 +423,7 @@ export async function markAsRead(
     conversationId: string | number
 ): Promise<{ marked_count: number }> {
     const response = await fetch(
-        `${API_BASE}/chats/${conversationId}/read`,
+        `${API_BASE}/chat/rooms/${conversationId}/read`,
         {
             method: 'POST', // Switched to POST based on swagger
             headers: {
@@ -420,7 +452,7 @@ export async function uploadImage(
     formData.append('image', file);
 
     const response = await fetch(
-        `${API_BASE}/chats/${conversationId}/messages/upload`,
+        `${API_BASE}/chat/rooms/${conversationId}/messages/upload`,
         {
             method: 'POST',
             headers: {

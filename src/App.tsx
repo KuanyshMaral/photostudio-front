@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 import LoginForm from "./features/auth/LoginForm.tsx";
 import RegisterForm from "./features/auth/RegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
-import Dashboard from "./features/auth/Dashboard";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
@@ -60,6 +59,14 @@ function App() {
     setAuthContext(auth);
   }, [auth]);
 
+  // Refresh user data on app load if token exists but user data might be stale
+  useEffect(() => {
+    if (auth.token && (!auth.user || !auth.user.name)) {
+      console.log('App: Token exists but no user name, refreshing user data...');
+      auth.refreshUser?.();
+    }
+  }, [auth.token]); // Only depend on token, not user
+
   return (
     <>
       <Toaster position="top-right" toastOptions={{
@@ -86,15 +93,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Client Dashboard */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
-            </ProtectedRoute>
-          } />
-          <Route path="/studios/:id" element={
+                    <Route path="/studios/:id" element={
             <ProtectedRoute>
               <Layout>
                 <StudioDetail />

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { refreshTokens } from "../api/authApi";
+import { apiCall } from "../utils/apiWrapper";
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     console.log('AuthProvider init - user from localStorage:', parsedUser);
     return parsedUser;
   });
+  const [isRefreshingUser, setIsRefreshingUser] = useState(false);
 
   const login = (token: string, refreshToken?: string, user?: User) => {
     console.log('AuthContext.login - token:', !!token, 'refreshToken:', !!refreshToken, 'user:', user);
@@ -131,7 +133,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshUser = async () => {
-    if (!token) return;
+    if (!token || isRefreshingUser) return;
+    
+    setIsRefreshingUser(true);
     
     try {
       const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
@@ -144,21 +148,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return; // Admin users don't need to refresh
       }
       
-      const endpoint = '/api/v1/users/me';
-      const fullUrl = `${import.meta.env.VITE_API_URL}${endpoint}`;
+      // Use the correct endpoint based on user role
+      const endpoint = currentUser?.role === 'studio_owner' ? '/profiles/owner' : '/profiles/client';
+      const API_BASE = String(import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1');
+      const fullUrl = `${API_BASE}${endpoint}`;
       console.log('refreshUser - calling endpoint:', fullUrl);
       
-      const response = await fetch(fullUrl, {
-        headers: { 'Authorization': `Bearer ${token}` },
+      const response = await apiCall(fullUrl, {
+        method: 'GET',
       });
 
       if (response.ok) {
-        const userData = await response.json();
+        const result = await response.json();
+        const profileData = result.data;
+        console.log('refreshUser - received profile data:', profileData);
+        
+        // Transform profile data to match User interface
+        const userData = {
+          id: profileData.id || profileData.user_id,
+          email: currentUser.email || (typeof profileData.email === 'string' ? profileData.email : profileData.email?.String || ''),
+          name: currentUser?.role === 'studio_owner' ? 
+            // For owners: use contact_person as name
+            (typeof profileData.contact_person === 'string' ? profileData.contact_person : profileData.contact_person?.String) || 
+            currentUser.email || 'Пользователь' :
+            // For clients: use name or nickname
+            (typeof profileData.name === 'string' ? profileData.name : profileData.name?.String) || 
+            (typeof profileData.nickname === 'string' ? profileData.nickname : profileData.nickname?.String) || 
+            currentUser.email || 'Пользователь',
+          role: currentUser.role,
+          avatar_url: (typeof profileData.avatar_url === 'string' ? profileData.avatar_url : profileData.avatar_url?.String) || ''
+        };
+        
+        console.log('refreshUser - transformed user data:', userData);
         setUser(userData);
         localStorage.setItem("user", JSON.stringify(userData));
       }
     } catch (error) {
       console.error('Failed to refresh user:', error);
+    } finally {
+      setIsRefreshingUser(false);
     }
   };
 

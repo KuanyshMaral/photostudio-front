@@ -227,9 +227,10 @@ export function useChat(options: UseChatOptions): UseChatReturn {
     // ========================================================
     
     useEffect(() => {
-        if (token) {
-            connect();
-        }
+        // WebSocket disabled - using HTTP fallback only
+        // if (token) {
+        //     connect();
+        // }
         
         return () => {
             // Cleanup
@@ -243,7 +244,7 @@ export function useChat(options: UseChatOptions): UseChatReturn {
                 window.clearInterval(pingIntervalRef.current);
             }
         };
-    }, [token, connect]);
+    }, [token]);
     
     return {
         isConnected,

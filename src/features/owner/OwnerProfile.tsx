@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getOwnerProfile, updateOwnerProfile, type OwnerProfile as OwnerProfileType, type OwnerProfileUpdateRequest } from '../../api/ownerProfileApi';
+import { uploadFile } from '../../api/uploadApi';
+import AvatarUpload from '../../components/AvatarUpload';
 import './OwnerProfile.css';
 
 interface OwnerProfileProps {
@@ -11,6 +13,7 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState('');
+  const [avatarLoading, setAvatarLoading] = useState(false);
   const [formData, setFormData] = useState<OwnerProfileUpdateRequest>({
     company_name: '',
     contact_person: '',
@@ -19,7 +22,8 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
     legal_address: '',
     phone: '',
     website: '',
-    bin: ''
+    bin: '',
+    avatar_url: ''
   });
 
   useEffect(() => {
@@ -41,7 +45,8 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
         legal_address: (profileData.legal_address as any)?.String || profileData.legal_address || '',
         phone: (profileData.phone as any)?.String || profileData.phone || '',
         website: (profileData.website as any)?.String || profileData.website || '',
-        bin: (profileData.bin as any)?.String || profileData.bin || ''
+        bin: (profileData.bin as any)?.String || profileData.bin || '',
+        avatar_url: (profileData.avatar_url as any)?.String || profileData.avatar_url || ''
       };
       
       setProfile(extractedData);
@@ -53,7 +58,8 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
         legal_address: extractedData.legal_address || '',
         phone: extractedData.phone || '',
         website: extractedData.website || '',
-        bin: extractedData.bin || ''
+        bin: extractedData.bin || '',
+        avatar_url: extractedData.avatar_url || ''
       });
     } catch (error) {
       console.error('Failed to load owner profile:', error);
@@ -79,7 +85,8 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
         legal_address: (profile.legal_address as any)?.String || profile.legal_address || '',
         phone: (profile.phone as any)?.String || profile.phone || '',
         website: (profile.website as any)?.String || profile.website || '',
-        bin: (profile.bin as any)?.String || profile.bin || ''
+        bin: (profile.bin as any)?.String || profile.bin || '',
+        avatar_url: (profile.avatar_url as any)?.String || profile.avatar_url || ''
       });
     }
     setError('');
@@ -88,6 +95,27 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    try {
+      setAvatarLoading(true);
+      const uploadResult = await uploadFile(file, token);
+      const avatarUrl = uploadResult.url;
+      
+      // Update form data with new avatar URL
+      setFormData(prev => ({ ...prev, avatar_url: avatarUrl }));
+      
+      // Also update profile immediately for preview
+      if (profile) {
+        setProfile(prev => prev ? { ...prev, avatar_url: avatarUrl } : null);
+      }
+    } catch (error) {
+      console.error('Failed to upload avatar:', error);
+      setError('Не удалось загрузить аватар');
+    } finally {
+      setAvatarLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -146,6 +174,18 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
           <div className="p-6 sm:p-8">
             {editing ? (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Avatar Upload Section */}
+                <div className="flex justify-center pb-6 border-b border-gray-100">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Аватар компании</h3>
+                    <AvatarUpload
+                      currentAvatar={formData.avatar_url ? `http://89.35.125.136:8090${formData.avatar_url}` : undefined}
+                      onUpload={handleAvatarUpload}
+                      isLoading={avatarLoading}
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="company_name" className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -288,6 +328,28 @@ export const OwnerProfile: React.FC<OwnerProfileProps> = ({ token }) => {
               </form>
             ) : (
               <div className="space-y-8">
+                {/* Avatar Display Section */}
+                <div className="flex justify-center pb-6 border-b border-gray-100">
+                  <div className="text-center">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Аватар компании</h3>
+                    <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center mx-auto">
+                      {profile?.avatar_url ? (
+                        <img
+                          src={`http://89.35.125.136:8090${(profile.avatar_url as any)?.String || profile.avatar_url}`}
+                          alt="Company Avatar"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-4xl font-bold text-gray-500">
+                          {profile?.company_name ? 
+                            (typeof profile.company_name === 'object' ? (profile.company_name as any).String : profile.company_name)?.charAt(0)?.toUpperCase() || '?'
+                            : '?'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
                 {/* Company Info */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">

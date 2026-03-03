@@ -32,7 +32,7 @@ export const WS_CONFIG = {
     baseUrl: getWebSocketUrl(),
     
     // Endpoint для чата
-    chatEndpoint: '/ws/chat',
+    chatEndpoint: '/chat/ws',
     
     // Интервал переподключения (ms)
     reconnectInterval: 3000,

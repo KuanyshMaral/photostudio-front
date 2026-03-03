@@ -62,10 +62,10 @@ const ChatModal: React.FC<ChatModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="text-lg font-semibold text-gray-900">
-            Чат с {conversation.other_user.name}
+            Чат с {String(conversation.other_user.name || 'Пользователь')}
             {conversation.studio && (
               <span className="text-sm text-gray-500 ml-2">
-                - {conversation.studio.name}
+                - {String(conversation.studio.name || 'Студия')}
               </span>
             )}
           </h2>
