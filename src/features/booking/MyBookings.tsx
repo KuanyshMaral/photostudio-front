@@ -60,7 +60,7 @@ const MyBookings: React.FC = () => {
       setError(null);
       
       try {
-        const data = await getMyBookings(token);
+        const data = await getMyBookings();
         setBookings(normalizeBookings(data));
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : "Не удалось загрузить бронирования";
@@ -83,10 +83,10 @@ const MyBookings: React.FC = () => {
     setCancelling(bookingId);
     
     try {
-      await cancelBooking(token, bookingId, { reason: 'Отмена пользователем' });
+      await cancelBooking(bookingId, { reason: 'Отмена пользователем' });
       toast.success('Бронирование отменено');
       // Refetch bookings after cancellation
-      const data = await getMyBookings(token);
+      const data = await getMyBookings();
       setBookings(normalizeBookings(data));
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Не удалось отменить бронирование";
