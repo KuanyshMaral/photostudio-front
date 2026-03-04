@@ -9,6 +9,53 @@ export type LoginResponse = {
   user: Profile;
 };
 
+// New client registration request according to Swagger
+export type ClientRegisterRequest = {
+  email: string;
+  password: string;
+};
+
+// New client registration response according to Swagger  
+export type ClientRegisterResponse = {
+  data: {
+    user: {
+      email: string;
+      id: number;
+      role: string;
+      studio_status?: string;
+    };
+    verification_sent: boolean;
+  };
+  success: boolean;
+};
+
+// Email verification request
+export type EmailVerificationRequest = {
+  code: string;
+  email: string;
+};
+
+// Email verification response
+export type EmailVerificationResponse = {
+  data: {
+    status: string;
+  };
+  success: boolean;
+};
+
+// Request email verification
+export type RequestVerificationRequest = {
+  email: string;
+};
+
+export type RequestVerificationResponse = {
+  data: {
+    status: string;
+  };
+  success: boolean;
+};
+
+// Legacy types for studio registration (keep for now)
 export type RegisterRequest = {
   name: string;
   email: string;

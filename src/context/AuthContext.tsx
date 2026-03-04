@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { refreshTokens } from "../api/authApi";
 import { apiCall } from "../utils/apiWrapper";
+import toast from 'react-hot-toast';
 
 /* eslint-disable react-refresh/only-export-components */
 
@@ -47,6 +48,39 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
   const [isRefreshingUser, setIsRefreshingUser] = useState(false);
 
+  // Validate tokens on mount
+  useEffect(() => {
+    const validateTokens = async () => {
+      if (token && refreshToken) {
+        console.log('Validating existing tokens...');
+        try {
+          // Try a simple API call to check if token is valid
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1'}/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            console.log('Existing access token is valid');
+          } else if (response.status === 401) {
+            console.log('Access token expired, trying refresh...');
+            const refreshSuccess = await refreshAccessToken();
+            if (!refreshSuccess) {
+              console.log('Refresh failed, tokens may be expired');
+              toast.error('Your session has expired. Please log in again.');
+            }
+          }
+        } catch (error) {
+          console.log('Token validation failed:', error);
+        }
+      }
+    };
+
+    validateTokens();
+  }, []); // Run only on mount
+
   const login = (token: string, refreshToken?: string, user?: User) => {
     console.log('AuthContext.login - token:', !!token, 'refreshToken:', !!refreshToken, 'user:', user);
     setToken(token);
@@ -75,6 +109,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const refreshAccessToken = async (): Promise<boolean> => {
+    console.log('refreshAccessToken called');
+    console.log('Current refreshToken:', !!refreshToken);
+    
     if (!refreshToken) {
       console.log('No refresh token available');
       return false;
@@ -82,18 +119,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       console.log('Attempting to refresh access token...');
+      console.log('Sending refresh token:', refreshToken.substring(0, 20) + '...');
+      
       const newTokens = await refreshTokens(refreshToken);
+      console.log('Refresh response received:', newTokens);
+      
+      if (!newTokens || !newTokens.access_token) {
+        console.error('Invalid refresh response - missing tokens');
+        return false;
+      }
       
       setToken(newTokens.access_token);
-      setRefreshToken(newTokens.refresh_token);
+      if (newTokens.refresh_token) {
+        setRefreshToken(newTokens.refresh_token);
+        localStorage.setItem("refreshToken", newTokens.refresh_token);
+      }
       localStorage.setItem("token", newTokens.access_token);
-      localStorage.setItem("refreshToken", newTokens.refresh_token);
       
       console.log('Access token refreshed successfully');
+      console.log('New access token:', newTokens.access_token.substring(0, 20) + '...');
+      if (newTokens.refresh_token) {
+        console.log('New refresh token saved:', newTokens.refresh_token.substring(0, 20) + '...');
+      }
       return true;
     } catch (error) {
       console.error('Failed to refresh access token:', error);
-      logout(); // Clear tokens on refresh failure
+      console.error('Error details:', error);
+      
+      // Only logout on authentication errors, not on network errors
+      if (error instanceof Error) {
+        const errorMessage = error.message.toLowerCase();
+        if (errorMessage.includes('invalid') || 
+            errorMessage.includes('expired') || 
+            errorMessage.includes('unauthorized') ||
+            errorMessage.includes('401') ||
+            errorMessage.includes('403')) {
+          console.log('Authentication error detected, logging out...');
+          logout(); // Clear tokens on auth failure
+        } else {
+          console.log('Network/server error, not logging out...');
+          // Don't logout on network errors, keep tokens for retry
+        }
+      } else {
+        console.log('Unknown error type, logging out...');
+        logout();
+      }
+      
       return false;
     }
   };

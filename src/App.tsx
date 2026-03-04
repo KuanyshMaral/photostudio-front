@@ -4,9 +4,13 @@ import { useAuth } from './context/AuthContext';
 import { setAuthContext } from './utils/apiWrapper';
 import { useEffect } from 'react';
 
+// Test components
+import TestRefreshPage from "./features/test/TestRefreshPage";
+import RefreshTestPage from "./features/test/RefreshTestPage";
+
 // Auth components (from Amir & Yerkanat projects)
 import LoginForm from "./features/auth/LoginForm.tsx";
-import RegisterForm from "./features/auth/RegisterForm.tsx";
+import ClientRegisterForm from "./features/auth/ClientRegisterForm.tsx";
 import StudioRegistrationForm from "./features/auth/StudioRegistrationForm.tsx";
 import { AuthLanding } from "./features/auth/pages/AuthLanding.tsx";
 import Layout from "./components/Layout.tsx";
@@ -81,8 +85,12 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<AuthLanding />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<RegisterForm />} />
+          <Route path="/register" element={<ClientRegisterForm />} />
           <Route path="/studio-register" element={<StudioRegistrationForm />} />
+          
+          {/* Test routes */}
+          <Route path="/test-refresh" element={<TestRefreshPage />} />
+          <Route path="/refresh-test" element={<RefreshTestPage />} />
           
           {/* Studio catalog (main page for authenticated users) */}
           <Route path="/studios" element={

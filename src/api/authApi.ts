@@ -21,6 +21,8 @@ export interface RefreshTokenResponse {
 }
 
 export const refreshTokens = async (refreshToken: string): Promise<{ access_token: string; refresh_token: string }> => {
+  console.log('refreshTokens called with:', refreshToken.substring(0, 20) + '...');
+  
   const response = await fetch(`${API_BASE}/auth/refresh`, {
     method: 'POST',
     headers: {
@@ -29,11 +31,27 @@ export const refreshTokens = async (refreshToken: string): Promise<{ access_toke
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
 
+  console.log('Refresh API response status:', response.status);
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error('Refresh API error:', errorData);
     throw new Error(errorData.error?.message || 'Failed to refresh tokens');
   }
 
   const result: RefreshTokenResponse = await response.json();
-  return result.data.tokens;
+  console.log('Refresh API response:', result);
+  
+  if (!result.success || !result.data || !result.data.tokens) {
+    console.error('Invalid refresh response structure:', result);
+    throw new Error('Invalid refresh response structure');
+  }
+  
+  const tokens = result.data.tokens;
+  console.log('Extracted tokens:', {
+    access_token: tokens.access_token.substring(0, 20) + '...',
+    refresh_token: tokens.refresh_token.substring(0, 20) + '...'
+  });
+  
+  return tokens;
 };

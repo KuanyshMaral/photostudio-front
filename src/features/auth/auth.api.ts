@@ -1,4 +1,18 @@
-import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse, StudioRegisterRequest, Profile, ApiError } from './auth.types';
+import type { 
+  LoginRequest, 
+  LoginResponse, 
+  RegisterRequest, 
+  RegisterResponse, 
+  StudioRegisterRequest, 
+  ClientRegisterRequest,
+  ClientRegisterResponse,
+  EmailVerificationRequest,
+  EmailVerificationResponse,
+  RequestVerificationRequest,
+  RequestVerificationResponse,
+  Profile, 
+  ApiError 
+} from './auth.types';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
 
@@ -378,4 +392,123 @@ export async function uploadVerificationDocs(token: string, documents: File[]): 
   const json = await response.json();
   console.log('Upload documents response:', json);
   return json.data || json;
+}
+
+// New client registration according to Swagger
+export async function registerClient(data: ClientRegisterRequest): Promise<ClientRegisterResponse> {
+  console.log('Registering client with data:', { email: data.email });
+  
+  const response = await fetch(`${API_BASE}/auth/register/client`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password
+    }),
+  });
+
+  console.log('Client registration response status:', response.status);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('Client registration error:', errorData);
+    
+    let errorMessage = 'Registration failed';
+    if (response.status === 409) {
+      errorMessage = 'Email already exists';
+    } else if (response.status === 400) {
+      errorMessage = errorData.error?.message || 'Validation error';
+    } else {
+      errorMessage = errorData.error?.message || errorData.message || 'Registration failed';
+    }
+    
+    const error = new Error(errorMessage) as any;
+    error.response = { status: response.status, data: errorData };
+    throw error;
+  }
+
+  const json = await response.json();
+  console.log('Client registration success:', json);
+  return json;
+}
+
+// Confirm email verification according to Swagger
+export async function confirmEmailVerification(data: EmailVerificationRequest): Promise<EmailVerificationResponse> {
+  console.log('Confirming email verification for:', data.email);
+  
+  const response = await fetch(`${API_BASE}/auth/verify/confirm`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      code: data.code,
+      email: data.email
+    }),
+  });
+
+  console.log('Email verification response status:', response.status);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('Email verification error:', errorData);
+    
+    let errorMessage = 'Verification failed';
+    if (response.status === 400) {
+      errorMessage = errorData.error?.message || 'Invalid code or validation error';
+    } else if (response.status === 429) {
+      errorMessage = 'Too many requests. Please try again later.';
+    } else {
+      errorMessage = errorData.error?.message || 'Verification failed';
+    }
+    
+    const error = new Error(errorMessage) as any;
+    error.response = { status: response.status, data: errorData };
+    throw error;
+  }
+
+  const json = await response.json();
+  console.log('Email verification success:', json);
+  return json;
+}
+
+// Request email verification according to Swagger
+export async function requestEmailVerification(data: RequestVerificationRequest): Promise<RequestVerificationResponse> {
+  console.log('Requesting email verification for:', data.email);
+  
+  const response = await fetch(`${API_BASE}/auth/verify/request`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: data.email
+    }),
+  });
+
+  console.log('Request verification response status:', response.status);
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    console.error('Request verification error:', errorData);
+    
+    let errorMessage = 'Request failed';
+    if (response.status === 400) {
+      errorMessage = errorData.error?.message || 'Validation error';
+    } else if (response.status === 429) {
+      errorMessage = 'Too many requests. Please try again later.';
+    } else {
+      errorMessage = errorData.error?.message || 'Request failed';
+    }
+    
+    const error = new Error(errorMessage) as any;
+    error.response = { status: response.status, data: errorData };
+    throw error;
+  }
+
+  const json = await response.json();
+  console.log('Request verification success:', json);
+  return json;
 }

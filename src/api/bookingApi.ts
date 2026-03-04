@@ -1,4 +1,5 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://89.35.125.136:8090/api/v1';
+import { apiCall } from '../utils/apiWrapper';
 
 // Types for booking operations based on Swagger
 export type BookingData = {
@@ -108,15 +109,11 @@ export const createBooking = async (data: BookingData, token: string) => {
 };
 
 // Cancel booking - POST /api/v1/booking/{id}/cancel
-export const cancelBooking = async (token: string, bookingId: number, data: CancelBookingRequest) => {
+export const cancelBooking = async (bookingId: number, data: CancelBookingRequest) => {
     console.log('Cancelling booking:', bookingId, 'reason:', data.reason);
     
-    const response = await fetch(`${API_BASE}/booking/${bookingId}/cancel`, {
+    const response = await apiCall(`${API_BASE}/booking/${bookingId}/cancel`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify(data),
     });
     
@@ -315,17 +312,15 @@ export const getBookingById = async (token: string, bookingId: number) => {
 };
 
 // Get user bookings - GET /api/v1/booking/my
-export const getMyBookings = async (token: string, status?: string) => {
+export const getMyBookings = async (status?: string) => {
     console.log('Getting user bookings, status:', status);
     
     const url = status 
         ? `${API_BASE}/booking/my?status=${status}`
         : `${API_BASE}/booking/my`;
     
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
+    const response = await apiCall(url, {
+        method: 'GET',
     });
     
     console.log('Get user bookings response status:', response.status);
@@ -344,7 +339,7 @@ export const getMyBookings = async (token: string, status?: string) => {
     return bookings;
 };
 
-// Get room availability - GET /api/v1/booking/room/{id}/availability
+// ... (rest of the code remains the same)
 export const getRoomAvailability = async (token: string, roomId: number, date: string) => {
     console.log('Getting room availability:', roomId, 'date:', date);
     
